@@ -1,0 +1,25 @@
+name: RL_PROJECTS
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.12
+  - pip
+
+  - numpy
+  - scipy
+  - pandas
+  - gymnasium
+  - cvxpy
+  - osqp
+  - matplotlib
+  - pyyaml
+  - tqdm
+  - tensorboard
+  - tyro
+  - pytest
+
+  - pip:
+      - --index-url=https://download.pytorch.org/whl/cu128
+      - torch
