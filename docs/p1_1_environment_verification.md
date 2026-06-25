@@ -210,11 +210,13 @@ git commit -m "Add constrained navigation environment"
 git push -u origin p1-environment
 ```
 
-Optional commit hash record after commit:
+Commit hash record after commit:
 
 ```cmd
 git rev-parse --short HEAD
 ```
+
+Commit Hash: `d0f07ec`
 
 ## Exit criteria confirmed
 
