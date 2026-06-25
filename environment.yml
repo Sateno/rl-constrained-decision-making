@@ -4,22 +4,34 @@ channels:
   - conda-forge
 
 dependencies:
+  # Core Python
   - python=3.12
-  - pip
+  - pip>=25
 
+  # Numerical computing
   - numpy
   - scipy
   - pandas
+
+  # RL environment API
   - gymnasium
+
+  # QP projection layer for P1
   - cvxpy
   - osqp
+
+  # Plotting and experiment logging
   - matplotlib
-  - pyyaml
-  - tqdm
   - tensorboard
+
+  # CleanRL-style command-line arguments
   - tyro
+
+  # Lightweight tests
   - pytest
 
+  # PyTorch CUDA build
   - pip:
-      - --index-url=https://download.pytorch.org/whl/cu128
-      - torch
+      - --index-url=https://download.pytorch.org/whl/cu130
+      - --extra-index-url=https://pypi.org/simple
+      - torch==2.12.0
