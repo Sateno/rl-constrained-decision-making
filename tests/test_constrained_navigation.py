@@ -1,5 +1,5 @@
 ################################################################################
-# Lightweight smoke checks for the P1 constrained navigation environment.
+# Lightweight smoke checks for the constrained navigation environment.
 #
 # These tests intentionally verify only milestone-critical behavior:
 # Gymnasium reset/step API, fixed shapes/dtypes, finite values, seeded reset,
@@ -9,7 +9,7 @@
 ################################################################################
 
 from __future__ import annotations
-from envs.constrained_navigation import ConstrainedNavigationEnv
+from environments.constrained_navigation import ConstrainedNavigationEnv
 import numpy as np
 
 
@@ -23,7 +23,7 @@ REQUIRED_INFO_KEYS = {
 
 
 def make_env(**kwargs):
-    from envs.constrained_navigation import ConstrainedNavigationEnv
+    from environments.constrained_navigation import ConstrainedNavigationEnv
     return ConstrainedNavigationEnv(**kwargs)
 
 
