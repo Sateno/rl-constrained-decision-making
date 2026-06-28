@@ -51,7 +51,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("results/tables/p1_random_eval.csv"),
+        default=Path("results/tables/random_policy_evaluation.csv"),
         help="CSV output path for one-row-per-episode results.",
     )
 
