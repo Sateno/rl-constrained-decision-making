@@ -5,15 +5,19 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Callable
 
+import torch
 import gymnasium as gym
 import numpy as np
 import pandas as pd
 
 from environments.factory import make_env
+from algorithms.ppo.agent import Agent
 
 
 @dataclass
 class EpisodeResult:
+    policy: str
+    checkpoint: str
     episode: int
     seed: int
     episode_return: float
@@ -31,7 +35,21 @@ ActionProvider = Callable[[gym.Env, np.ndarray], np.ndarray]
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Evaluate the P1 constrained navigation environment."
+        description="Evaluate policies on the constrained navigation environment."
+    )
+
+    parser.add_argument(
+        "--policy",
+        choices=["random", "ppo"],
+        default="random",
+        help="Policy source to evaluate.",
+    )
+
+    parser.add_argument(
+        "--checkpoint",
+        type=Path,
+        default=None,
+        help="Path to a PPO checkpoint when --policy ppo.",
     )
 
     parser.add_argument(
@@ -51,7 +69,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("results/tables/random_policy_evaluation.csv"),
+        default=Path("runs/evaluation/random_policy_evaluation.csv"),
         help="CSV output path for one-row-per-episode results.",
     )
 
@@ -62,6 +80,19 @@ def parse_args() -> argparse.Namespace:
         help="Maximum number of environment steps per episode.",
     )
 
+    parser.add_argument(
+        "--stochastic",
+        action="store_true",
+        help="Sample from the PPO policy instead of using the actor mean.",
+    )
+
+    parser.add_argument(
+        "--cuda",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Use CUDA for PPO policy evaluation when available.",
+    )
+
     args = parser.parse_args()
 
     if args.episodes <= 0:
@@ -69,6 +100,9 @@ def parse_args() -> argparse.Namespace:
 
     if args.max_episode_steps <= 0:
         parser.error("--max-episode-steps must be positive.")
+
+    if args.policy == "ppo" and args.checkpoint is None:
+        parser.error("--checkpoint is required when --policy ppo.")
 
     return args
 
@@ -87,8 +121,10 @@ def run_episode(
     action_provider: ActionProvider,
     seed: int,
     episode: int,
+    policy_name: str,
+    checkpoint_path: str = "",
 ) -> EpisodeResult:
-    #Run one complete episode and return episode-level metrics.
+    # Run one complete episode and return episode-level metrics.
 
     obs, info = env.reset(seed=seed)
 
@@ -96,6 +132,8 @@ def run_episode(
         raise RuntimeError("Non-finite observation returned by env.reset().")
 
     result = EpisodeResult(
+        policy=policy_name,
+        checkpoint=checkpoint_path,
         episode=int(episode),
         seed=int(seed),
         episode_return=0.0,
@@ -138,11 +176,13 @@ def run_episode(
         result.collision = bool(info.get("collision", False))
         result.terminated = bool(terminated)
         result.truncated = bool(truncated)
-
         result.final_distance_to_goal = float(info.get("distance_to_goal", np.inf))
 
         current_min_distance = float(info.get("min_obstacle_distance", np.inf))
-        result.min_obstacle_distance = min(result.min_obstacle_distance, current_min_distance)
+        result.min_obstacle_distance = min(
+            result.min_obstacle_distance,
+            current_min_distance,
+        )
 
         if result.episode_length > max_steps_guard:
             raise RuntimeError(
@@ -151,6 +191,92 @@ def run_episode(
             )
 
     return result
+
+def load_ppo_agent(*, checkpoint_path: str | Path, device: torch.device) -> tuple[Agent, dict]:
+    checkpoint_path = Path(checkpoint_path)
+
+    if not checkpoint_path.exists():
+        raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
+
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+
+    obs_dim = int(checkpoint["obs_dim"])
+    action_dim = int(checkpoint["action_dim"])
+
+    agent = Agent(obs_dim=obs_dim, action_dim=action_dim).to(device)
+    agent.load_state_dict(checkpoint["agent_state_dict"])
+    agent.eval()
+
+    return agent, checkpoint
+
+
+def make_ppo_action_provider(*, agent: Agent, device: torch.device, deterministic: bool) -> ActionProvider:
+    # Create an action provider compatible with run_episode(...).
+    #
+    # The evaluator passes one observation at a time as a NumPy array with
+    # shape (obs_dim,). The PPO agent expects a Torch tensor with batch shape
+    # (1, obs_dim).
+    #
+    # deterministic=True uses the actor mean, which is the standard first
+    # choice for evaluation. deterministic=False samples from the Gaussian
+    # policy, matching the stochastic training-time policy behavior.
+
+    agent.eval()
+
+    def ppo_action(env: gym.Env, obs: np.ndarray) -> np.ndarray:
+        # env is accepted to match the ActionProvider signature.
+        # It is not used here because the PPO action depends only on obs.
+        _ = env
+
+        obs_tensor = torch.as_tensor(
+            obs,
+            dtype=torch.float32,
+            device=device,
+        ).unsqueeze(0)
+
+        with torch.no_grad():
+            if deterministic:
+                action_tensor = agent.actor_mean(obs_tensor)
+            else:
+                action_tensor, _, _, _ = agent.get_action_and_value(obs_tensor)
+
+        action = action_tensor.squeeze(0).detach().cpu().numpy()
+
+        if not np.all(np.isfinite(action)):
+            raise RuntimeError(f"PPO produced non-finite action: {action}")
+
+        return action.astype(np.float32, copy=False)
+
+    return ppo_action
+
+
+def validate_checkpoint_environment_compatibility(*, checkpoint: dict, env_factory) -> None:
+    # Create one environment only to inspect observation/action spaces.
+    # This does not run an episode and does not call PPO.
+
+    env = env_factory()
+
+    try:
+        env_obs_dim = int(np.prod(env.observation_space.shape))
+        env_action_dim = int(np.prod(env.action_space.shape))
+
+        checkpoint_obs_dim = int(checkpoint["obs_dim"])
+        checkpoint_action_dim = int(checkpoint["action_dim"])
+
+        if env_obs_dim != checkpoint_obs_dim:
+            raise ValueError(
+                f"Checkpoint obs_dim={checkpoint_obs_dim} does not match "
+                f"environment obs_dim={env_obs_dim}."
+            )
+
+        if env_action_dim != checkpoint_action_dim:
+            raise ValueError(
+                f"Checkpoint action_dim={checkpoint_action_dim} does not match "
+                f"environment action_dim={env_action_dim}."
+            )
+
+    finally:
+        env.close()
 
 
 def write_results_csv(*, results: list[EpisodeResult], output_path: str | Path) -> None:
@@ -205,15 +331,30 @@ def print_summary(summary: dict[str, float | int], output_path: str | Path) -> N
 def main() -> None:
     args = parse_args()
 
-    env_kwargs = {
-        "max_episode_steps": args.max_episode_steps,
-    }
+    device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
 
-    env_factory = make_env(
-        env_index=0,
-        env_kwargs=env_kwargs,
-        record_episode_statistics=False,
-    )
+    env_kwargs = {"max_episode_steps": args.max_episode_steps}
+
+    env_factory = make_env(env_index=0, env_kwargs=env_kwargs, record_episode_statistics=False)
+
+    if args.policy == "random":
+        action_provider = random_action
+        checkpoint_label = ""
+
+    elif args.policy == "ppo":
+        agent, checkpoint = load_ppo_agent(
+            checkpoint_path=args.checkpoint,
+            device=device,
+        )
+
+        validate_checkpoint_environment_compatibility(checkpoint=checkpoint, env_factory=env_factory)
+
+        action_provider = make_ppo_action_provider(agent=agent, device=device, deterministic=not args.stochastic)
+
+        checkpoint_label = str(args.checkpoint)
+
+    else:
+        raise ValueError(f"Unsupported policy: {args.policy}")
 
     results: list[EpisodeResult] = []
 
@@ -223,14 +364,16 @@ def main() -> None:
         env = env_factory()
 
         try:
-            # Seed random action sampling for reproducibility.
             env.action_space.seed(episode_seed)
+            torch.manual_seed(episode_seed)
 
             result = run_episode(
                 env=env,
-                action_provider=random_action,
+                action_provider=action_provider,
                 seed=episode_seed,
                 episode=episode_index,
+                policy_name=args.policy,
+                checkpoint_path=checkpoint_label,
             )
 
             results.append(result)
@@ -238,11 +381,7 @@ def main() -> None:
         finally:
             env.close()
 
-    write_results_csv(
-        results=results,
-        output_path=args.output,
-    )
-
+    write_results_csv(results=results, output_path=args.output)
     summary = summarize_results(results)
     print_summary(summary, args.output)
 

@@ -9,7 +9,6 @@
 ################################################################################
 
 from __future__ import annotations
-from environments.constrained_navigation import ConstrainedNavigationEnv
 import numpy as np
 
 

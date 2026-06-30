@@ -1,11 +1,11 @@
-# cleanrl
+# Algorithms
 
-This folder will hold the adapted CleanRL PPO script.
+This package contains project-owned algorithm implementations and adapted algorithm scripts.
 
-Planned files:
+## PPO
 
-- ppo_continuous_action_base.py
-- ppo_continuous_action_projection.py
+`algorithms/ppo/ppo_continuous_action.py` contains the adapted continuous-action PPO training script.
 
-The base file should be downloaded from CleanRL and left unchanged.
-The projection file should be the modified training script used for P1.
+`algorithms/ppo/agent.py` contains the shared PPO actor--critic model used by training and evaluation.
+
+The PPO implementation is adapted from CleanRL's continuous-action PPO script. CleanRL provenance should be recorded in the repository documentation rather than by keeping an unused base copy in the source tree.
