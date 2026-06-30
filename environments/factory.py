@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Callable
 import gymnasium as gym
 from environments.constrained_navigation import ConstrainedNavigationEnv
+from environments.action_wrappers import NormalizedActionWrapper
 
 
 #########################################################################
@@ -12,7 +13,12 @@ from environments.constrained_navigation import ConstrainedNavigationEnv
 # It returns a zero-argument callable so Gymnasium vector environments
 # can create independent environment instances.
 #########################################################################
-def make_env(*, env_index: int, env_kwargs: dict | None = None, record_episode_statistics: bool = True) -> Callable[[], gym.Env]:
+def make_env(
+    *, env_index: int, 
+    env_kwargs: dict | None = None, 
+    record_episode_statistics: bool = True, 
+    normalize_actions: bool = True,
+) -> Callable[[], gym.Env]:
     
     # Keep for future seeting/debugging
     _ = env_index
@@ -23,6 +29,9 @@ def make_env(*, env_index: int, env_kwargs: dict | None = None, record_episode_s
     def create_env() -> gym.Env:
         env = ConstrainedNavigationEnv(**local_env_kwargs)
         
+        if normalize_actions:
+            env = NormalizedActionWrapper(env)
+
         if record_episode_statistics:
             env = gym.wrappers.RecordEpisodeStatistics(env)
         

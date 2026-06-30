@@ -220,13 +220,63 @@ if __name__ == "__main__":
             rewards[step] = torch.tensor(reward).to(device).view(-1)
             next_obs, next_done = torch.Tensor(next_obs).to(device), torch.Tensor(next_done).to(device)
 
-            if "final_info" in infos:
+            # Gymnasium RecordEpisodeStatistics can expose completed-episode statistics
+            # through infos["episode"] and infos["_episode"] in vectorized environments.
+            # Some older CleanRL/Gymnasium combinations used infos["final_info"].
+            if "episode" in infos:
+                episode_info = infos["episode"]
+                episode_mask = infos.get("_episode", np.ones(args.num_envs, dtype=bool))
+        
+                for env_index, finished in enumerate(episode_mask):
+                    if not finished:
+                        continue
+        
+                    episodic_return = float(episode_info["r"][env_index])
+                    episodic_length = int(episode_info["l"][env_index])
+        
+                    print(
+                        f"global_step={global_step}, "
+                        f"env={env_index}, "
+                        f"episodic_return={episodic_return:.3f}, "
+                        f"episodic_length={episodic_length}"
+                    )
+        
+                    writer.add_scalar(
+                        "charts/episodic_return",
+                        episodic_return,
+                        global_step,
+                    )
+        
+                    writer.add_scalar(
+                        "charts/episodic_length",
+                        episodic_length,
+                        global_step,
+                    )
+        
+            elif "final_info" in infos:
                 for info in infos["final_info"]:
                     if info and "episode" in info:
-                        print(f"global_step={global_step}, episodic_return={info['episode']['r']}")
-                        writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
-                        writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
-
+                        episodic_return = float(info["episode"]["r"])
+                        episodic_length = int(info["episode"]["l"])
+        
+                        print(
+                            f"global_step={global_step}, "
+                            f"episodic_return={episodic_return:.3f}, "
+                            f"episodic_length={episodic_length}"
+                        )
+        
+                        writer.add_scalar(
+                            "charts/episodic_return",
+                            episodic_return,
+                            global_step,
+                        )
+        
+                        writer.add_scalar(
+                            "charts/episodic_length",
+                            episodic_length,
+                            global_step,
+                        )
+        
         # bootstrap value if not done
         with torch.no_grad():
             next_value = agent.get_value(next_obs).reshape(1, -1)
