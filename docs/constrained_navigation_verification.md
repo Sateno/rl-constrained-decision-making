@@ -73,6 +73,21 @@ position approximately [0.1, 0.0]
 theta approximately 0.0
 ```
 
+## Obstacle Capacity and Active Count Check
+
+```cmd
+python -c "from environments.constrained_navigation import ConstrainedNavigationEnv; env=ConstrainedNavigationEnv(max_obstacles=5, num_active_obstacles=2); obs,info=env.reset(seed=0); print(env.observation_space.shape, obs.shape); print(env.obstacle_mask, int(env.obstacle_mask.sum())); env.close()"
+```
+
+Expected result:
+
+```text
+(31,) (31,)
+[ True  True False False False] 2
+```
+
+The default configuration remains `max_obstacles=3` with three active obstacles and observation shape `(21,)`.
+
 ## Lightweight Environment Tests
 
 ```cmd

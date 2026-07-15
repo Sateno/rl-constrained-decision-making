@@ -142,6 +142,24 @@ def test_forced_collision_case_using_reset_options():
     assert info["success"] is False
 
 
+# Verify that observation capacity and active obstacle count are independent.
+def test_obstacle_capacity_and_active_count_are_independent():
+    env = make_env(max_obstacles=5, num_active_obstacles=2)
+
+    obs, info = env.reset(seed=0)
+
+    assert obs.shape == (31,)
+    assert env.obstacle_centers.shape == (5, 2)
+    assert env.obstacle_radii.shape == (5,)
+    assert env.obstacle_mask.shape == (5,)
+    assert int(np.sum(env.obstacle_mask)) == 2
+    np.testing.assert_array_equal(
+        env.obstacle_mask,
+        np.asarray([True, True, False, False, False], dtype=bool),
+    )
+    assert_basic_info(info)
+
+
 def test_short_random_rollout_has_finite_observations_and_rewards():
     env = make_env(max_episode_steps=20)
 
