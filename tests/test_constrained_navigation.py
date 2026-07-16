@@ -2,7 +2,7 @@
 # Lightweight smoke checks for the constrained navigation environment.
 #
 # These tests intentionally verify only milestone-critical behavior:
-# Gymnasium reset/step API, fixed shapes/dtypes, finite values, seeded reset,
+# Gymnasium reset/step API, fixed shapes/dtypes, finite observations/rewards,
 # forced success/collision, and a short random rollout.
 #
 # They are not a full contract suite and do not test every private helper.
@@ -16,7 +16,7 @@ REQUIRED_INFO_KEYS = {
     "success",
     "collision",
     "distance_to_goal",
-    "min_obstacle_distance",
+    "min_obstacle_clearance",
     "step_count",
 }
 
@@ -98,7 +98,40 @@ def test_same_seed_produces_same_reset_observation():
 
     np.testing.assert_allclose(obs1, obs2)
     assert info1["distance_to_goal"] == info2["distance_to_goal"]
-    assert info1["min_obstacle_distance"] == info2["min_obstacle_distance"]
+    assert info1["min_obstacle_clearance"] == info2["min_obstacle_clearance"]
+
+
+# Verify that the obstacle metric is signed clearance from collision geometry.
+def test_min_obstacle_clearance_uses_collision_boundary():
+    env = make_env(agent_radius=0.10)
+
+    centers = np.zeros((env.max_obstacles, 2), dtype=np.float32)
+    radii = np.zeros(env.max_obstacles, dtype=np.float32)
+    mask = np.zeros(env.max_obstacles, dtype=bool)
+
+    centers[0] = np.asarray([1.0, 0.0], dtype=np.float32)
+    radii[0] = 0.25
+    mask[0] = True
+
+    _, info = env.reset(
+        seed=0,
+        options={
+            "start": np.asarray([0.0, 0.0], dtype=np.float32),
+            "theta": 0.0,
+            "goal": np.asarray([5.0, 0.0], dtype=np.float32),
+            "obstacle_centers": centers,
+            "obstacle_radii": radii,
+            "obstacle_mask": mask,
+        },
+    )
+
+    expected_clearance = 1.0 - (0.25 + 0.10)
+    np.testing.assert_allclose(info["min_obstacle_clearance"], expected_clearance)
+    assert info["collision"] is False
+
+    _, no_obstacle_info = env.reset(seed=0, options=no_obstacle_options(env))
+    assert np.isnan(no_obstacle_info["min_obstacle_clearance"])
+    assert no_obstacle_info["collision"] is False
 
 
 def test_forced_success_case_using_reset_options():

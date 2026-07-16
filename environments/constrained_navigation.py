@@ -24,7 +24,6 @@ class ConstrainedNavigationEnv(gym.Env):
         omega_max: float = 2.0,
         goal_radius: float = 0.25,
         agent_radius: float = 0.10,
-        safety_margin: float = 0.05,
         max_episode_steps: int = 200,
         time_penalty: float = 0.01,
         timeout_distance_penalty: float = 1.0,
@@ -54,7 +53,6 @@ class ConstrainedNavigationEnv(gym.Env):
         self.omega_max = float(omega_max)                # turn-rate bound
         self.goal_radius = float(goal_radius)            # success threshold
         self.agent_radius = float(agent_radius)          # collision footprint
-        self.safety_margin = float(safety_margin)        # safety buffer
         self.max_episode_steps = int(max_episode_steps)  # time-limit truncation
         self.time_penalty = float(time_penalty)
         self.timeout_distance_penalty = float(timeout_distance_penalty)
@@ -261,8 +259,8 @@ class ConstrainedNavigationEnv(gym.Env):
     def _obstacle_margins(self) -> np.ndarray:
         delta = self.obstacle_centers - self.position[None, :]
         center_distances = np.linalg.norm(delta, axis=1)
-        effective_radii = self.obstacle_radii + self.agent_radius
-        margins = center_distances - effective_radii
+        collision_radii = self.obstacle_radii + self.agent_radius
+        margins = center_distances - collision_radii
 
         # Inactive obstacle slots should not affect min-distance or collision.
         margins = np.where(self.obstacle_mask, margins, np.inf)
@@ -322,19 +320,21 @@ class ConstrainedNavigationEnv(gym.Env):
         margins = self._obstacle_margins()
 
         if np.any(self.obstacle_mask):
-            min_obstacle_distance = float(np.min(margins))
+            min_obstacle_clearance = float(np.min(margins))
+            collision = bool(min_obstacle_clearance <= 0.0)
         else:
-            # Keep this finite for simple smoke checks.
-            min_obstacle_distance = 1.0e6
+            # Clearance is undefined without active obstacles. NaN prevents a
+            # placeholder value from entering evaluation aggregates.
+            min_obstacle_clearance = float("nan")
+            collision = False
 
         success = bool(distance_to_goal <= self.goal_radius)
-        collision = bool(min_obstacle_distance <= 0.0)
 
         return {
             "success": success,
             "collision": collision,
             "distance_to_goal": float(distance_to_goal),
-            "min_obstacle_distance": float(min_obstacle_distance),
+            "min_obstacle_clearance": min_obstacle_clearance,
             "step_count": int(self.step_count),
         }
 

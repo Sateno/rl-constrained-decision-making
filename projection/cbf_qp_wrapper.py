@@ -21,12 +21,9 @@ class CbfQpProjectionWrapper(gym.Wrapper):
         self.base_env = env
 
         # Use the physical action bounds defined by the environment.
+        # The agent footprint is supplied separately on every projection call.
         if params is None:
-            params = ProjectionParams(
-                v_max=env.v_max,
-                omega_max=env.omega_max,
-                safety_margin=env.agent_radius,
-            )
+            params = ProjectionParams(v_max=env.v_max, omega_max=env.omega_max)
         else:
             params = replace(params, v_max=env.v_max, omega_max=env.omega_max)
 
@@ -47,6 +44,7 @@ class CbfQpProjectionWrapper(gym.Wrapper):
             obstacle_centers=self.base_env.obstacle_centers,
             obstacle_radii=self.base_env.obstacle_radii,
             obstacle_mask=self.base_env.obstacle_mask,
+            agent_radius=self.base_env.agent_radius,
             raw_action=raw_action,
             params=self.params,
         )

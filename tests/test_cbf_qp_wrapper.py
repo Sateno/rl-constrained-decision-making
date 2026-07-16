@@ -13,6 +13,7 @@ import numpy as np
 from environments.factory import make_env
 from environments.action_wrappers import NormalizedActionWrapper
 from environments.constrained_navigation import ConstrainedNavigationEnv
+from projection.cbf_qp_projection import ProjectionParams
 from projection.cbf_qp_wrapper import CbfQpProjectionWrapper
 
 
@@ -35,7 +36,7 @@ def projection_obstacle_options(env: ConstrainedNavigationEnv) -> dict:
     obstacle_radii = np.zeros(env.max_obstacles, dtype=np.float64)
     obstacle_mask = np.zeros(env.max_obstacles, dtype=bool)
 
-    obstacle_centers[0] = np.asarray([0.75, 0.0], dtype=np.float64)
+    obstacle_centers[0] = np.asarray([1.35, 0.0], dtype=np.float64)
     obstacle_radii[0] = 0.25
     obstacle_mask[0] = True
 
@@ -70,7 +71,8 @@ def no_obstacle_options(env: ConstrainedNavigationEnv) -> dict:
 def test_projection_wrapper_projects_physical_action_and_reports_diagnostics() -> None:
 #{
     base_env = ConstrainedNavigationEnv()
-    env = CbfQpProjectionWrapper(base_env)
+    params = ProjectionParams(lookahead_distance=0.25, alpha=2.0, extra_clearance=0.0, slack_penalty=10000.0)
+    env = CbfQpProjectionWrapper(base_env, params=params)
 
     env.reset(seed=0, options=projection_obstacle_options(base_env))
 
@@ -90,8 +92,8 @@ def test_projection_wrapper_projects_physical_action_and_reports_diagnostics() -
     assert info["projection_slack_max"] >= 0.0
     assert info["projection_slack_sum"] >= 0.0
 
-    # The raw action would move the agent by v_max * dt.
-    # A smaller displacement confirms that the projected action was executed.
+    # This layout requires correction only when the wrapper includes agent_radius.
+    # A smaller displacement confirms both radius inflation and projected execution.
     assert 0.0 < base_env.position[0] < raw_action[0] * base_env.dt
     np.testing.assert_allclose(base_env.position[1], 0.0, atol=1.0e-8)
 

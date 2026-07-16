@@ -60,7 +60,7 @@ if errorlevel 1 exit /b 1
 
 echo.
 echo [9/9] Summary comparison...
-python -c "import pandas as pd; cols=['episode_return','episode_length','success','collision','final_distance_to_goal','min_obstacle_distance']; r=pd.read_csv(r'runs\evaluation\random_policy_seed1000.csv'); p=pd.read_csv(r'runs\evaluation\ppo_baseline_51200_seed1_eval.csv'); s=pd.read_csv(r'runs\evaluation\ppo_baseline_51200_seed1_eval_stochastic.csv'); print('random'); print(r[cols].mean(numeric_only=True)); print(); print('ppo deterministic'); print(p[cols].mean(numeric_only=True)); print(); print('ppo stochastic'); print(s[cols].mean(numeric_only=True))"
+python -c "import pandas as pd; cols=['episode_return','episode_length','success','collision','final_distance_to_goal','min_obstacle_clearance']; r=pd.read_csv(r'runs\evaluation\random_policy_seed1000.csv'); p=pd.read_csv(r'runs\evaluation\ppo_baseline_51200_seed1_eval.csv'); s=pd.read_csv(r'runs\evaluation\ppo_baseline_51200_seed1_eval_stochastic.csv'); print('random'); print(r[cols].mean(numeric_only=True)); print(); print('ppo deterministic'); print(p[cols].mean(numeric_only=True)); print(); print('ppo stochastic'); print(s[cols].mean(numeric_only=True))"
 if errorlevel 1 exit /b 1
 
 echo.

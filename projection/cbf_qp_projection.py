@@ -21,7 +21,7 @@ class ProjectionParams:
     omega_max: float = 2.0
     lookahead_distance: float = 0.25
     alpha: float = 2.0
-    safety_margin: float = 0.0
+    extra_clearance: float = 0.0
     slack_penalty: float = 1000.0
     correction_tolerance: float = 1.0e-6
     solver_name: str = "OSQP"
@@ -33,7 +33,7 @@ class ProjectionParams:
             "omega_max": self.omega_max,
             "lookahead_distance": self.lookahead_distance,
             "alpha": self.alpha,
-            "safety_margin": self.safety_margin,
+            "extra_clearance": self.extra_clearance,
             "slack_penalty": self.slack_penalty,
             "correction_tolerance": self.correction_tolerance,
         }
@@ -50,8 +50,8 @@ class ProjectionParams:
             raise ValueError("lookahead_distance must be nonnegative.")
         if self.alpha <= 0.0:
             raise ValueError("alpha must be positive.")
-        if self.safety_margin < 0.0:
-            raise ValueError("safety_margin must be nonnegative.")
+        if self.extra_clearance < 0.0:
+            raise ValueError("extra_clearance must be nonnegative.")
         if self.slack_penalty <= 0.0:
             raise ValueError("slack_penalty must be positive.")
         if self.correction_tolerance < 0.0:
@@ -255,6 +255,7 @@ def build_cbf_constraints(
     obstacle_centers: ArrayLike,
     obstacle_radii: ArrayLike,
     obstacle_mask: ArrayLike,
+    agent_radius: float,
     params: ProjectionParams,
 ) -> CbfConstraintData:
 #{
@@ -266,6 +267,12 @@ def build_cbf_constraints(
     centers = _as_obstacle_centers(obstacle_centers)
     radii = _as_obstacle_radii(obstacle_radii, centers.shape[0])
     mask = _as_obstacle_mask(obstacle_mask, centers.shape[0])
+    agent_radius_float = float(agent_radius)
+
+    if not np.isfinite(agent_radius_float):
+        raise ValueError("agent_radius must be finite.")
+    if agent_radius_float < 0.0:
+        raise ValueError("agent_radius must be nonnegative.")
 
     active_indices = np.flatnonzero(mask).astype(np.int64)
     if active_indices.size == 0:
@@ -285,9 +292,9 @@ def build_cbf_constraints(
 
     for index in active_indices:
         obstacle_center = centers[index]
-        effective_radius = float(radii[index] + params.safety_margin)
+        projection_radius = float(radii[index] + agent_radius_float + params.extra_clearance)
         displacement = p_lookahead - obstacle_center
-        h_value = float(displacement @ displacement - effective_radius * effective_radius)
+        h_value = float(displacement @ displacement - projection_radius * projection_radius)
         grad_h = 2.0 * displacement
         a_row = grad_h @ J_lookahead
         b_value = -params.alpha * h_value
@@ -445,6 +452,7 @@ def project_physical_action(
     obstacle_centers: ArrayLike,
     obstacle_radii: ArrayLike,
     obstacle_mask: ArrayLike,
+    agent_radius: float,
     raw_action: ArrayLike,
     params: ProjectionParams | None = None,
 ) -> ProjectionResult:
@@ -456,6 +464,7 @@ def project_physical_action(
         obstacle_centers=obstacle_centers,
         obstacle_radii=obstacle_radii,
         obstacle_mask=obstacle_mask,
+        agent_radius=agent_radius,
         params=projection_params,
     )
     return solve_projection_qp(raw_action=raw_action, constraint_data=constraint_data, params=projection_params)

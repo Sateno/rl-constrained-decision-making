@@ -117,7 +117,7 @@ episode_length            65.450000
 success                    0.050000
 collision                  0.800000
 final_distance_to_goal     2.672536
-min_obstacle_distance      0.035840
+min_obstacle_clearance     0.035840
 
 ppo deterministic
 episode_return            12.319942
@@ -125,7 +125,7 @@ episode_length            96.000000
 success                    1.000000
 collision                  0.000000
 final_distance_to_goal     0.235396
-min_obstacle_distance      0.518163
+min_obstacle_clearance     0.518163
 
 ppo stochastic
 episode_return            -1.187591
@@ -133,8 +133,16 @@ episode_length            137.650000
 success                    0.400000
 collision                  0.250000
 final_distance_to_goal     1.179077
-min_obstacle_distance      0.266364
+min_obstacle_clearance     0.266364
 ```
+
+`min_obstacle_clearance` is the per-episode minimum signed clearance from the collision boundary:
+
+```text
+center distance - (obstacle radius + agent radius)
+```
+
+The numerical values above are unchanged from the previously verified baseline; only the metric name has been corrected.
 
 Primary baseline mode:
 
