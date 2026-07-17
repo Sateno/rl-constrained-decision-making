@@ -89,8 +89,21 @@ class Args:
     """the number of iterations (computed in runtime)"""
     max_episode_steps: int = 200
     """ the masimum number of episodes to run before we truncate """
+    max_obstacles: int = 3
+    """fixed obstacle capacity; changing this changes the observation dimension"""
+    num_active_obstacles: int | None = None
+    """number of active obstacles in the built-in layout; defaults to min(3, max_obstacles)"""
 
-def make_env(env_id, idx, capture_video, run_name, gamma, max_episode_steps):
+def make_env(
+    env_id,
+    idx,
+    capture_video,
+    run_name,
+    gamma,
+    max_episode_steps,
+    max_obstacles,
+    num_active_obstacles,
+):
     # Return a zero-argument callable compatible with Gymnasium SyncVectorEnv.
     #
     # env_id, run_name, and gamma are kept in the signature to minimize changes
@@ -109,6 +122,8 @@ def make_env(env_id, idx, capture_video, run_name, gamma, max_episode_steps):
         env_index=idx,
         env_kwargs={
             "max_episode_steps": max_episode_steps,
+            "max_obstacles": max_obstacles,
+            "num_active_obstacles": num_active_obstacles,
         },
         record_episode_statistics=True,
     )
@@ -161,6 +176,8 @@ if __name__ == "__main__":
                 run_name,
                 args.gamma,
                 args.max_episode_steps,
+                args.max_obstacles,
+                args.num_active_obstacles,
             )
             for i in range(args.num_envs)
         ]

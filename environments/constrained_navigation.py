@@ -18,12 +18,12 @@ class ConstrainedNavigationEnv(gym.Env):
         self,
         *,
         max_obstacles: int = 3,
+        num_active_obstacles: int | None = None,
         dt: float = 0.1,
         v_max: float = 1.0,
         omega_max: float = 2.0,
         goal_radius: float = 0.25,
         agent_radius: float = 0.10,
-        safety_margin: float = 0.05,
         max_episode_steps: int = 200,
         time_penalty: float = 0.01,
         timeout_distance_penalty: float = 1.0,
@@ -31,12 +31,28 @@ class ConstrainedNavigationEnv(gym.Env):
         super().__init__()
 
         self.max_obstacles = int(max_obstacles)          # fixed observation capacity
+
+        if self.max_obstacles <= 0:
+            raise ValueError("max_obstacles must be positive.")
+
+        default_obstacle_count = 3
+        default_active_count = min(default_obstacle_count, self.max_obstacles)
+        self.num_active_obstacles = (
+            default_active_count
+            if num_active_obstacles is None
+            else int(num_active_obstacles)
+        )
+
+        if self.num_active_obstacles < 0 or self.num_active_obstacles > self.max_obstacles:
+            raise ValueError("num_active_obstacles must be between 0 and max_obstacles.")
+        if self.num_active_obstacles > default_obstacle_count:
+            raise ValueError("The built-in layout defines at most three active obstacles.")
+
         self.dt = float(dt)                              # integration step
         self.v_max = float(v_max)                        # speed bound
         self.omega_max = float(omega_max)                # turn-rate bound
         self.goal_radius = float(goal_radius)            # success threshold
         self.agent_radius = float(agent_radius)          # collision footprint
-        self.safety_margin = float(safety_margin)        # safety buffer
         self.max_episode_steps = int(max_episode_steps)  # time-limit truncation
         self.time_penalty = float(time_penalty)
         self.timeout_distance_penalty = float(timeout_distance_penalty)
@@ -91,7 +107,7 @@ class ConstrainedNavigationEnv(gym.Env):
         default_theta = 0.0
         default_goal = np.asarray([4.0, 0.0], dtype=np.float64)
 
-        default_obstacle_centers = np.asarray(
+        built_in_obstacle_centers = np.asarray(
             [
                 [1.5, 0.5],
                 [2.5, -0.5],
@@ -99,20 +115,20 @@ class ConstrainedNavigationEnv(gym.Env):
             ],
             dtype=np.float64,
         )
-        default_obstacle_radii = np.asarray([0.30, 0.30, 0.25], dtype=np.float64)
-        default_obstacle_mask = np.asarray([True, True, True], dtype=bool)
+        built_in_obstacle_radii = np.asarray([0.30, 0.30, 0.25], dtype=np.float64)
 
-        self.position = np.asarray(
-            options.get("start", default_start),
-            dtype=np.float64,
-        ).reshape(2)
+        default_obstacle_centers = np.zeros((self.max_obstacles, 2), dtype=np.float64)
+        default_obstacle_radii = np.zeros(self.max_obstacles, dtype=np.float64)
+        default_obstacle_mask = np.zeros(self.max_obstacles, dtype=bool)
 
+        built_in_count = min(self.max_obstacles, built_in_obstacle_centers.shape[0])
+        default_obstacle_centers[:built_in_count] = built_in_obstacle_centers[:built_in_count]
+        default_obstacle_radii[:built_in_count] = built_in_obstacle_radii[:built_in_count]
+        default_obstacle_mask[:self.num_active_obstacles] = True
+
+        self.position = np.asarray(options.get("start", default_start), dtype=np.float64).reshape(2)
         self.theta = float(options.get("theta", default_theta))
-
-        self.goal = np.asarray(
-            options.get("goal", default_goal),
-            dtype=np.float64,
-        ).reshape(2)
+        self.goal = np.asarray(options.get("goal", default_goal), dtype=np.float64).reshape(2)
 
         self.obstacle_centers = np.asarray(
             options.get("obstacle_centers", default_obstacle_centers),
@@ -243,8 +259,8 @@ class ConstrainedNavigationEnv(gym.Env):
     def _obstacle_margins(self) -> np.ndarray:
         delta = self.obstacle_centers - self.position[None, :]
         center_distances = np.linalg.norm(delta, axis=1)
-        effective_radii = self.obstacle_radii + self.agent_radius
-        margins = center_distances - effective_radii
+        collision_radii = self.obstacle_radii + self.agent_radius
+        margins = center_distances - collision_radii
 
         # Inactive obstacle slots should not affect min-distance or collision.
         margins = np.where(self.obstacle_mask, margins, np.inf)
@@ -304,19 +320,21 @@ class ConstrainedNavigationEnv(gym.Env):
         margins = self._obstacle_margins()
 
         if np.any(self.obstacle_mask):
-            min_obstacle_distance = float(np.min(margins))
+            min_obstacle_clearance = float(np.min(margins))
+            collision = bool(min_obstacle_clearance <= 0.0)
         else:
-            # Keep this finite for simple smoke checks.
-            min_obstacle_distance = 1.0e6
+            # Clearance is undefined without active obstacles. NaN prevents a
+            # placeholder value from entering evaluation aggregates.
+            min_obstacle_clearance = float("nan")
+            collision = False
 
         success = bool(distance_to_goal <= self.goal_radius)
-        collision = bool(min_obstacle_distance <= 0.0)
 
         return {
             "success": success,
             "collision": collision,
             "distance_to_goal": float(distance_to_goal),
-            "min_obstacle_distance": float(min_obstacle_distance),
+            "min_obstacle_clearance": min_obstacle_clearance,
             "step_count": int(self.step_count),
         }
 

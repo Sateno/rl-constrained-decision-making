@@ -1,8 +1,8 @@
 ################################################################################
 # Lightweight smoke checks for the constrained navigation environment.
 #
-# These tests intentionally verify only milestone-critical behavior:
-# Gymnasium reset/step API, fixed shapes/dtypes, finite values, seeded reset,
+# These tests intentionally verify only scientifically critical behavior:
+# Gymnasium reset/step API, fixed shapes/dtypes, finite observations/rewards,
 # forced success/collision, and a short random rollout.
 #
 # They are not a full contract suite and do not test every private helper.
@@ -16,7 +16,7 @@ REQUIRED_INFO_KEYS = {
     "success",
     "collision",
     "distance_to_goal",
-    "min_obstacle_distance",
+    "min_obstacle_clearance",
     "step_count",
 }
 
@@ -98,7 +98,40 @@ def test_same_seed_produces_same_reset_observation():
 
     np.testing.assert_allclose(obs1, obs2)
     assert info1["distance_to_goal"] == info2["distance_to_goal"]
-    assert info1["min_obstacle_distance"] == info2["min_obstacle_distance"]
+    assert info1["min_obstacle_clearance"] == info2["min_obstacle_clearance"]
+
+
+# Verify that the obstacle metric is signed clearance from collision geometry.
+def test_min_obstacle_clearance_uses_collision_boundary():
+    env = make_env(agent_radius=0.10)
+
+    centers = np.zeros((env.max_obstacles, 2), dtype=np.float32)
+    radii = np.zeros(env.max_obstacles, dtype=np.float32)
+    mask = np.zeros(env.max_obstacles, dtype=bool)
+
+    centers[0] = np.asarray([1.0, 0.0], dtype=np.float32)
+    radii[0] = 0.25
+    mask[0] = True
+
+    _, info = env.reset(
+        seed=0,
+        options={
+            "start": np.asarray([0.0, 0.0], dtype=np.float32),
+            "theta": 0.0,
+            "goal": np.asarray([5.0, 0.0], dtype=np.float32),
+            "obstacle_centers": centers,
+            "obstacle_radii": radii,
+            "obstacle_mask": mask,
+        },
+    )
+
+    expected_clearance = 1.0 - (0.25 + 0.10)
+    np.testing.assert_allclose(info["min_obstacle_clearance"], expected_clearance)
+    assert info["collision"] is False
+
+    _, no_obstacle_info = env.reset(seed=0, options=no_obstacle_options(env))
+    assert np.isnan(no_obstacle_info["min_obstacle_clearance"])
+    assert no_obstacle_info["collision"] is False
 
 
 def test_forced_success_case_using_reset_options():
@@ -140,6 +173,24 @@ def test_forced_collision_case_using_reset_options():
     assert truncated is False
     assert info["collision"] is True
     assert info["success"] is False
+
+
+# Verify that observation capacity and active obstacle count are independent.
+def test_obstacle_capacity_and_active_count_are_independent():
+    env = make_env(max_obstacles=5, num_active_obstacles=2)
+
+    obs, info = env.reset(seed=0)
+
+    assert obs.shape == (31,)
+    assert env.obstacle_centers.shape == (5, 2)
+    assert env.obstacle_radii.shape == (5,)
+    assert env.obstacle_mask.shape == (5,)
+    assert int(np.sum(env.obstacle_mask)) == 2
+    np.testing.assert_array_equal(
+        env.obstacle_mask,
+        np.asarray([True, True, False, False, False], dtype=bool),
+    )
+    assert_basic_info(info)
 
 
 def test_short_random_rollout_has_finite_observations_and_rewards():

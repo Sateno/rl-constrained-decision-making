@@ -73,6 +73,55 @@ position approximately [0.1, 0.0]
 theta approximately 0.0
 ```
 
+## Obstacle Capacity and Active Count Check
+
+```cmd
+python -c "from environments.constrained_navigation import ConstrainedNavigationEnv; env=ConstrainedNavigationEnv(max_obstacles=5, num_active_obstacles=2); obs,info=env.reset(seed=0); print(env.observation_space.shape, obs.shape); print(env.obstacle_mask, int(env.obstacle_mask.sum())); env.close()"
+```
+
+Expected result:
+
+```text
+(31,) (31,)
+[ True  True False False False] 2
+```
+
+The default configuration remains `max_obstacles=3` with three active obstacles and observation shape `(21,)`.
+
+## Obstacle Clearance Metric Check
+
+The canonical safety metric is:
+
+```text
+min_obstacle_clearance
+    = min over active obstacles of
+      center_distance - (obstacle_radius + agent_radius)
+```
+
+Positive values indicate separation, zero indicates contact with the collision boundary, and negative values indicate penetration.
+
+```cmd
+python -c "from environments.constrained_navigation import ConstrainedNavigationEnv; import numpy as np; env=ConstrainedNavigationEnv(agent_radius=0.10); centers=np.zeros((3,2)); radii=np.zeros(3); mask=np.zeros(3,dtype=bool); centers[0]=[1.0,0.0]; radii[0]=0.25; mask[0]=True; _,info=env.reset(seed=0, options={'start':np.array([0.0,0.0]),'theta':0.0,'goal':np.array([5.0,0.0]),'obstacle_centers':centers,'obstacle_radii':radii,'obstacle_mask':mask}); print(info['min_obstacle_clearance']); assert abs(info['min_obstacle_clearance']-0.65)<1e-12; env.close()"
+```
+
+Expected result:
+
+```text
+0.65
+```
+
+When no obstacles are active, the clearance metric is undefined and is reported as `NaN`; collision remains `False`.
+
+```cmd
+python -c "from environments.constrained_navigation import ConstrainedNavigationEnv; import numpy as np; env=ConstrainedNavigationEnv(num_active_obstacles=0); _,info=env.reset(seed=0); print(info['min_obstacle_clearance'], info['collision']); assert np.isnan(info['min_obstacle_clearance']); assert info['collision'] is False; env.close()"
+```
+
+Expected result:
+
+```text
+nan False
+```
+
 ## Lightweight Environment Tests
 
 ```cmd
@@ -110,5 +159,6 @@ The constrained-navigation environment is verified when:
 - The base physical action bounds are `[0, -omega_max]` and `[v_max, omega_max]`.
 - `reset` and `step` satisfy the Gymnasium API.
 - The direct dynamics sanity check matches the expected forward step.
+- The obstacle metric reports signed collision-boundary clearance and uses `NaN` when no obstacle is active.
 - Lightweight environment tests pass.
 - A short random rollout produces finite observations and rewards.
