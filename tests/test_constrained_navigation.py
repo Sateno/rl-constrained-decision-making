@@ -1,7 +1,7 @@
 ################################################################################
 # Lightweight smoke checks for the constrained navigation environment.
 #
-# These tests intentionally verify only milestone-critical behavior:
+# These tests intentionally verify only scientifically critical behavior:
 # Gymnasium reset/step API, fixed shapes/dtypes, finite observations/rewards,
 # forced success/collision, and a short random rollout.
 #

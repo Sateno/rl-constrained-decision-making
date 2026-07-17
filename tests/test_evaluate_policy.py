@@ -8,6 +8,7 @@ import pandas as pd
 
 from environments.factory import make_env
 from evaluation.evaluate_policy import (
+    main,
     make_projection_params,
     parse_args,
     print_summary,
@@ -17,6 +18,7 @@ from evaluation.evaluate_policy import (
 )
 from projection.cbf_qp_projection import ProjectionParams
 from projection.cbf_qp_wrapper import CbfQpProjectionWrapper
+from evaluation.trajectory_recording import write_trajectory_archive
 
 
 # Return one deterministic normalized action for evaluator smoke checks.
@@ -266,6 +268,7 @@ def test_solver_failure_preserves_unknown_slack_diagnostics(tmp_path, capsys) ->
     )
 
     env = env_factory()
+    trajectory_records = []
 
     try:
         result = run_episode(
@@ -274,6 +277,7 @@ def test_solver_failure_preserves_unknown_slack_diagnostics(tmp_path, capsys) ->
             seed=11,
             episode=0,
             policy_name="random",
+            trajectory_records=trajectory_records,
         )
 
     finally:
@@ -318,4 +322,99 @@ def test_solver_failure_preserves_unknown_slack_diagnostics(tmp_path, capsys) ->
     assert "mean_projection_slack_sum:          N/A" in printed
     assert "max_projection_slack:               N/A" in printed
 
+    trajectory_path = tmp_path / "projection_solver_failure_trajectories.npz"
+    write_trajectory_archive(
+        trajectories=trajectory_records,
+        output_path=trajectory_path,
+        projection_params=projection_params,
+    )
+
+    with np.load(trajectory_path, allow_pickle=False) as archive:
+        key = archive["episode_keys"].tolist()[0]
+        assert not archive[f"{key}_projection_success"].any()
+        assert archive[f"{key}_projection_solver_status"].tolist() == [
+            "solver_error",
+            "solver_error",
+        ]
+        np.testing.assert_allclose(
+            archive[f"{key}_action_exec_physical"],
+            np.zeros((2, 2)),
+        )
+        assert np.isnan(archive[f"{key}_projection_slack_values"]).all()
+
 #} End function test_solver_failure_preserves_unknown_slack_diagnostics
+
+# Verify the single-mode evaluator can write a self-contained trajectory archive.
+def test_single_evaluator_writes_trajectory_archive(monkeypatch, tmp_path) -> None:
+#{
+    output_path = tmp_path / "random_evaluation.csv"
+    trajectory_path = tmp_path / "random_evaluation_trajectories.npz"
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "evaluate_policy.py",
+            "--policy",
+            "random",
+            "--episodes",
+            "1",
+            "--seed",
+            "23",
+            "--max-episode-steps",
+            "1",
+            "--num-active-obstacles",
+            "0",
+            "--no-cuda",
+            "--output",
+            str(output_path),
+            "--trajectory-output",
+            str(trajectory_path),
+        ],
+    )
+
+    main()
+
+    assert output_path.exists()
+    assert trajectory_path.exists()
+
+    with np.load(trajectory_path, allow_pickle=False) as archive:
+        assert str(archive["trajectory_archive_version"]) == "evaluation_trajectory_v1"
+        assert int(archive["episode_count"]) == 1
+        assert archive["episode_keys"].tolist() == ["episode_0000"]
+
+        key = "episode_0000"
+        assert int(archive[f"{key}_episode"]) == 0
+        assert int(archive[f"{key}_seed"]) == 23
+        assert archive[f"{key}_positions"].shape == (2, 2)
+        assert archive[f"{key}_headings"].shape == (2,)
+        assert archive[f"{key}_action_raw_normalized"].shape == (1, 2)
+        assert archive[f"{key}_action_raw_physical"].shape == (1, 2)
+        assert archive[f"{key}_action_exec_physical"].shape == (1, 2)
+        assert archive[f"{key}_projection_slack_values"].shape == (1, 3)
+
+        raw_normalized = archive[f"{key}_action_raw_normalized"][0]
+        raw_physical = archive[f"{key}_action_raw_physical"][0]
+        expected_physical = np.asarray(
+            [
+                0.5 * (np.clip(raw_normalized[0], -1.0, 1.0) + 1.0),
+                2.0 * np.clip(raw_normalized[1], -1.0, 1.0),
+            ],
+            dtype=np.float64,
+        )
+
+        np.testing.assert_allclose(raw_physical, expected_physical, rtol=2.0e-7, atol=1.0e-7)
+        np.testing.assert_allclose(
+            archive[f"{key}_action_exec_physical"],
+            archive[f"{key}_action_raw_physical"],
+        )
+        np.testing.assert_allclose(
+            archive[f"{key}_action_correction_physical"],
+            np.zeros((1, 2)),
+        )
+        assert not archive[f"{key}_projection_enabled"].any()
+        assert archive[f"{key}_projection_success"].all()
+        assert archive[f"{key}_projection_solver_status"].tolist() == ["disabled"]
+
+#} End function test_single_evaluator_writes_trajectory_archive
+

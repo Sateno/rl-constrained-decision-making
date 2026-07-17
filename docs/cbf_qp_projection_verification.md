@@ -1,4 +1,4 @@
-# P1.3 CBF-QP Projection Geometry Verification
+# CBF-QP Projection Geometry Verification
 
 ## Purpose
 
@@ -19,7 +19,7 @@ tests/test_cbf_qp_projection.py
 tests/test_cbf_qp_wrapper.py
 ```
 
-Evaluator parameter exposure and CSV persistence are recorded separately in `docs/projection_evaluation_parameters_verification.md`. Episode mean/max slack propagation is recorded in `docs/projection_slack_metrics_verification.md`, solver-failure slack semantics are recorded in `docs/projection_failure_diagnostics_verification.md`, and paired checkpoint evaluation is recorded in `docs/paired_projection_evaluation_verification.md`. This document does not cover PPO retraining or final result-table generation.
+Evaluator parameter exposure and CSV persistence are recorded separately in `docs/projection_evaluation_parameters_verification.md`. Episode mean/max slack propagation is recorded in `docs/projection_slack_metrics_verification.md`, solver-failure slack semantics are recorded in `docs/projection_failure_diagnostics_verification.md`, paired checkpoint evaluation is recorded in `docs/paired_projection_evaluation_verification.md`, and raw/executed action trajectory auditability is recorded in `docs/trajectory_audit_verification.md`. This document does not cover PPO retraining or final result-table generation.
 
 ## Repository Context
 
@@ -184,7 +184,7 @@ The command reports success=False, reports solver_error, returns action_exec=[0.
 | Custom wrapper parameters still include the environment agent radius | Prevents omission of the robot footprint when parameters are supplied explicitly. |
 | Normalized-action wrapper remains outside the projection wrapper | Protects physical-action projection and wrapper ordering. |
 
-This is intentionally not a full unit-test suite. The purpose is to protect the milestone-critical projection mechanics without freezing internal implementation details.
+This is intentionally not a full unit-test suite. The purpose is to protect the scientifically critical projection mechanics without freezing internal implementation details.
 
 ## Completion Criteria
 
@@ -197,4 +197,4 @@ The radius-semantics issue is complete when all of the following conditions hold
 5. The wrapper passes `ConstrainedNavigationEnv.agent_radius` for both default and custom projection parameters.
 6. Focused geometry and wrapper tests pass.
 7. The stationary solver-failure fallback remains unchanged.
-8. The complete lightweight repository test suite passes before milestone closure.
+8. The complete lightweight repository test suite passes before validation closure.

@@ -1,8 +1,8 @@
-# P1.3 Projection Evaluation Parameter Verification
+# Projection Evaluation Parameter Verification
 
 ## Purpose
 
-This document records the evaluator-level contract for configuring and persisting the CBF-QP projection hyperparameters used during P1.3 checkpoint evaluation.
+This document records the evaluator-level contract for configuring and persisting the CBF-QP projection hyperparameters used during checkpoint evaluation.
 
 The implementation file is:
 
@@ -142,7 +142,7 @@ python -m pytest tests/test_evaluate_policy.py -q -rs
 Acceptance criterion:
 
 ```text
-3 passed
+4 passed
 ```
 
 The parameter smoke test verifies the complete configuration path:
@@ -246,4 +246,10 @@ The paired projection-disabled/projection-enabled orchestration contract is defi
 
 ```text
 docs/paired_projection_evaluation_verification.md
+```
+
+Raw/executed action and trajectory persistence are defined separately in:
+
+```text
+docs/trajectory_audit_verification.md
 ```

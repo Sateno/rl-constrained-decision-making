@@ -1,7 +1,7 @@
 ################################################################################
 # Lightweight smoke checks for the CBF-QP projection wrapper.
 #
-# These tests intentionally verify only milestone-critical behavior:
+# These tests intentionally verify only scientifically critical behavior:
 # physical-action projection before environment execution, projection
 # diagnostics in the info dictionary, and normalized-action wrapper ordering.
 ################################################################################
@@ -19,8 +19,12 @@ from projection.cbf_qp_wrapper import CbfQpProjectionWrapper
 
 PROJECTION_INFO_KEYS = {
     "projection_enabled",
+    "projection_action_raw",
+    "projection_action_exec",
+    "projection_correction",
     "projection_intervened",
     "projection_correction_norm",
+    "projection_slack_values",
     "projection_slack_max",
     "projection_slack_sum",
     "projection_success",
@@ -91,6 +95,28 @@ def test_projection_wrapper_projects_physical_action_and_reports_diagnostics() -
     assert info["projection_correction_norm"] > 0.0
     assert info["projection_slack_max"] >= 0.0
     assert info["projection_slack_sum"] >= 0.0
+    np.testing.assert_allclose(info["projection_action_raw"], raw_action)
+    np.testing.assert_allclose(
+        info["projection_action_exec"] - info["projection_action_raw"],
+        info["projection_correction"],
+    )
+    np.testing.assert_allclose(
+        np.linalg.norm(info["projection_correction"]),
+        info["projection_correction_norm"],
+    )
+    assert info["projection_slack_values"].shape == (base_env.max_obstacles,)
+    np.testing.assert_allclose(
+        info["projection_slack_values"][1:],
+        np.zeros(base_env.max_obstacles - 1),
+    )
+    np.testing.assert_allclose(
+        np.sum(info["projection_slack_values"]),
+        info["projection_slack_sum"],
+    )
+    np.testing.assert_allclose(
+        np.max(info["projection_slack_values"]),
+        info["projection_slack_max"],
+    )
 
     # This layout requires correction only when the wrapper includes agent_radius.
     # A smaller displacement confirms both radius inflation and projected execution.
@@ -136,6 +162,10 @@ def test_normalized_wrapper_is_outside_projection_wrapper() -> None:
     assert info["projection_solver_status"] == "no_active_constraints"
     assert info["projection_active_constraint_count"] == 0
     assert info["projection_intervened"] is False
+    np.testing.assert_allclose(info["projection_action_raw"], np.asarray([0.5, 0.0]))
+    np.testing.assert_allclose(info["projection_action_exec"], info["projection_action_raw"])
+    np.testing.assert_allclose(info["projection_correction"], np.zeros(2))
+    np.testing.assert_allclose(info["projection_slack_values"], np.zeros(base_env.max_obstacles))
     np.testing.assert_allclose(base_env.position, expected_position, atol=1.0e-8)
 
 #} End function test_normalized_wrapper_is_outside_projection_wrapper

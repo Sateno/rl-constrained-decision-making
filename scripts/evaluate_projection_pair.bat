@@ -33,6 +33,8 @@ echo Paired projection evaluation completed successfully.
 echo Outputs:
 echo   %OUTPUT_PREFIX%_projection_disabled.csv
 echo   %OUTPUT_PREFIX%_projection_enabled.csv
+echo   %OUTPUT_PREFIX%_projection_disabled_trajectories.npz
+echo   %OUTPUT_PREFIX%_projection_enabled_trajectories.npz
 echo   %OUTPUT_PREFIX%_paired_episodes.csv
 echo   %OUTPUT_PREFIX%_paired_summary.csv
 

@@ -61,13 +61,27 @@ class CbfQpProjectionWrapper(gym.Wrapper):
 
     #} End function step
 
-    # Attach scalar projection diagnostics to the environment info dictionary.
+    # Attach action, slack, and solver diagnostics to the environment info dictionary.
     def _add_projection_info(self, info: dict[str, Any], result: ProjectionResult) -> dict[str, Any]:
     #{
+        active_indices = np.flatnonzero(self.base_env.obstacle_mask)
+
+        if result.slack_values.shape != (active_indices.size,):
+            raise RuntimeError(
+                "Projection slack vector does not match the active obstacle count."
+            )
+
+        slack_values = np.zeros(self.base_env.max_obstacles, dtype=np.float64)
+        slack_values[active_indices] = result.slack_values
+
         updated_info = dict(info)
         updated_info["projection_enabled"] = True
+        updated_info["projection_action_raw"] = result.action_raw.astype(np.float64, copy=True)
+        updated_info["projection_action_exec"] = result.action_exec.astype(np.float64, copy=True)
+        updated_info["projection_correction"] = result.correction.astype(np.float64, copy=True)
         updated_info["projection_intervened"] = bool(result.intervened)
         updated_info["projection_correction_norm"] = float(result.correction_norm)
+        updated_info["projection_slack_values"] = slack_values
         updated_info["projection_slack_max"] = float(result.slack_max)
         updated_info["projection_slack_sum"] = float(result.slack_sum)
         updated_info["projection_success"] = bool(result.success)

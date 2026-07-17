@@ -66,6 +66,62 @@ def test_paired_projection_evaluation_writes_aligned_artifacts(monkeypatch, tmp_
     projection_enabled = pd.read_csv(output_paths["projection_enabled"])
     paired_episodes = pd.read_csv(output_paths["paired_episodes"])
     paired_summary = pd.read_csv(output_paths["paired_summary"]).iloc[0]
+    expected_checkpoint_sha256 = str(paired_summary["checkpoint_sha256"])
+
+    with np.load(output_paths["projection_disabled_trajectories"], allow_pickle=False) as archive:
+        assert int(archive["episode_count"]) == 2
+        assert archive["episode_keys"].tolist() == ["episode_0000", "episode_0001"]
+        assert str(archive["run_projection_mode"]) == "disabled"
+        assert str(archive["run_checkpoint_sha256"]) == expected_checkpoint_sha256
+        assert int(archive["run_base_seed"]) == 31
+        assert int(archive["run_last_seed"]) == 32
+        assert [
+            int(archive[f"{key}_seed"])
+            for key in archive["episode_keys"].tolist()
+        ] == [31, 32]
+
+        for key in archive["episode_keys"].tolist():
+            assert archive[f"{key}_positions"].shape == (2, 2)
+            assert archive[f"{key}_action_raw_normalized"].shape == (1, 2)
+            assert archive[f"{key}_action_raw_physical"].shape == (1, 2)
+            assert archive[f"{key}_action_exec_physical"].shape == (1, 2)
+            np.testing.assert_allclose(
+                archive[f"{key}_action_exec_physical"],
+                archive[f"{key}_action_raw_physical"],
+            )
+            np.testing.assert_allclose(
+                archive[f"{key}_action_correction_physical"],
+                np.zeros((1, 2)),
+            )
+            assert not archive[f"{key}_projection_enabled"].any()
+            assert archive[f"{key}_projection_solver_status"].tolist() == ["disabled"]
+
+    with np.load(output_paths["projection_enabled_trajectories"], allow_pickle=False) as archive:
+        assert int(archive["episode_count"]) == 2
+        assert archive["episode_keys"].tolist() == ["episode_0000", "episode_0001"]
+        assert str(archive["run_projection_mode"]) == "enabled"
+        assert str(archive["run_checkpoint_sha256"]) == expected_checkpoint_sha256
+        assert int(archive["run_base_seed"]) == 31
+        assert int(archive["run_last_seed"]) == 32
+        assert [
+            int(archive[f"{key}_seed"])
+            for key in archive["episode_keys"].tolist()
+        ] == [31, 32]
+
+        for key in archive["episode_keys"].tolist():
+            assert archive[f"{key}_projection_enabled"].all()
+            assert archive[f"{key}_projection_success"].all()
+            assert archive[f"{key}_projection_solver_status"].tolist() == [
+                "no_active_constraints"
+            ]
+            np.testing.assert_allclose(
+                archive[f"{key}_action_exec_physical"],
+                archive[f"{key}_action_raw_physical"],
+            )
+            np.testing.assert_allclose(
+                archive[f"{key}_projection_slack_values"],
+                np.zeros((1, 3)),
+            )
 
     assert projection_disabled["episode"].tolist() == [0, 1]
     assert projection_enabled["episode"].tolist() == [0, 1]
@@ -113,5 +169,11 @@ def test_paired_projection_evaluation_writes_aligned_artifacts(monkeypatch, tmp_
     assert paired_summary["collision_rate_delta_enabled_minus_disabled"] == 0.0
     assert paired_summary["with_projection_total_interventions"] == 0
     assert paired_summary["with_projection_total_solver_failures"] == 0
+    assert paired_summary["projection_disabled_trajectory_npz"] == str(
+        output_paths["projection_disabled_trajectories"]
+    )
+    assert paired_summary["projection_enabled_trajectory_npz"] == str(
+        output_paths["projection_enabled_trajectories"]
+    )
 
 #} End function test_paired_projection_evaluation_writes_aligned_artifacts

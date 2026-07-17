@@ -16,7 +16,7 @@ dependencies:
   # RL environment API
   - gymnasium
 
-  # QP projection layer for P1
+  # QP projection layer
   - cvxpy
   - osqp
 

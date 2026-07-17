@@ -1,4 +1,4 @@
-# P1.3 Projection Solver-Failure Diagnostic Verification
+# Projection Solver-Failure Diagnostic Verification
 
 ## Purpose
 
@@ -133,7 +133,7 @@ python -m pytest tests/test_evaluate_policy.py -q -rs
 Acceptance criterion:
 
 ```text
-3 passed
+4 passed
 ```
 
 ### 3. Reproduce the failure-time episode contract
@@ -158,6 +158,14 @@ Acceptance criterion:
 
 ```text
 All lightweight tests pass.
+```
+
+## Trajectory Failure Diagnostics
+
+Per-step solver status, executed stop actions, correction vectors, and undefined active-obstacle slack values are preserved in the trajectory archive defined in:
+
+```text
+docs/trajectory_audit_verification.md
 ```
 
 ## Completion Criteria

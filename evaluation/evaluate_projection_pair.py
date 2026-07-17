@@ -23,6 +23,7 @@ from evaluation.evaluate_policy import (
     validate_checkpoint_environment_compatibility,
     write_results_csv,
 )
+from evaluation.trajectory_recording import EpisodeTrajectory, write_trajectory_archive
 from projection.cbf_qp_projection import ProjectionParams
 
 
@@ -174,6 +175,8 @@ def make_output_paths(output_prefix: str | Path) -> dict[str, Path]:
     return {
         "projection_disabled": parent / f"{name}_projection_disabled.csv",
         "projection_enabled": parent / f"{name}_projection_enabled.csv",
+        "projection_disabled_trajectories": parent / f"{name}_projection_disabled_trajectories.npz",
+        "projection_enabled_trajectories": parent / f"{name}_projection_enabled_trajectories.npz",
         "paired_episodes": parent / f"{name}_paired_episodes.csv",
         "paired_summary": parent / f"{name}_paired_summary.csv",
     }
@@ -216,6 +219,7 @@ def run_evaluation_mode(
     checkpoint_path: str,
     projection_enabled: bool,
     device: torch.device,
+    trajectory_records: list[EpisodeTrajectory],
 ) -> list[EpisodeResult]:
 #{
     results: list[EpisodeResult] = []
@@ -239,6 +243,7 @@ def run_evaluation_mode(
                 episode=episode_index,
                 policy_name="ppo",
                 checkpoint_path=checkpoint_path,
+                trajectory_records=trajectory_records,
             )
 
             if result.projection_enabled != projection_enabled:
@@ -465,6 +470,12 @@ def build_paired_summary_table(
 
     row["projection_disabled_csv"] = str(output_paths["projection_disabled"])
     row["projection_enabled_csv"] = str(output_paths["projection_enabled"])
+    row["projection_disabled_trajectory_npz"] = str(
+        output_paths["projection_disabled_trajectories"]
+    )
+    row["projection_enabled_trajectory_npz"] = str(
+        output_paths["projection_enabled_trajectories"]
+    )
     row["paired_episodes_csv"] = str(output_paths["paired_episodes"])
     row["paired_summary_csv"] = str(output_paths["paired_summary"])
 
@@ -516,6 +527,14 @@ def print_paired_summary(
     print(
         "collision_rate_delta_enabled_minus_disabled:     "
         f"{collision_rate_delta:.6f}"
+    )
+    print(
+        "projection_disabled_trajectory_npz:             "
+        f"{output_paths['projection_disabled_trajectories']}"
+    )
+    print(
+        "projection_enabled_trajectory_npz:              "
+        f"{output_paths['projection_enabled_trajectories']}"
     )
     print(f"paired_episodes_csv:                               {output_paths['paired_episodes']}")
     print(f"paired_summary_csv:                                {output_paths['paired_summary']}")
@@ -576,6 +595,8 @@ def main() -> None:
         deterministic=not args.stochastic,
     )
     checkpoint_path = str(args.checkpoint)
+    projection_disabled_trajectories: list[EpisodeTrajectory] = []
+    projection_enabled_trajectories: list[EpisodeTrajectory] = []
 
     projection_disabled_results = run_evaluation_mode(
         env_factory=projection_disabled_factory,
@@ -585,6 +606,7 @@ def main() -> None:
         checkpoint_path=checkpoint_path,
         projection_enabled=False,
         device=device,
+        trajectory_records=projection_disabled_trajectories,
     )
     projection_enabled_results = run_evaluation_mode(
         env_factory=projection_enabled_factory,
@@ -594,6 +616,7 @@ def main() -> None:
         checkpoint_path=checkpoint_path,
         projection_enabled=True,
         device=device,
+        trajectory_records=projection_enabled_trajectories,
     )
 
     if file_sha256(args.checkpoint) != checkpoint_sha256:
@@ -615,6 +638,18 @@ def main() -> None:
         projection_params=projection_params,
         checkpoint_sha256=checkpoint_sha256,
         device=device,
+    )
+    write_trajectory_archive(
+        trajectories=projection_disabled_trajectories,
+        output_path=output_paths["projection_disabled_trajectories"],
+        projection_params=projection_params,
+        run_metadata={**pair_metadata, "projection_mode": "disabled"},
+    )
+    write_trajectory_archive(
+        trajectories=projection_enabled_trajectories,
+        output_path=output_paths["projection_enabled_trajectories"],
+        projection_params=projection_params,
+        run_metadata={**pair_metadata, "projection_mode": "enabled"},
     )
     paired_episode_table = build_paired_episode_table(
         projection_disabled_results=projection_disabled_results,

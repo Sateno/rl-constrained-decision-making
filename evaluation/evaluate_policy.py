@@ -13,6 +13,13 @@ import pandas as pd
 from environments.factory import make_env
 from algorithms.ppo.agent import Agent
 from projection.cbf_qp_projection import ProjectionParams
+from evaluation.trajectory_recording import (
+    EpisodeTrajectory,
+    append_episode_transition,
+    create_episode_trajectory,
+    physical_action_from_policy_action,
+    write_trajectory_archive,
+)
 
 # Episode-level evaluation metrics returned by run_episode.
 @dataclass
@@ -88,6 +95,13 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path("runs/evaluation/random_policy_evaluation.csv"),
         help="CSV output path for one-row-per-episode results.",
+    )
+
+    parser.add_argument(
+        "--trajectory-output",
+        type=Path,
+        default=None,
+        help="Optional compressed NPZ output for state, action, and projection trajectories.",
     )
 
     parser.add_argument(
@@ -171,6 +185,9 @@ def parse_args() -> argparse.Namespace:
     if args.max_obstacles <= 0:
         parser.error("--max-obstacles must be positive.")
 
+    if args.trajectory_output is not None and args.trajectory_output.suffix.lower() != ".npz":
+        parser.error("--trajectory-output must use the .npz extension.")
+
     if args.num_active_obstacles is not None:
         if args.num_active_obstacles < 0 or args.num_active_obstacles > args.max_obstacles:
             parser.error("--num-active-obstacles must be between 0 and --max-obstacles.")
@@ -225,12 +242,26 @@ def run_episode(
     episode: int,
     policy_name: str,
     checkpoint_path: str = "",
+    trajectory_records: list[EpisodeTrajectory] | None = None,
 ) -> EpisodeResult:
 #{
     obs, info = env.reset(seed=seed)
 
     if not np.all(np.isfinite(obs)):
         raise RuntimeError("Non-finite observation returned by env.reset().")
+
+    episode_trajectory = (
+        create_episode_trajectory(
+            env=env,
+            initial_info=info,
+            policy_name=policy_name,
+            checkpoint_path=checkpoint_path,
+            episode=episode,
+            seed=seed,
+        )
+        if trajectory_records is not None
+        else None
+    )
 
     result = EpisodeResult(
         policy=policy_name,
@@ -270,6 +301,11 @@ def run_episode(
     while not (terminated or truncated):
     #{
         action = action_provider(env, obs)
+        action_raw_physical = (
+            physical_action_from_policy_action(env, action)
+            if episode_trajectory is not None
+            else None
+        )
 
         obs, reward, terminated, truncated, info = env.step(action)
 
@@ -278,6 +314,18 @@ def run_episode(
 
         if not np.isfinite(reward):
             raise RuntimeError(f"Non-finite reward encountered in episode {episode}.")
+
+        if episode_trajectory is not None:
+            append_episode_transition(
+                trajectory=episode_trajectory,
+                env=env,
+                action_raw_normalized=action,
+                action_raw_physical=action_raw_physical,
+                reward=reward,
+                terminated=terminated,
+                truncated=truncated,
+                info=info,
+            )
 
         # Accumulate projection diagnostics reported for this environment step.
         if bool(info.get("projection_enabled", False)):
@@ -355,6 +403,12 @@ def run_episode(
 
         if result.projection_solver_failure_count == 0:
             result.mean_projection_slack_sum = projection_slack_sum_total / result.episode_length
+
+    if episode_trajectory is not None:
+        if len(episode_trajectory.rewards) != result.episode_length:
+            raise RuntimeError("Trajectory length does not match the episode result length.")
+
+        trajectory_records.append(episode_trajectory)
 
     return result
 #} End function run_episode
@@ -639,6 +693,9 @@ def main() -> None:
         raise ValueError(f"Unsupported policy: {args.policy}")
 
     results: list[EpisodeResult] = []
+    trajectory_records: list[EpisodeTrajectory] | None = (
+        [] if args.trajectory_output is not None else None
+    )
 
     for episode_index in range(args.episodes):
         episode_seed = args.seed + episode_index
@@ -656,6 +713,7 @@ def main() -> None:
                 episode=episode_index,
                 policy_name=args.policy,
                 checkpoint_path=checkpoint_label,
+                trajectory_records=trajectory_records,
             )
 
             results.append(result)
@@ -664,8 +722,32 @@ def main() -> None:
             env.close()
 
     write_results_csv(results=results, output_path=args.output, projection_params=projection_params)
+
+    if trajectory_records is not None:
+        resolved_active_count = (
+            min(3, args.max_obstacles)
+            if args.num_active_obstacles is None
+            else args.num_active_obstacles
+        )
+        write_trajectory_archive(
+            trajectories=trajectory_records,
+            output_path=args.trajectory_output,
+            projection_params=projection_params,
+            run_metadata={
+                "policy": args.policy,
+                "stochastic": bool(args.stochastic),
+                "device": str(device),
+                "max_episode_steps": int(args.max_episode_steps),
+                "max_obstacles": int(args.max_obstacles),
+                "num_active_obstacles": int(resolved_active_count),
+            },
+        )
+
     summary = summarize_results(results)
     print_summary(summary, args.output)
+
+    if args.trajectory_output is not None:
+        print(f"trajectory_output:                   {args.trajectory_output}")
 
 #} End function main
 

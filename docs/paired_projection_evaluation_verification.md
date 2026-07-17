@@ -1,4 +1,4 @@
-# P1.3 Paired Projection Evaluation Verification
+# Paired Projection Evaluation Verification
 
 ## Purpose
 
@@ -27,7 +27,7 @@ evaluation/evaluate_policy.py
 
 The repository previously required two independent evaluator commands to compare projection-disabled and projection-enabled behavior. A manual comparison could accidentally change the checkpoint, episode seeds, environment configuration, policy evaluation mode, or projection parameters between commands.
 
-P1.3 requires the same trained policy to be evaluated in both modes under a common protocol. The paired path therefore owns the comparison orchestration while reusing the existing episode runner, checkpoint loader, projection metrics, CSV writer, and summary functions.
+Evaluation-time predictive action projection requires the same trained policy to be evaluated in both modes under a common protocol. The paired path therefore owns the comparison orchestration while reusing the existing episode runner, checkpoint loader, projection metrics, CSV writer, and summary functions.
 
 ## Paired Evaluation Contract
 
@@ -76,7 +76,7 @@ For an output prefix such as:
 runs\evaluation\ppo_baseline_51200_seed1_projection_pair
 ```
 
-the command writes four CSV files.
+the command writes four CSV files and two compressed NPZ trajectory archives.
 
 ### Projection-disabled raw episode rows
 
@@ -93,6 +93,29 @@ ppo_baseline_51200_seed1_projection_pair_projection_enabled.csv
 ```
 
 This file uses the same schema and records the intervention, correction, slack, and solver-failure diagnostics produced with `projection_enabled=True`.
+
+
+### Projection-disabled trajectory archive
+
+```text
+ppo_baseline_51200_seed1_projection_pair_projection_disabled_trajectories.npz
+```
+
+This archive records the initial state and every transition for each projection-disabled episode. The physical executed action equals the physical raw action, the correction is zero, and the per-step solver status is `disabled`.
+
+### Projection-enabled trajectory archive
+
+```text
+ppo_baseline_51200_seed1_projection_pair_projection_enabled_trajectories.npz
+```
+
+This archive records normalized raw actions, physical raw actions, physical executed actions, correction vectors, positions, headings, geometry, reward/termination fields, slot-aligned slack values, intervention flags, solver status, and success diagnostics.
+
+Both archives use the `evaluation_trajectory_v1` contract defined in:
+
+```text
+docs/trajectory_audit_verification.md
+```
 
 ### Wide paired episode table
 
@@ -124,7 +147,7 @@ This file contains one comparison row. It records:
 - projection-enabled aggregate task metrics;
 - projection-enabled burden and solver diagnostics;
 - enabled-minus-disabled aggregate deltas;
-- paths to all four comparison artifacts.
+- paths to all six comparison artifacts.
 
 The checkpoint SHA-256 is computed before loading and verified again after both modes finish. This identifies the checkpoint contents even if a path is later reused and rejects a checkpoint file that changes during evaluation.
 
@@ -154,7 +177,7 @@ The canonical repository wrapper is:
 scripts\evaluate_projection_pair.bat
 ```
 
-The batch file uses the established P1.2 checkpoint, twenty evaluation episodes, seeds `1000` through `1019`, the default three-obstacle environment, explicit projection parameters, and CPU evaluation.
+The batch file uses the established PPO baseline checkpoint, twenty evaluation episodes, seeds `1000` through `1019`, the default three-obstacle environment, explicit projection parameters, and CPU evaluation.
 
 ## Minimal Verification Commands
 
@@ -208,7 +231,10 @@ persisted projection parameters
 checkpoint SHA-256
 paired episode deltas
 paired summary deltas
-all four output files
+state/action array alignment
+raw/executed action identity in the disabled mode
+projection diagnostics in the enabled mode
+all six output artifacts
 ```
 
 ### 4. Run the complete lightweight suite
@@ -220,7 +246,7 @@ python -m pytest -q -rs
 Acceptance criterion:
 
 ```text
-18 passed
+19 passed
 ```
 
 ### 5. Run the canonical paired checkpoint evaluation
@@ -232,7 +258,7 @@ scripts\evaluate_projection_pair.bat
 Acceptance criterion:
 
 ```text
-The command writes all four CSV artifacts and exits successfully.
+The command writes all four CSV artifacts and both NPZ trajectory archives, then exits successfully.
 ```
 
 ### 6. Verify episode alignment and the comparison row
@@ -250,7 +276,7 @@ Validation was performed in the available Linux review environment.
 ```text
 paired evaluator compilation: passed
 focused paired-evaluation test: 1 passed
-complete lightweight suite: 18 passed
+complete lightweight suite: 19 passed
 ```
 
 ### Deterministic checkpoint comparison
@@ -302,7 +328,15 @@ maximum slack = 0.0168056268301485
 solver failures = 0
 ```
 
-This stochastic run is a projection-path diagnostic, not a final P1.4 result.
+This stochastic run is a projection-path diagnostic, not a final comparative experiment result.
+
+## Trajectory Audit Contract
+
+The action/state trajectory schema, array shapes, disabled-mode conventions, projection-vector diagnostics, and `allow_pickle=False` loading requirement are defined in:
+
+```text
+docs/trajectory_audit_verification.md
+```
 
 ## Scope Boundary
 
@@ -313,9 +347,8 @@ This issue adds paired evaluation orchestration and paired artifacts only. It do
 - normalized or physical action mappings;
 - CBF geometry, QP equations, solver fallback, or wrapper order;
 - single-mode episode metrics or summary semantics;
-- trajectory recording;
 - projection-enabled PPO training;
-- P1.4 experiment execution;
+- comparative experiment execution;
 - final result aggregation or plotting.
 
 ## Completion Criteria
@@ -329,8 +362,9 @@ The paired-evaluation issue is complete when all of the following conditions hol
 5. The checkpoint is loaded once, identified by path and SHA-256, and verified unchanged after both modes finish.
 6. Checkpoint compatibility is verified for both environment factories.
 7. Two raw fixed-schema episode CSVs are preserved.
-8. One wide paired episode table is written.
-9. One wide paired summary table is written.
-10. Pairing errors are rejected rather than silently merged.
-11. The deterministic baseline noninterference result is preserved.
-12. The focused smoke test and complete lightweight suite pass.
+8. Two `evaluation_trajectory_v1` NPZ archives preserve state, raw action, executed action, correction, slack, and solver diagnostics.
+9. One wide paired episode table is written.
+10. One wide paired summary table is written and links all six artifacts.
+11. Pairing errors are rejected rather than silently merged.
+12. The deterministic baseline noninterference result is preserved.
+13. The focused smoke test and complete lightweight suite pass.

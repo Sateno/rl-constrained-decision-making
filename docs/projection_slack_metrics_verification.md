@@ -1,4 +1,4 @@
-# P1.3 Projection Slack Metric Verification
+# Projection Slack Metric Verification
 
 ## Purpose
 
@@ -158,7 +158,7 @@ python -m pytest tests/test_evaluate_policy.py -q -rs
 Acceptance criterion:
 
 ```text
-3 passed
+4 passed
 ```
 
 The focused mean-slack test uses three successful scripted projection steps:
@@ -219,6 +219,12 @@ The paired projection-disabled/projection-enabled orchestration contract is defi
 
 ```text
 docs/paired_projection_evaluation_verification.md
+```
+
+Per-step slack-vector trajectory persistence is defined separately in:
+
+```text
+docs/trajectory_audit_verification.md
 ```
 
 ## Scope Boundary

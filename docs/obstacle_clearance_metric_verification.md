@@ -1,4 +1,4 @@
-# P1.3 Obstacle Clearance Metric Verification
+# Obstacle Clearance Metric Verification
 
 ## Purpose
 
@@ -263,4 +263,4 @@ This issue does not modify:
 - paired projection-off/on orchestration;
 - trajectory recording;
 - training-time projection;
-- P1.4 experiment execution.
+- comparative experiment execution.
