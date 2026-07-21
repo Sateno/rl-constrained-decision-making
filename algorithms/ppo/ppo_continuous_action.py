@@ -14,7 +14,9 @@ import tyro
 from torch.utils.tensorboard import SummaryWriter
 
 from algorithms.ppo.agent import Agent
+from algorithms.ppo.projection_training import ProjectionTrainingDiagnostics
 from environments.factory import make_env as make_constrained_env
+from projection.cbf_qp_projection import ProjectionParams
 
 
 @dataclass
@@ -45,6 +47,8 @@ class Args:
     # Algorithm specific arguments
     env_id: str = "ConstrainedNavigation-v0"
     """the id of the environment"""
+    method: str = "ppo_baseline"
+    """descriptive method label saved with the experiment configuration"""
     total_timesteps: int = 1000000
     """total timesteps of the experiments"""
     learning_rate: float = 3e-4
@@ -93,6 +97,18 @@ class Args:
     """fixed obstacle capacity; changing this changes the observation dimension"""
     num_active_obstacles: int | None = None
     """number of active obstacles in the built-in layout; defaults to min(3, max_obstacles)"""
+    collision_penalty: float = 10.0
+    """collision penalty used by the environment reward"""
+    enable_projection: bool = False
+    """whether predictive action projection is enabled during environment interaction"""
+    projection_lookahead_distance: float = 0.25
+    """lookahead distance used by the projection barrier"""
+    projection_alpha: float = 2.0
+    """barrier-rate parameter used by the projection constraints"""
+    projection_slack_penalty: float = 1000.0
+    """quadratic penalty on projection slack variables"""
+    projection_extra_clearance: float = 0.0
+    """projection-only clearance added beyond collision geometry"""
 
 def make_env(
     env_id,
@@ -103,6 +119,9 @@ def make_env(
     max_episode_steps,
     max_obstacles,
     num_active_obstacles,
+    collision_penalty,
+    enable_projection,
+    projection_params,
 ):
     # Return a zero-argument callable compatible with Gymnasium SyncVectorEnv.
     #
@@ -124,8 +143,11 @@ def make_env(
             "max_episode_steps": max_episode_steps,
             "max_obstacles": max_obstacles,
             "num_active_obstacles": num_active_obstacles,
+            "collision_penalty": collision_penalty,
         },
         record_episode_statistics=True,
+        enable_projection=enable_projection,
+        projection_params=projection_params,
     )
 
 
@@ -134,6 +156,14 @@ if __name__ == "__main__":
     args.batch_size = int(args.num_envs * args.num_steps)
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
+    projection_params = None
+    if args.enable_projection:
+        projection_params = ProjectionParams(
+            lookahead_distance=args.projection_lookahead_distance,
+            alpha=args.projection_alpha,
+            slack_penalty=args.projection_slack_penalty,
+            extra_clearance=args.projection_extra_clearance,
+        )
     run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
     if args.track:
         import wandb
@@ -178,6 +208,9 @@ if __name__ == "__main__":
                 args.max_episode_steps,
                 args.max_obstacles,
                 args.num_active_obstacles,
+                args.collision_penalty,
+                args.enable_projection,
+                projection_params,
             )
             for i in range(args.num_envs)
         ]
@@ -214,6 +247,8 @@ if __name__ == "__main__":
             lrnow = frac * args.learning_rate
             optimizer.param_groups[0]["lr"] = lrnow
 
+        projection_diagnostics = ProjectionTrainingDiagnostics()
+
         for step in range(0, args.num_steps):
             global_step += args.num_envs
             obs[step] = next_obs
@@ -224,18 +259,21 @@ if __name__ == "__main__":
                 action_raw, logprob, _, value = agent.get_action_and_value(next_obs)
                 values[step] = value.flatten()
 
-            # Baseline PPO executes the sampled action directly.
-            # Later projection will replace action_exec while preserving action_raw.
-            action_exec = action_raw
-            
+            # PPO stores the raw normalized action used by the policy distribution.
+            # The environment wrapper stack maps it to the physical executed action.
+            environment_action = action_raw
+
             actions_raw[step] = action_raw
             logprobs[step] = logprob
 
             # TRY NOT TO MODIFY: execute the game and log data.
-            next_obs, reward, terminations, truncations, infos = envs.step(action_exec.cpu().numpy())
+            next_obs, reward, terminations, truncations, infos = envs.step(environment_action.cpu().numpy())
             next_done = np.logical_or(terminations, truncations)
             rewards[step] = torch.tensor(reward).to(device).view(-1)
             next_obs, next_done = torch.Tensor(next_obs).to(device), torch.Tensor(next_done).to(device)
+
+            if args.enable_projection:
+                projection_diagnostics.update(infos, args.num_envs)
 
             # Gymnasium RecordEpisodeStatistics can expose completed-episode statistics
             # through infos["episode"] and infos["_episode"] in vectorized environments.
@@ -269,6 +307,11 @@ if __name__ == "__main__":
                         episodic_length,
                         global_step,
                     )
+                    writer.add_scalar("safety/success", float(infos["success"][env_index]), global_step)
+                    writer.add_scalar("safety/collision", float(infos["collision"][env_index]), global_step)
+                    min_clearance = float(infos["min_obstacle_clearance"][env_index])
+                    if np.isfinite(min_clearance):
+                        writer.add_scalar("safety/min_obstacle_clearance", min_clearance, global_step)
         
             elif "final_info" in infos:
                 for info in infos["final_info"]:
@@ -293,6 +336,14 @@ if __name__ == "__main__":
                             episodic_length,
                             global_step,
                         )
+                        writer.add_scalar("safety/success", float(info.get("success", False)), global_step)
+                        writer.add_scalar("safety/collision", float(info.get("collision", False)), global_step)
+                        min_clearance = float(info.get("min_obstacle_clearance", float("nan")))
+                        if np.isfinite(min_clearance):
+                            writer.add_scalar("safety/min_obstacle_clearance", min_clearance, global_step)
+
+        if args.enable_projection:
+            projection_diagnostics.write_tensorboard(writer, global_step)
         
         # bootstrap value if not done
         with torch.no_grad():

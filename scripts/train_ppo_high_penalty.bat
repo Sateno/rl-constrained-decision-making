@@ -10,7 +10,7 @@ set "TOTAL_TIMESTEPS=%~2"
 if not defined TOTAL_TIMESTEPS set "TOTAL_TIMESTEPS=51200"
 
 set "CHECKPOINT_PATH=%~3"
-if not defined CHECKPOINT_PATH set "CHECKPOINT_PATH=runs\checkpoints\ppo_baseline_%TOTAL_TIMESTEPS%_seed%SEED%.pt"
+if not defined CHECKPOINT_PATH set "CHECKPOINT_PATH=runs\checkpoints\ppo_high_penalty_%TOTAL_TIMESTEPS%_seed%SEED%.pt"
 
 if exist "%CHECKPOINT_PATH%" (
     echo ERROR: checkpoint already exists: %CHECKPOINT_PATH%
@@ -20,8 +20,8 @@ if exist "%CHECKPOINT_PATH%" (
 for %%I in ("%CHECKPOINT_PATH%") do if not exist "%%~dpI" mkdir "%%~dpI"
 
 python -m algorithms.ppo.ppo_continuous_action ^
-  --method ppo_baseline ^
-  --exp-name ppo_baseline_%TOTAL_TIMESTEPS%_seed%SEED% ^
+  --method ppo_high_penalty ^
+  --exp-name ppo_high_penalty_%TOTAL_TIMESTEPS%_seed%SEED% ^
   --env-id ConstrainedNavigation-v0 ^
   --total-timesteps %TOTAL_TIMESTEPS% ^
   --num-envs 4 ^
@@ -31,7 +31,7 @@ python -m algorithms.ppo.ppo_continuous_action ^
   --max-episode-steps 200 ^
   --max-obstacles 3 ^
   --num-active-obstacles 3 ^
-  --collision-penalty 10.0 ^
+  --collision-penalty 50.0 ^
   --no-enable-projection ^
   --seed %SEED% ^
   --save-model ^

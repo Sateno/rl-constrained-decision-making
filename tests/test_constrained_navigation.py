@@ -193,6 +193,28 @@ def test_obstacle_capacity_and_active_count_are_independent():
     assert_basic_info(info)
 
 
+# Verify that the named reward variant changes only the collision penalty term.
+def test_collision_penalty_changes_only_collision_reward_term():
+    default_env = make_env(collision_penalty=10.0)
+    high_penalty_env = make_env(collision_penalty=50.0)
+    options = collision_options(default_env)
+
+    default_env.reset(seed=0, options=options)
+    high_penalty_env.reset(seed=0, options=options)
+
+    default_transition = default_env.step(np.asarray([0.0, 0.0], dtype=np.float32))
+    high_penalty_transition = high_penalty_env.step(np.asarray([0.0, 0.0], dtype=np.float32))
+
+    default_obs, default_reward, default_terminated, default_truncated, default_info = default_transition
+    high_obs, high_reward, high_terminated, high_truncated, high_info = high_penalty_transition
+
+    np.testing.assert_allclose(default_obs, high_obs)
+    np.testing.assert_allclose(default_reward - high_reward, 40.0)
+    assert default_terminated == high_terminated == True
+    assert default_truncated == high_truncated == False
+    assert default_info == high_info
+
+
 def test_short_random_rollout_has_finite_observations_and_rewards():
     env = make_env(max_episode_steps=20)
 
