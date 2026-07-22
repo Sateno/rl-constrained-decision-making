@@ -243,9 +243,13 @@ def run_episode(
     policy_name: str,
     checkpoint_path: str = "",
     trajectory_records: list[EpisodeTrajectory] | None = None,
+    reset_options: dict | None = None,
 ) -> EpisodeResult:
 #{
-    obs, info = env.reset(seed=seed)
+    if reset_options is None:
+        obs, info = env.reset(seed=seed)
+    else:
+        obs, info = env.reset(seed=seed, options=reset_options)
 
     if not np.all(np.isfinite(obs)):
         raise RuntimeError("Non-finite observation returned by env.reset().")

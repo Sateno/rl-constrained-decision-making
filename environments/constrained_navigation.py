@@ -27,6 +27,7 @@ class ConstrainedNavigationEnv(gym.Env):
         max_episode_steps: int = 200,
         time_penalty: float = 0.01,
         timeout_distance_penalty: float = 1.0,
+        collision_penalty: float = 10.0,
     ) -> None:
         super().__init__()
 
@@ -56,6 +57,10 @@ class ConstrainedNavigationEnv(gym.Env):
         self.max_episode_steps = int(max_episode_steps)  # time-limit truncation
         self.time_penalty = float(time_penalty)
         self.timeout_distance_penalty = float(timeout_distance_penalty)
+        self.collision_penalty = float(collision_penalty)
+
+        if not np.isfinite(self.collision_penalty) or self.collision_penalty < 0.0:
+            raise ValueError("collision_penalty must be finite and nonnegative.")
 
         self.obs_dim = 6 + 5 * self.max_obstacles        # fixed neural-network input size
 
@@ -87,7 +92,6 @@ class ConstrainedNavigationEnv(gym.Env):
         self.progress_weight: float = 1.0
         self.action_penalty: float = 0.01
         self.goal_reward: float = 10.0
-        self.collision_penalty: float = 10.0
 
     ############################################################################
     # Reset

@@ -28,7 +28,7 @@ from projection.cbf_qp_projection import ProjectionParams, project_physical_acti
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_CONDA_ENVIRONMENT = "RL_PROJECTS"
-EXPECTED_TEST_COUNT = 19
+MINIMUM_TEST_COUNT = 19
 EXPECTED_CHECKPOINT_SHA256 = (
     "3c06bd19ee42914aef49f049de88c165190f745ca1c4cdbb3ac23bb7497da1c3"
 )
@@ -322,7 +322,7 @@ def validate_checkpoint() -> str:
 # region Regression and compatibility validation
 
 # Compile the active Python source and run the complete lightweight suite.
-def validate_compilation_and_tests() -> None:
+def validate_compilation_and_tests() -> int:
 #{
     run_command(
         label="Active source compilation",
@@ -356,16 +356,21 @@ def validate_compilation_and_tests() -> None:
     ]
     require(summary_lines, "Could not find the pytest completion summary.")
     pytest_summary = summary_lines[-1]
+    passed_match = re.search(r"(?P<count>\d+) passed", pytest_summary)
+    require(passed_match is not None, f"Could not parse the pytest count: {pytest_summary}")
+    passed_count = int(passed_match.group("count"))
     require(
-        re.search(rf"\b{EXPECTED_TEST_COUNT} passed\b", pytest_summary) is not None,
+        passed_count >= MINIMUM_TEST_COUNT,
         (
-            f"Expected exactly {EXPECTED_TEST_COUNT} passing tests, "
+            f"Expected at least {MINIMUM_TEST_COUNT} passing tests, "
             f"but the pytest summary was: {pytest_summary}"
         ),
     )
     require("failed" not in pytest_summary, f"Pytest reported a failure: {pytest_summary}")
     require("error" not in pytest_summary, f"Pytest reported an error: {pytest_summary}")
     require("skipped" not in pytest_summary, f"Pytest reported a skip: {pytest_summary}")
+
+    return passed_count
 #} End function validate_compilation_and_tests
 
 
@@ -824,6 +829,7 @@ def write_pass_summary(
     milliseconds_per_call: float,
     calls_per_second: float,
     started_at: str,
+    pytest_passed: int,
 ) -> None:
 #{
     summary_lines = [
@@ -835,7 +841,7 @@ def write_pass_summary(
         f"python_executable={sys.executable}",
         f"checkpoint={CHECKPOINT_PATH}",
         f"checkpoint_sha256={checkpoint_sha256}",
-        f"pytest_passed={EXPECTED_TEST_COUNT}",
+        f"pytest_passed={pytest_passed}",
         f"trajectory_archive_version={EXPECTED_TRAJECTORY_ARCHIVE_VERSION}",
         f"deterministic_output_prefix={DETERMINISTIC_PREFIX}",
         f"stochastic_output_prefix={STOCHASTIC_PREFIX}",
@@ -879,7 +885,7 @@ def main() -> int:
     #{
         validate_environment()
         checkpoint_sha256 = validate_checkpoint()
-        validate_compilation_and_tests()
+        pytest_passed = validate_compilation_and_tests()
         validate_active_obstacle_compatibility()
         validate_capacity_mismatch_rejection()
 
@@ -910,6 +916,7 @@ def main() -> int:
             milliseconds_per_call=milliseconds_per_call,
             calls_per_second=calls_per_second,
             started_at=started_at,
+            pytest_passed=pytest_passed,
         )
 
     #} End try

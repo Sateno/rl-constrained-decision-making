@@ -1,0 +1,55 @@
+{
+  "schema_version": "navigation_layout_suite_v1",
+  "suite_id": "development_navigation_layouts",
+  "max_obstacles": 3,
+  "agent_radius": 0.1,
+  "goal_radius": 0.25,
+  "layouts": [
+    {
+      "layout_id": "open_route",
+      "start": [0.0, 0.0],
+      "theta": 0.0,
+      "goal": [4.0, 0.0],
+      "obstacles": []
+    },
+    {
+      "layout_id": "near_start_projection_check",
+      "start": [0.0, 0.0],
+      "theta": 0.0,
+      "goal": [4.0, 0.0],
+      "obstacles": [
+        {"center": [0.45, 0.0], "radius": 0.2}
+      ]
+    },
+    {
+      "layout_id": "central_block",
+      "start": [0.0, 0.0],
+      "theta": 0.0,
+      "goal": [4.0, 0.0],
+      "obstacles": [
+        {"center": [2.0, 0.0], "radius": 0.35}
+      ]
+    },
+    {
+      "layout_id": "alternating_passage",
+      "start": [0.0, 0.0],
+      "theta": 0.0,
+      "goal": [4.0, 0.0],
+      "obstacles": [
+        {"center": [1.4, 0.45], "radius": 0.3},
+        {"center": [2.4, -0.45], "radius": 0.3},
+        {"center": [3.2, 0.4], "radius": 0.25}
+      ]
+    },
+    {
+      "layout_id": "diagonal_route",
+      "start": [0.0, -0.6],
+      "theta": 0.15,
+      "goal": [4.0, 0.6],
+      "obstacles": [
+        {"center": [1.5, -0.05], "radius": 0.3},
+        {"center": [2.8, 0.45], "radius": 0.25}
+      ]
+    }
+  ]
+}
