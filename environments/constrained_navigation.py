@@ -1,6 +1,4 @@
 from __future__ import annotations
-from logging import info
-
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces

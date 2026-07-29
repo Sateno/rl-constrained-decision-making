@@ -16,8 +16,8 @@ class ProjectionTrainingDiagnostics:
     slack_sum: float = 0.0
     slack_max: float = 0.0
 
-    # Consume vector-environment projection fields and fail on a solver error.
-    def update(self, infos: dict, num_envs: int) -> None:
+    # Consume one vectorized projection-info mapping.
+    def _update_vector(self, infos: dict, num_envs: int) -> None:
     #{
         if "projection_success" not in infos:
             return
@@ -34,9 +34,12 @@ class ProjectionTrainingDiagnostics:
             failure_details = ", ".join(
                 f"env {index}: {solver_status[index]}" for index in failed_indices
             )
-            raise RuntimeError(f"Projection solve failed during training ({failure_details}).")
+            raise RuntimeError(
+                f"Projection solve failed during training ({failure_details})."
+            )
 
         valid_indices = np.flatnonzero(projection_mask)
+
         if not valid_indices.size:
             return
 
@@ -67,6 +70,17 @@ class ProjectionTrainingDiagnostics:
         self.correction_sum += float(np.sum(correction_norms))
         self.slack_sum += float(np.sum(step_slack_sums))
         self.slack_max = max(self.slack_max, float(np.max(step_slack_maxima)))
+    #} End function _update_vector
+
+    # Consume ordinary and same-step terminal projection diagnostics.
+    def update(self, infos: dict, num_envs: int) -> None:
+    #{
+        self._update_vector(infos, num_envs)
+
+        final_info = infos.get("final_info")
+
+        if final_info is not None:
+            self._update_vector(final_info, num_envs)
     #} End function update
 
     # Write rollout-level projection burden to TensorBoard.

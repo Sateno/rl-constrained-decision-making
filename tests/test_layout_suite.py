@@ -9,8 +9,8 @@ import pytest
 import torch
 
 from algorithms.ppo.agent import Agent
-from evaluation.evaluate_layout_suite import main
-from evaluation.layout_suite import file_sha256, load_navigation_layout_suite
+from evaluation.evaluate_layout_suite import main, validate_output_paths
+from evaluation.layout_suite import load_navigation_layout_suite
 
 
 # Write one small valid suite used by loader and evaluator checks.
@@ -61,7 +61,7 @@ def test_layout_suite_loads_and_pads_geometry(tmp_path) -> None:
 
     assert suite.schema_version == "navigation_layout_suite_v1"
     assert suite.suite_id == "test_navigation_layouts"
-    assert suite.sha256 == file_sha256(suite_path)
+    assert len(suite.sha256) == 64
     assert suite.max_obstacles == 3
     assert len(suite.layouts) == 2
 
@@ -78,6 +78,35 @@ def test_layout_suite_loads_and_pads_geometry(tmp_path) -> None:
     assert layout.obstacle_centers[0, 0] == 1.0
 
 #} End function test_layout_suite_loads_and_pads_geometry
+
+
+# Equivalent JSON has the same identity under LF and CRLF line endings.
+def test_layout_suite_hash_is_independent_of_line_endings(tmp_path) -> None:
+#{
+    lf_path = tmp_path / "layouts_lf.json"
+    crlf_path = tmp_path / "layouts_crlf.json"
+    write_suite(lf_path)
+    content = lf_path.read_text(encoding="utf-8")
+    crlf_path.write_bytes(content.replace("\n", "\r\n").encode("utf-8"))
+
+    assert load_navigation_layout_suite(lf_path).sha256 == load_navigation_layout_suite(
+        crlf_path
+    ).sha256
+#} End function test_layout_suite_hash_is_independent_of_line_endings
+
+
+# Existing common-layout outputs are protected from silent replacement.
+def test_layout_evaluator_refuses_existing_outputs(tmp_path) -> None:
+#{
+    output_path = tmp_path / "results.csv"
+    trajectory_path = tmp_path / "trajectories.npz"
+    output_path.write_text("existing", encoding="utf-8")
+
+    with pytest.raises(FileExistsError, match="--overwrite"):
+        validate_output_paths(output_path, trajectory_path, overwrite=False)
+
+    validate_output_paths(output_path, trajectory_path, overwrite=True)
+#} End function test_layout_evaluator_refuses_existing_outputs
 
 
 # Verify that duplicate scenario identities are rejected before evaluation.
@@ -152,7 +181,7 @@ def test_layout_evaluator_writes_provenance_and_trajectory(monkeypatch, tmp_path
     main()
 
     results = pd.read_csv(output_path)
-    expected_hash = file_sha256(suite_path)
+    expected_hash = load_navigation_layout_suite(suite_path).sha256
 
     assert results["layout_id"].tolist() == ["open_route", "offset_obstacle"]
     assert results["evaluation_seed"].tolist() == [31, 32]

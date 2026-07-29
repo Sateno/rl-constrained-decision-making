@@ -16,7 +16,11 @@ set "TABLES_DIR=%OUTPUT_DIR%\tables"
 set "FIGURES_DIR=%OUTPUT_DIR%\figures"
 set "SUMMARY_PATH=%OUTPUT_DIR%\result_build_summary.txt"
 
-if exist "%SUMMARY_PATH%" del /q "%SUMMARY_PATH%"
+if exist "%OUTPUT_DIR%" (
+    echo ERROR: output directory already exists: %OUTPUT_DIR%
+    echo Choose a new output directory or remove the old build explicitly.
+    exit /b 2
+)
 
 python -m analysis.aggregate_projection_results ^
   --protocol "%PROTOCOL%" ^

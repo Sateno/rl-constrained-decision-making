@@ -2,7 +2,11 @@
   "schema_version": "projection_analysis_protocol_v1",
   "study_id": "predictive_action_projection_core",
   "layout_suite": "../evaluation/layouts/core_navigation_layouts.json",
-  "expected_train_seeds": [1, 2, 3],
+  "expected_train_seeds": [
+    1,
+    2,
+    3
+  ],
   "expected_repeats_per_layout": 1,
   "evaluation_policy_mode": "deterministic",
   "evaluation_collision_penalty": 10.0,
@@ -19,21 +23,30 @@
       "display_name": "PPO baseline",
       "training_collision_penalty": 10.0,
       "training_projection_enabled": false,
-      "required_projection_modes": ["disabled", "enabled"]
+      "required_projection_modes": [
+        "disabled",
+        "enabled"
+      ]
     },
     {
       "method": "ppo_high_penalty",
       "display_name": "PPO high penalty",
       "training_collision_penalty": 50.0,
       "training_projection_enabled": false,
-      "required_projection_modes": ["disabled"]
+      "required_projection_modes": [
+        "disabled"
+      ]
     },
     {
       "method": "ppo_train_projection",
       "display_name": "PPO trained with projection",
       "training_collision_penalty": 10.0,
       "training_projection_enabled": true,
-      "required_projection_modes": ["disabled", "enabled"]
+      "required_projection_modes": [
+        "disabled",
+        "enabled"
+      ]
     }
-  ]
+  ],
+  "require_complete_artifacts": true
 }

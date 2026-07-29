@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from evaluation.layout_suite import load_navigation_layout_suite
+from evaluation.layout_suite import canonical_json_sha256, load_navigation_layout_suite
 
 
 PROTOCOL_SCHEMA = "projection_analysis_protocol_v1"
@@ -120,6 +119,11 @@ def load_protocol(path: str | Path) -> dict[str, object]:
     if type(repeats) is not int or repeats <= 0:
         raise ValueError("expected_repeats_per_layout must be positive.")
 
+    require_complete_artifacts = data.get("require_complete_artifacts", False)
+    if type(require_complete_artifacts) is not bool:
+        raise ValueError("require_complete_artifacts must be Boolean when provided.")
+    data["require_complete_artifacts"] = require_complete_artifacts
+
     suite_path = (source.parent / str(data.get("layout_suite", ""))).resolve()
     suite = load_navigation_layout_suite(suite_path)
     layout_ids = {layout.layout_id for layout in suite.layouts}
@@ -133,8 +137,9 @@ def load_protocol(path: str | Path) -> dict[str, object]:
     if not required_projection_fields.issubset(projection):
         raise ValueError("projection_parameters is incomplete.")
 
+    protocol_sha256 = canonical_json_sha256(data)
     data["_source_path"] = source
-    data["_sha256"] = hashlib.sha256(raw).hexdigest()
+    data["_sha256"] = protocol_sha256
     data["_layout_suite"] = suite
     data["_method_map"] = {method["method"]: method for method in methods}
     return data
@@ -260,8 +265,61 @@ def validate_episodes(protocol: dict[str, object], episodes: pd.DataFrame) -> No
         if not np.all(np.isfinite(values)) or not np.allclose(values, float(expected), atol=1.0e-12, rtol=0.0):
             raise ValueError(f"Evaluation rows do not share the protocol {column}.")
 
-    if int(pd.to_numeric(episodes["projection_solver_failure_count"]).sum()) != 0:
+    episode_returns = pd.to_numeric(episodes["episode_return"], errors="coerce").to_numpy(float)
+    episode_lengths = pd.to_numeric(episodes["episode_length"], errors="coerce").to_numpy(float)
+
+    if not np.all(np.isfinite(episode_returns)):
+        raise ValueError("episode_return must be finite for every selected episode.")
+    if not np.all(np.isfinite(episode_lengths)) or np.any(episode_lengths <= 0.0):
+        raise ValueError("episode_length must be finite and positive for every selected episode.")
+
+    solver_failures = pd.to_numeric(
+        episodes["projection_solver_failure_count"],
+        errors="coerce",
+    ).to_numpy(float)
+
+    if not np.all(np.isfinite(solver_failures)) or not np.allclose(
+        solver_failures,
+        np.round(solver_failures),
+        atol=0.0,
+        rtol=0.0,
+    ):
+        raise ValueError("projection_solver_failure_count must contain finite integers.")
+    if np.any(solver_failures != 0.0):
         raise ValueError("The selected evaluation dataset contains projection solver failures.")
+
+    projection_metrics = (
+        "projection_intervention_rate",
+        "mean_projection_correction_norm",
+        "max_projection_correction_norm",
+        "mean_projection_slack_sum",
+        "max_projection_slack",
+    )
+
+    for column in projection_metrics:
+        values = pd.to_numeric(episodes[column], errors="coerce").to_numpy(float)
+        if not np.all(np.isfinite(values)) or np.any(values < 0.0):
+            raise ValueError(f"{column} must be finite and nonnegative.")
+
+    intervention_rates = pd.to_numeric(
+        episodes["projection_intervention_rate"],
+        errors="coerce",
+    ).to_numpy(float)
+    if np.any(intervention_rates > 1.0):
+        raise ValueError("projection_intervention_rate must not exceed one.")
+
+    clearance = pd.to_numeric(episodes["min_obstacle_clearance"], errors="coerce").to_numpy(float)
+    if np.any(np.isinf(clearance)):
+        raise ValueError("min_obstacle_clearance must not contain infinite values.")
+    active_layouts = {
+        layout.layout_id: bool(np.any(layout.obstacle_mask))
+        for layout in suite.layouts
+    }
+    active_rows = episodes["layout_id"].map(active_layouts).to_numpy(bool)
+    if not np.all(np.isfinite(clearance[active_rows])):
+        raise ValueError(
+            "min_obstacle_clearance may be undefined only for layouts without active obstacles."
+        )
 
     expected_enabled = episodes["projection_mode"].eq("enabled")
     if not bool((episodes["projection_enabled"] == expected_enabled).all()):
@@ -280,6 +338,9 @@ def validate_episodes(protocol: dict[str, object], episodes: pd.DataFrame) -> No
 
     if bool(duplicates.any()):
         raise ValueError("Duplicate common-layout episode keys were discovered.")
+
+    reference_keys = None
+    reference_label = None
 
     for method in methods:
         method_name = method["method"]
@@ -313,15 +374,24 @@ def validate_episodes(protocol: dict[str, object], episodes: pd.DataFrame) -> No
                 if len(hashes) != 1:
                     raise ValueError(f"Multiple checkpoints were mixed for {method_name}, seed {seed}, {mode}.")
                 checkpoint_hashes.update(hashes)
-                mode_keys.append(
-                    set(
-                        zip(
-                            group["layout_id"].astype(str),
-                            group["layout_repeat"].astype(int),
-                            group["evaluation_seed"].astype(int),
-                        )
+                keys = set(
+                    zip(
+                        group["layout_id"].astype(str),
+                        group["layout_repeat"].astype(int),
+                        group["evaluation_seed"].astype(int),
                     )
                 )
+                mode_keys.append(keys)
+
+                label = f"{method_name}, seed {seed}, {mode}"
+                if reference_keys is None:
+                    reference_keys = keys
+                    reference_label = label
+                elif keys != reference_keys:
+                    raise ValueError(
+                        "Evaluation keys differ across methods, seeds, or projection modes: "
+                        f"{reference_label} versus {label}."
+                    )
 
             if len(checkpoint_hashes) != 1:
                 raise ValueError(f"Projection modes use different checkpoints for {method_name}, seed {seed}.")
@@ -592,7 +662,7 @@ def write_latex_tables(methods: pd.DataFrame, paired_methods: pd.DataFrame, outp
             )
 
         paired_lines.append(
-            f"{latex_escape(row.display_name)} & " + " & ".join(values) + " \\"
+            f"{latex_escape(row.display_name)} & " + " & ".join(values) + " " + '\\\\'
         )
 
     paired_lines.extend(["\\bottomrule", "\\end{tabular}"])
@@ -605,6 +675,13 @@ def write_latex_tables(methods: pd.DataFrame, paired_methods: pd.DataFrame, outp
 # Build all canonical tables from discovered common-layout episode CSVs.
 def build_result_tables(protocol_path: str | Path, evaluation_dir: str | Path, output_dir: str | Path) -> dict[str, Path]:
 #{
+    output = Path(output_dir)
+
+    if output.exists() and (not output.is_dir() or any(output.iterdir())):
+        raise FileExistsError(
+            f"Result table directory already exists and is not empty: {output}"
+        )
+
     protocol = load_protocol(protocol_path)
     episodes, discovery_audit = discover_episodes(protocol, evaluation_dir)
     validate_episodes(protocol, episodes)
@@ -612,7 +689,6 @@ def build_result_tables(protocol_path: str | Path, evaluation_dir: str | Path, o
     methods = method_summary(protocol, checkpoints)
     paired = paired_deltas(protocol, episodes)
     paired_methods = paired_summary(paired)
-    output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
     paths = {
         "episodes": output / "evaluation_episode_results.csv",
