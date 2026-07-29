@@ -2,7 +2,9 @@
   "schema_version": "projection_analysis_protocol_v1",
   "study_id": "development_projection_analysis_smoke",
   "layout_suite": "../evaluation/layouts/development_navigation_layouts.json",
-  "expected_train_seeds": [1],
+  "expected_train_seeds": [
+    1
+  ],
   "expected_repeats_per_layout": 1,
   "evaluation_policy_mode": "deterministic",
   "evaluation_collision_penalty": 10.0,
@@ -17,7 +19,11 @@
     {
       "method": "ppo_baseline",
       "display_name": "PPO baseline",
-      "required_projection_modes": ["disabled", "enabled"]
+      "required_projection_modes": [
+        "disabled",
+        "enabled"
+      ]
     }
-  ]
+  ],
+  "require_complete_artifacts": false
 }

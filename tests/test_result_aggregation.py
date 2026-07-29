@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from analysis.aggregate_projection_results import build_result_tables
+from evaluation.layout_suite import load_navigation_layout_suite
 
 
 #################################################################################
@@ -73,6 +74,7 @@ def write_protocol(root: Path, layout_suite_path: Path) -> Path:
                     "extra_clearance": 0.0,
                 },
                 "representative_layout_id": "layout_b",
+                "require_complete_artifacts": False,
                 "methods": [
                     {
                         "method": "ppo_baseline",
@@ -143,9 +145,7 @@ def episode_row(
 # Write all required CSV shards under arbitrary filenames.
 def write_complete_evaluations(root: Path, layout_suite_path: Path) -> list[Path]:
 #{
-    import hashlib
-
-    suite_hash = hashlib.sha256(layout_suite_path.read_bytes()).hexdigest()
+    suite_hash = load_navigation_layout_suite(layout_suite_path).sha256
     evaluation_dir = root / "evaluation"
     evaluation_dir.mkdir()
     paths = []
@@ -229,7 +229,13 @@ def test_result_build_aggregates_layouts_before_seeds_and_preserves_pairs(tmp_pa
         "episode_return_delta_enabled_minus_disabled_mean"
     ] == pytest.approx(1.75)
     assert outputs["method_latex"].read_text(encoding="utf-8").strip()
-    assert outputs["paired_latex"].read_text(encoding="utf-8").strip()
+    paired_latex = outputs["paired_latex"].read_text(encoding="utf-8")
+    assert paired_latex.strip()
+    assert "PPO baseline & " in paired_latex
+    assert any(
+        line.startswith("PPO baseline & ") and line.endswith('\\\\')
+        for line in paired_latex.splitlines()
+    )
     assert audit["selected_csv_count"] == 4
     assert audit["discovered_csv_count"] == 5
     assert audit["projection_solver_failure_count"] == 0
@@ -265,6 +271,72 @@ def test_result_build_rejects_duplicate_episode_keys(tmp_path: Path):
         build_result_tables(protocol_path, tmp_path / "evaluation", tmp_path / "tables")
 
 #} End function test_result_build_rejects_duplicate_episode_keys
+
+
+# Every method and seed must use one identical layout/repeat/evaluation-seed key set.
+def test_result_build_rejects_cross_seed_evaluation_key_mismatch(tmp_path: Path):
+#{
+    layout_suite_path = write_layout_suite(tmp_path)
+    protocol_path = write_protocol(tmp_path, layout_suite_path)
+    paths = write_complete_evaluations(tmp_path, layout_suite_path)
+    frame = pd.read_csv(paths[2])
+    frame.loc[0, "evaluation_seed"] = 9999
+    frame.to_csv(paths[2], index=False)
+
+    with pytest.raises(ValueError, match="Evaluation keys differ"):
+        build_result_tables(protocol_path, tmp_path / "evaluation", tmp_path / "tables")
+#} End function test_result_build_rejects_cross_seed_evaluation_key_mismatch
+
+
+@pytest.mark.parametrize(
+    ("column", "value", "message"),
+    [
+        ("episode_return", np.nan, "episode_return must be finite"),
+        (
+            "projection_solver_failure_count",
+            np.nan,
+            "projection_solver_failure_count must contain finite integers",
+        ),
+        (
+            "mean_projection_correction_norm",
+            np.nan,
+            "mean_projection_correction_norm must be finite",
+        ),
+    ],
+)
+# Non-finite evidence fields cannot be interpreted as valid zero-valued results.
+def test_result_build_rejects_nonfinite_evidence(
+    tmp_path: Path,
+    column: str,
+    value: float,
+    message: str,
+):
+#{
+    layout_suite_path = write_layout_suite(tmp_path)
+    protocol_path = write_protocol(tmp_path, layout_suite_path)
+    paths = write_complete_evaluations(tmp_path, layout_suite_path)
+    frame = pd.read_csv(paths[1])
+    frame.loc[0, column] = value
+    frame.to_csv(paths[1], index=False)
+
+    with pytest.raises(ValueError, match=message):
+        build_result_tables(protocol_path, tmp_path / "evaluation", tmp_path / "tables")
+#} End function test_result_build_rejects_nonfinite_evidence
+
+
+# A completed result-table directory is never overwritten silently.
+def test_result_build_refuses_nonempty_output_directory(tmp_path: Path):
+#{
+    layout_suite_path = write_layout_suite(tmp_path)
+    protocol_path = write_protocol(tmp_path, layout_suite_path)
+    write_complete_evaluations(tmp_path, layout_suite_path)
+    output_dir = tmp_path / "tables"
+    output_dir.mkdir()
+    (output_dir / "existing.txt").write_text("existing", encoding="utf-8")
+
+    with pytest.raises(FileExistsError, match="not empty"):
+        build_result_tables(protocol_path, tmp_path / "evaluation", output_dir)
+#} End function test_result_build_refuses_nonempty_output_directory
 
 
 # Files from another layout suite are ignored rather than selected by filename conventions.
@@ -369,3 +441,61 @@ def test_training_curve_discovery_uses_tensorboard_checkpoint_metadata(tmp_path:
     assert points["value"].tolist() == [1.0, 2.0]
 
 #} End function test_training_curve_discovery_uses_tensorboard_checkpoint_metadata
+
+
+
+
+# Development builds tolerate the absence of optional TensorBoard curve data.
+def test_training_curve_aggregation_accepts_empty_optional_data() -> None:
+#{
+    from analysis.plot_projection_results import aggregate_curve
+
+    assert aggregate_curve(pd.DataFrame(), "charts/episodic_return").empty
+#} End function test_training_curve_aggregation_accepts_empty_optional_data
+
+# Final protocols require a TensorBoard training-return source for every checkpoint.
+def test_final_result_build_rejects_missing_training_run(tmp_path: Path) -> None:
+#{
+    from analysis.plot_projection_results import training_points
+
+    checkpoint_summary = pd.DataFrame(
+        [
+            {
+                "method": "ppo_baseline",
+                "display_name": "PPO baseline",
+                "train_seed": 1,
+                "checkpoint_sha256": "1" * 64,
+            }
+        ]
+    )
+    runs_dir = tmp_path / "runs"
+    runs_dir.mkdir()
+
+    with pytest.raises(ValueError, match="Required TensorBoard run was not found"):
+        training_points(checkpoint_summary, runs_dir, require_complete=True)
+#} End function test_final_result_build_rejects_missing_training_run
+
+
+# Final protocols reject partial representative-trajectory evidence.
+def test_final_result_build_rejects_missing_representative_trajectory(tmp_path: Path) -> None:
+#{
+    from analysis.aggregate_projection_results import load_protocol
+    from analysis.plot_projection_results import plot_trajectories
+
+    layout_suite_path = write_layout_suite(tmp_path)
+    protocol_path = write_protocol(tmp_path, layout_suite_path)
+    protocol = load_protocol(protocol_path)
+    protocol["require_complete_artifacts"] = True
+    paths = write_complete_evaluations(tmp_path, layout_suite_path)
+    episodes = pd.concat([pd.read_csv(path) for path in paths], ignore_index=True)
+
+    with pytest.raises(ValueError, match="Required representative trajectories are incomplete"):
+        plot_trajectories(
+            protocol,
+            episodes,
+            tmp_path / "evaluation",
+            tmp_path / "figure.pdf",
+            tmp_path / "selection.csv",
+            require_complete=True,
+        )
+#} End function test_final_result_build_rejects_missing_representative_trajectory

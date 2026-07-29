@@ -199,7 +199,11 @@ def resolve_recorded_checkpoint(path_text: str, runs_dir: Path) -> Path:
 
 
 # Discover TensorBoard runs by the checkpoint path recorded in their own metadata.
-def training_points(checkpoint_summary: pd.DataFrame, runs_dir: Path) -> tuple[pd.DataFrame, list[dict]]:
+def training_points(
+    checkpoint_summary: pd.DataFrame,
+    runs_dir: Path,
+    require_complete: bool = False,
+) -> tuple[pd.DataFrame, list[dict]]:
 #{
     unique = checkpoint_summary[
         ["method", "display_name", "train_seed", "checkpoint_sha256"]
@@ -216,6 +220,10 @@ def training_points(checkpoint_summary: pd.DataFrame, runs_dir: Path) -> tuple[p
             hyperparameters, scalars = load_tensorboard_run(run_dir)
         except ModuleNotFoundError as error:
             if error.name and error.name.startswith("tensorboard"):
+                if require_complete:
+                    raise RuntimeError(
+                        "TensorBoard is required by the final analysis protocol."
+                    ) from error
                 return pd.DataFrame(), [
                     {"reason": "tensorboard_unavailable", "details": str(error)}
                 ]
@@ -269,13 +277,17 @@ def training_points(checkpoint_summary: pd.DataFrame, runs_dir: Path) -> tuple[p
         match = run_index.get(str(row.checkpoint_sha256))
 
         if match is None:
-            skipped.append(
-                {
-                    "method": row.method,
-                    "train_seed": int(row.train_seed),
-                    "reason": "tensorboard_run_not_found",
-                }
-            )
+            item = {
+                "method": row.method,
+                "train_seed": int(row.train_seed),
+                "reason": "tensorboard_run_not_found",
+            }
+            if require_complete:
+                raise ValueError(
+                    "Required TensorBoard run was not found for "
+                    f"{row.method}, seed {int(row.train_seed)}."
+                )
+            skipped.append(item)
             continue
 
         run_dir, hyperparameters, scalars = match
@@ -298,14 +310,18 @@ def training_points(checkpoint_summary: pd.DataFrame, runs_dir: Path) -> tuple[p
             frame = scalars.get(tag, pd.DataFrame())
 
             if frame.empty:
-                skipped.append(
-                    {
-                        "method": row.method,
-                        "train_seed": int(row.train_seed),
-                        "tag": tag,
-                        "reason": "scalar_not_found",
-                    }
-                )
+                item = {
+                    "method": row.method,
+                    "train_seed": int(row.train_seed),
+                    "tag": tag,
+                    "reason": "scalar_not_found",
+                }
+                if require_complete and tag == "charts/episodic_return":
+                    raise ValueError(
+                        "Required charts/episodic_return scalar was not found for "
+                        f"{row.method}, seed {int(row.train_seed)}."
+                    )
+                skipped.append(item)
                 continue
 
             frame = frame.copy()
@@ -323,6 +339,9 @@ def training_points(checkpoint_summary: pd.DataFrame, runs_dir: Path) -> tuple[p
 # Interpolate seed curves onto one common within-method grid.
 def aggregate_curve(points: pd.DataFrame, tag: str) -> pd.DataFrame:
 #{
+    if points.empty or "tag" not in points.columns:
+        return pd.DataFrame()
+
     rows = []
 
     for (method, display_name), method_rows in points[points["tag"] == tag].groupby(
@@ -470,11 +489,19 @@ def episode_key(archive: np.lib.npyio.NpzFile, episode: int, seed: int) -> str:
 
 
 # Plot one protocol-selected layout for the lowest training seed of each method/mode.
-def plot_trajectories(protocol: dict[str, object], episodes: pd.DataFrame, evaluation_dir: Path, figure_path: Path, selection_path: Path) -> bool:
+def plot_trajectories(
+    protocol: dict[str, object],
+    episodes: pd.DataFrame,
+    evaluation_dir: Path,
+    figure_path: Path,
+    selection_path: Path,
+    require_complete: bool = False,
+) -> bool:
 #{
     index = trajectory_index(protocol, evaluation_dir)
     selected = []
     trajectories = []
+    missing = []
     seed = min(protocol["expected_train_seeds"])
 
     for method in protocol["methods"]:
@@ -488,6 +515,9 @@ def plot_trajectories(protocol: dict[str, object], episodes: pd.DataFrame, evalu
             ]
 
             if len(rows) != 1:
+                missing.append(
+                    f"{method['method']}, seed {seed}, {mode}: expected one evaluation row"
+                )
                 continue
 
             row = rows.iloc[0]
@@ -495,6 +525,9 @@ def plot_trajectories(protocol: dict[str, object], episodes: pd.DataFrame, evalu
             archive_path = index.get(key)
 
             if archive_path is None:
+                missing.append(
+                    f"{method['method']}, seed {seed}, {mode}: trajectory archive not found"
+                )
                 continue
 
             with np.load(archive_path, allow_pickle=False) as archive:
@@ -523,6 +556,10 @@ def plot_trajectories(protocol: dict[str, object], episodes: pd.DataFrame, evalu
                 }
             )
 
+    if missing and require_complete:
+        raise ValueError(
+            "Required representative trajectories are incomplete: " + "; ".join(missing)
+        )
     if not trajectories:
         return False
 
@@ -563,7 +600,14 @@ def build_result_figures(protocol_path: str | Path, tables_dir: str | Path, eval
     tables = Path(tables_dir)
     evaluation = Path(evaluation_dir).resolve()
     figures = Path(figures_dir)
+
+    if figures.exists() and (not figures.is_dir() or any(figures.iterdir())):
+        raise FileExistsError(
+            f"Result figure directory already exists and is not empty: {figures}"
+        )
+
     figures.mkdir(parents=True, exist_ok=True)
+    require_complete = bool(protocol["require_complete_artifacts"])
     method_summary = pd.read_csv(tables / "method_summary.csv")
     checkpoint_summary = pd.read_csv(tables / "checkpoint_summary.csv")
     episodes = pd.read_csv(tables / "evaluation_episode_results.csv")
@@ -577,14 +621,23 @@ def build_result_figures(protocol_path: str | Path, tables_dir: str | Path, eval
         else:
             skipped.append({"figure": filename, "reason": "no_finite_values"})
 
+    if require_complete and runs_dir is None:
+        raise ValueError("The final analysis protocol requires a runs directory.")
+
     if runs_dir is not None:
-        points, missing = training_points(checkpoint_summary, Path(runs_dir).resolve())
+        points, missing = training_points(
+            checkpoint_summary,
+            Path(runs_dir).resolve(),
+            require_complete=require_complete,
+        )
         skipped.extend(missing)
         curve_frames = []
 
         for tag, filename, ylabel in TRAINING_TAGS:
             curve = aggregate_curve(points, tag)
             if curve.empty:
+                if require_complete and tag == "charts/episodic_return":
+                    raise ValueError("Required training-return curve could not be aggregated.")
                 skipped.append({"figure": filename, "reason": "scalar_unavailable"})
                 continue
             path = figures / filename
@@ -600,7 +653,14 @@ def build_result_figures(protocol_path: str | Path, tables_dir: str | Path, eval
     selection = tables / "representative_trajectory_selection.csv"
     trajectory_figure = figures / "representative_trajectories.pdf"
 
-    if plot_trajectories(protocol, episodes, evaluation, trajectory_figure, selection):
+    if plot_trajectories(
+        protocol,
+        episodes,
+        evaluation,
+        trajectory_figure,
+        selection,
+        require_complete=require_complete,
+    ):
         generated[trajectory_figure.name] = trajectory_figure
         generated[selection.name] = selection
     else:

@@ -93,6 +93,21 @@ def _as_finite_float(value: object, field_name: str) -> float:
 #} End function _as_finite_float
 
 
+# Return a platform-independent SHA-256 for parsed JSON data.
+def canonical_json_sha256(data: object) -> str:
+#{
+    canonical = json.dumps(
+        data,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+#} End function canonical_json_sha256
+
+
 # Return the SHA-256 of exact file bytes.
 def file_sha256(path: str | Path) -> str:
 #{
@@ -262,7 +277,7 @@ def load_navigation_layout_suite(path: str | Path) -> NavigationLayoutSuite:
         schema_version=schema_version,
         suite_id=suite_id,
         source_path=source_path,
-        sha256=hashlib.sha256(raw_bytes).hexdigest(),
+        sha256=canonical_json_sha256(data),
         max_obstacles=max_obstacles,
         agent_radius=agent_radius,
         goal_radius=goal_radius,
@@ -278,6 +293,7 @@ __all__ = [
     "LAYOUT_SUITE_SCHEMA_VERSION",
     "NavigationLayout",
     "NavigationLayoutSuite",
+    "canonical_json_sha256",
     "file_sha256",
     "load_navigation_layout_suite",
 ]

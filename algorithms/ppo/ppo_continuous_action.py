@@ -151,6 +151,14 @@ def make_env(
     )
 
 
+# Create the synchronous vector environment with immediate autoreset semantics.
+def make_vector_env(env_fns):
+    return gym.vector.SyncVectorEnv(
+        env_fns,
+        autoreset_mode=gym.vector.AutoresetMode.SAME_STEP,
+    )
+
+
 if __name__ == "__main__":
     args = tyro.cli(Args)
     args.batch_size = int(args.num_envs * args.num_steps)
@@ -197,7 +205,7 @@ if __name__ == "__main__":
 
 
     # env setup
-    envs = gym.vector.SyncVectorEnv(
+    envs = make_vector_env(
         [
             make_env(
                 args.env_id,
@@ -275,72 +283,49 @@ if __name__ == "__main__":
             if args.enable_projection:
                 projection_diagnostics.update(infos, args.num_envs)
 
-            # Gymnasium RecordEpisodeStatistics can expose completed-episode statistics
-            # through infos["episode"] and infos["_episode"] in vectorized environments.
-            # Some older CleanRL/Gymnasium combinations used infos["final_info"].
-            if "episode" in infos:
-                episode_info = infos["episode"]
-                episode_mask = infos.get("_episode", np.ones(args.num_envs, dtype=bool))
-        
-                for env_index, finished in enumerate(episode_mask):
-                    if not finished:
-                        continue
-        
+            # Same-step autoreset preserves terminal data in final_info while returning
+            # the next episode's reset observation for continued rollout collection.
+            final_info = infos.get("final_info")
+
+            if final_info is not None and "episode" in final_info:
+                episode_mask = np.asarray(
+                    final_info.get("_episode", np.zeros(args.num_envs, dtype=bool)),
+                    dtype=bool,
+                )
+                episode_info = final_info["episode"]
+
+                for env_index in np.flatnonzero(episode_mask):
                     episodic_return = float(episode_info["r"][env_index])
                     episodic_length = int(episode_info["l"][env_index])
-        
+
                     print(
                         f"global_step={global_step}, "
                         f"env={env_index}, "
                         f"episodic_return={episodic_return:.3f}, "
                         f"episodic_length={episodic_length}"
                     )
-        
+                    writer.add_scalar("charts/episodic_return", episodic_return, global_step)
+                    writer.add_scalar("charts/episodic_length", episodic_length, global_step)
                     writer.add_scalar(
-                        "charts/episodic_return",
-                        episodic_return,
+                        "safety/success",
+                        float(final_info["success"][env_index]),
                         global_step,
                     )
-        
                     writer.add_scalar(
-                        "charts/episodic_length",
-                        episodic_length,
+                        "safety/collision",
+                        float(final_info["collision"][env_index]),
                         global_step,
                     )
-                    writer.add_scalar("safety/success", float(infos["success"][env_index]), global_step)
-                    writer.add_scalar("safety/collision", float(infos["collision"][env_index]), global_step)
-                    min_clearance = float(infos["min_obstacle_clearance"][env_index])
-                    if np.isfinite(min_clearance):
-                        writer.add_scalar("safety/min_obstacle_clearance", min_clearance, global_step)
-        
-            elif "final_info" in infos:
-                for info in infos["final_info"]:
-                    if info and "episode" in info:
-                        episodic_return = float(info["episode"]["r"])
-                        episodic_length = int(info["episode"]["l"])
-        
-                        print(
-                            f"global_step={global_step}, "
-                            f"episodic_return={episodic_return:.3f}, "
-                            f"episodic_length={episodic_length}"
-                        )
-        
+                    final_clearance = float(
+                        final_info["min_obstacle_clearance"][env_index]
+                    )
+
+                    if np.isfinite(final_clearance):
                         writer.add_scalar(
-                            "charts/episodic_return",
-                            episodic_return,
+                            "safety/final_obstacle_clearance",
+                            final_clearance,
                             global_step,
                         )
-        
-                        writer.add_scalar(
-                            "charts/episodic_length",
-                            episodic_length,
-                            global_step,
-                        )
-                        writer.add_scalar("safety/success", float(info.get("success", False)), global_step)
-                        writer.add_scalar("safety/collision", float(info.get("collision", False)), global_step)
-                        min_clearance = float(info.get("min_obstacle_clearance", float("nan")))
-                        if np.isfinite(min_clearance):
-                            writer.add_scalar("safety/min_obstacle_clearance", min_clearance, global_step)
 
         if args.enable_projection:
             projection_diagnostics.write_tensorboard(writer, global_step)

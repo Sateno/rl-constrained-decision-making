@@ -46,6 +46,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--cuda", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--trajectory-output", type=Path, default=None)
+    parser.add_argument("--overwrite", action="store_true")
 
     defaults = ProjectionParams()
     parser.add_argument(
@@ -92,6 +93,24 @@ def parse_args() -> argparse.Namespace:
 #} End function parse_args
 
 
+# Refuse to replace completed evaluation artifacts unless explicitly requested.
+def validate_output_paths(output_path: Path, trajectory_path: Path | None, overwrite: bool) -> None:
+#{
+    existing = [
+        path
+        for path in (output_path, trajectory_path)
+        if path is not None and path.exists()
+    ]
+
+    if existing and not overwrite:
+        joined = ", ".join(str(path) for path in existing)
+        raise FileExistsError(
+            f"Evaluation output already exists: {joined}. "
+            "Delete it or pass --overwrite explicitly."
+        )
+#} End function validate_output_paths
+
+
 # Validate explicit labels and return the training fields stored in the checkpoint.
 def checkpoint_metadata(checkpoint: dict, *, method: str, train_seed: int) -> dict[str, object]:
 #{
@@ -128,6 +147,7 @@ def checkpoint_metadata(checkpoint: dict, *, method: str, train_seed: int) -> di
 def main() -> None:
 #{
     args = parse_args()
+    validate_output_paths(args.output, args.trajectory_output, args.overwrite)
     suite = load_navigation_layout_suite(args.layout_suite)
     projection_params = make_projection_params(args)
     projection_enabled = args.projection_mode == "enabled"
