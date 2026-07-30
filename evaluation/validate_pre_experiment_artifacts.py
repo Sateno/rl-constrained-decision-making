@@ -211,7 +211,7 @@ def scalar_event_count(accumulator: Any, tag: str) -> int:
 
 
 # Audit the three short training checkpoints and their TensorBoard runs.
-def validate_training(checkpoint_directory: Path, output: Path) -> None:
+def validate_training(checkpoint_directory: Path, output: Path, seed: int, total_timesteps: int) -> None:
 #{
     import torch
     from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
@@ -229,8 +229,8 @@ def validate_training(checkpoint_directory: Path, output: Path) -> None:
         checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
         args = checkpoint["args"]
         require(args["method"] == method, f"Method mismatch in {checkpoint_path}.")
-        require(int(args["seed"]) == 9901, f"Seed mismatch in {checkpoint_path}.")
-        require(int(args["total_timesteps"]) == 2048, f"Timestep mismatch in {checkpoint_path}.")
+        require(int(args["seed"]) == seed, f"Seed mismatch in {checkpoint_path}.")
+        require(int(args["total_timesteps"]) == total_timesteps, f"Timestep mismatch in {checkpoint_path}.")
         require(bool(args["enable_projection"]) == projection_enabled, f"Projection flag mismatch in {checkpoint_path}.")
         require(float(args["collision_penalty"]) == collision_penalty, f"Collision penalty mismatch in {checkpoint_path}.")
 
@@ -401,6 +401,8 @@ def main() -> None:
     training_parser = subparsers.add_parser("training")
     training_parser.add_argument("--checkpoint-dir", type=Path, required=True)
     training_parser.add_argument("--output", type=Path, required=True)
+    training_parser.add_argument("--seed", type=int, required=True)
+    training_parser.add_argument("--total-timesteps", type=int, required=True)
 
     layout_parser = subparsers.add_parser("layouts")
     layout_parser.add_argument("--evaluation-dir", type=Path, required=True)
@@ -417,7 +419,12 @@ def main() -> None:
     elif args.command == "canonical":
         validate_canonical_summary()
     elif args.command == "training":
-        validate_training(args.checkpoint_dir, args.output)
+        validate_training(
+            args.checkpoint_dir,
+            args.output,
+            args.seed,
+            args.total_timesteps,
+        )
     elif args.command == "layouts":
         validate_layouts(args.evaluation_dir, args.output)
     elif args.command == "results":
