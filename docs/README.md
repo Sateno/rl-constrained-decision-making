@@ -42,6 +42,14 @@ The Python validators and tests are the executable source of truth. The validati
 
 Records preserve decisions and evidence tied to a particular revision, checkpoint, protocol, or dataset. Accepted records are not rewritten to match later outcomes. A correction requires a new record or an explicit amendment.
 
+### Curated calibration evidence
+
+- [Core navigation layout calibration evidence](../results/calibration/core_navigation_layouts_v1/README.md)
+
+The calibration evidence directory contains the compact family table, the
+layout-level paired comparison, and the representative trajectory figure. The
+complete raw calibration bundle remains outside normal Git under `runs/`.
+
 ### Visual references
 
 - [Original training layout](assets/layouts/original_training_layout.pdf)
