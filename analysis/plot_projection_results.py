@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 
@@ -14,21 +13,17 @@ import numpy as np
 import pandas as pd
 
 from analysis.aggregate_projection_results import load_protocol
-
-
-TRAINING_TAGS = (
-    ("charts/episodic_return", "training_return.pdf", "Episode return"),
-    (
-        "projection/intervention_frequency",
-        "training_projection_intervention.pdf",
-        "Projection intervention frequency",
-    ),
-    (
-        "projection/correction_norm",
-        "training_projection_correction.pdf",
-        "Projection correction norm",
-    ),
+from analysis.training_diagnostics import (
+    DERIVED_EPISODE_CURVES,
+    TRAINING_CURVES,
+    aggregate_curve,
+    aggregate_episode_curve,
+    training_episode_diagnostics,
+    training_points,
+    training_rollout_diagnostics,
 )
+
+
 EVALUATION_PLOTS = (
     ("episode_return", "evaluation_return.pdf", "Mean episode return", False),
     ("success_rate", "evaluation_success_rate.pdf", "Success rate", False),
@@ -37,6 +32,18 @@ EVALUATION_PLOTS = (
         "min_obstacle_clearance",
         "evaluation_min_obstacle_clearance.pdf",
         "Mean minimum obstacle clearance",
+        False,
+    ),
+    (
+        "action_bound_clipping_rate",
+        "evaluation_action_bound_clipping.pdf",
+        "Action-bound clipping rate",
+        False,
+    ),
+    (
+        "action_bound_clipping_norm",
+        "evaluation_action_bound_clipping_norm.pdf",
+        "Mean action-bound clipping norm",
         False,
     ),
     (
@@ -52,9 +59,21 @@ EVALUATION_PLOTS = (
         True,
     ),
     (
+        "projection_correction_norm_max",
+        "evaluation_projection_correction_max.pdf",
+        "Maximum projection correction norm",
+        True,
+    ),
+    (
         "projection_slack_sum",
         "evaluation_projection_slack.pdf",
         "Mean summed projection slack",
+        True,
+    ),
+    (
+        "projection_slack_max",
+        "evaluation_projection_slack_max.pdf",
+        "Maximum projection slack",
         True,
     ),
 )
@@ -63,25 +82,12 @@ EVALUATION_PLOTS = (
 #################################################################################
 # region Basic plotting
 
-# Return one file SHA-256.
-def file_sha256(path: Path) -> str:
-#{
-    digest = hashlib.sha256()
-
-    with path.open("rb") as file:
-        for block in iter(lambda: file.read(1024 * 1024), b""):
-            digest.update(block)
-
-    return digest.hexdigest()
-
-#} End function file_sha256
-
-
 # Save without automatic layout engines that can fail inside native libraries.
 def save_figure(figure: plt.Figure, path: Path, bottom: float = 0.30) -> None:
 #{
     path.parent.mkdir(parents=True, exist_ok=True)
     figure.subplots_adjust(left=0.16, right=0.98, top=0.90, bottom=bottom)
+
     figure.savefig(path)
     plt.close(figure)
 
@@ -126,270 +132,6 @@ def plot_evaluation_bar(summary: pd.DataFrame, metric: str, path: Path, ylabel: 
 
 #################################################################################
 # region TensorBoard curves
-
-# Parse the Markdown table written by CleanRL to the TensorBoard text summary.
-def parse_hyperparameters(text: str) -> dict[str, str]:
-#{
-    values = {}
-
-    for line in text.splitlines():
-        if not line.startswith("|"):
-            continue
-
-        cells = [cell.strip() for cell in line.split("|")[1:-1]]
-
-        if len(cells) < 2 or cells[0] in {"param", "-"}:
-            continue
-
-        values[cells[0]] = cells[1]
-
-    return values
-
-#} End function parse_hyperparameters
-
-
-# Read one TensorBoard run without importing the PPO or PyTorch modules.
-def load_tensorboard_run(run_dir: Path) -> tuple[dict[str, str], dict[str, pd.DataFrame]]:
-#{
-    from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
-
-    accumulator = EventAccumulator(str(run_dir), size_guidance={"scalars": 0, "tensors": 1})
-    accumulator.Reload()
-    tags = accumulator.Tags()
-    hyperparameters = {}
-    text_tag = "hyperparameters/text_summary"
-
-    if text_tag in tags.get("tensors", []):
-        events = accumulator.Tensors(text_tag)
-
-        if events and events[-1].tensor_proto.string_val:
-            text = events[-1].tensor_proto.string_val[0].decode("utf-8")
-            hyperparameters = parse_hyperparameters(text)
-
-    scalars = {}
-
-    for tag, _, _ in TRAINING_TAGS:
-        if tag not in tags.get("scalars", []):
-            continue
-
-        events = accumulator.Scalars(tag)
-        scalars[tag] = pd.DataFrame(
-            {
-                "step": [event.step for event in events],
-                "value": [event.value for event in events],
-            }
-        )
-
-    return hyperparameters, scalars
-
-#} End function load_tensorboard_run
-
-
-# Resolve a checkpoint path recorded in TensorBoard against the repository root.
-def resolve_recorded_checkpoint(path_text: str, runs_dir: Path) -> Path:
-#{
-    normalized = Path(path_text.strip().replace("\\", "/"))
-
-    if normalized.is_absolute():
-        return normalized
-
-    return (runs_dir.parent / normalized).resolve()
-
-#} End function resolve_recorded_checkpoint
-
-
-# Discover TensorBoard runs by the checkpoint path recorded in their own metadata.
-def training_points(
-    checkpoint_summary: pd.DataFrame,
-    runs_dir: Path,
-    require_complete: bool = False,
-) -> tuple[pd.DataFrame, list[dict]]:
-#{
-    unique = checkpoint_summary[
-        ["method", "display_name", "train_seed", "checkpoint_sha256"]
-    ].drop_duplicates()
-    required_hashes = set(unique["checkpoint_sha256"].astype(str))
-    run_index = {}
-    skipped = []
-    event_directories = sorted(
-        {path.parent for path in runs_dir.rglob("events.out.tfevents.*")}
-    )
-
-    for run_dir in event_directories:
-        try:
-            hyperparameters, scalars = load_tensorboard_run(run_dir)
-        except ModuleNotFoundError as error:
-            if error.name and error.name.startswith("tensorboard"):
-                if require_complete:
-                    raise RuntimeError(
-                        "TensorBoard is required by the final analysis protocol."
-                    ) from error
-                return pd.DataFrame(), [
-                    {"reason": "tensorboard_unavailable", "details": str(error)}
-                ]
-            raise
-        except Exception as error:
-            skipped.append(
-                {
-                    "run_dir": str(run_dir),
-                    "reason": "tensorboard_run_unreadable",
-                    "details": str(error),
-                }
-            )
-            continue
-
-        checkpoint_text = hyperparameters.get("checkpoint_path", "").strip()
-
-        if not checkpoint_text:
-            skipped.append(
-                {"run_dir": str(run_dir), "reason": "checkpoint_path_not_recorded"}
-            )
-            continue
-
-        checkpoint_path = resolve_recorded_checkpoint(checkpoint_text, runs_dir)
-
-        if not checkpoint_path.is_file():
-            skipped.append(
-                {
-                    "run_dir": str(run_dir),
-                    "reason": "recorded_checkpoint_not_found",
-                    "checkpoint_path": str(checkpoint_path),
-                }
-            )
-            continue
-
-        checkpoint_hash = file_sha256(checkpoint_path)
-
-        if checkpoint_hash not in required_hashes:
-            continue
-
-        if checkpoint_hash in run_index:
-            raise ValueError(
-                f"Duplicate TensorBoard runs for checkpoint SHA-256 {checkpoint_hash}: "
-                f"{run_index[checkpoint_hash][0]} and {run_dir}"
-            )
-
-        run_index[checkpoint_hash] = (run_dir, hyperparameters, scalars)
-
-    frames = []
-
-    for row in unique.itertuples(index=False):
-        match = run_index.get(str(row.checkpoint_sha256))
-
-        if match is None:
-            item = {
-                "method": row.method,
-                "train_seed": int(row.train_seed),
-                "reason": "tensorboard_run_not_found",
-            }
-            if require_complete:
-                raise ValueError(
-                    "Required TensorBoard run was not found for "
-                    f"{row.method}, seed {int(row.train_seed)}."
-                )
-            skipped.append(item)
-            continue
-
-        run_dir, hyperparameters, scalars = match
-        recorded_seed = hyperparameters.get("seed", "").strip()
-        recorded_method = hyperparameters.get("method", "").strip()
-
-        if recorded_seed and int(recorded_seed) != int(row.train_seed):
-            raise ValueError(
-                f"TensorBoard seed {recorded_seed} does not match evaluation seed "
-                f"{row.train_seed} for {run_dir}."
-            )
-
-        if recorded_method and recorded_method != row.method:
-            raise ValueError(
-                f"TensorBoard method {recorded_method!r} does not match evaluation method "
-                f"{row.method!r} for {run_dir}."
-            )
-
-        for tag, _, _ in TRAINING_TAGS:
-            frame = scalars.get(tag, pd.DataFrame())
-
-            if frame.empty:
-                item = {
-                    "method": row.method,
-                    "train_seed": int(row.train_seed),
-                    "tag": tag,
-                    "reason": "scalar_not_found",
-                }
-                if require_complete and tag == "charts/episodic_return":
-                    raise ValueError(
-                        "Required charts/episodic_return scalar was not found for "
-                        f"{row.method}, seed {int(row.train_seed)}."
-                    )
-                skipped.append(item)
-                continue
-
-            frame = frame.copy()
-            frame["method"] = row.method
-            frame["display_name"] = row.display_name
-            frame["train_seed"] = int(row.train_seed)
-            frame["tag"] = tag
-            frames.append(frame)
-
-    return (pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()), skipped
-
-#} End function training_points
-
-
-# Interpolate seed curves onto one common within-method grid.
-def aggregate_curve(points: pd.DataFrame, tag: str) -> pd.DataFrame:
-#{
-    if points.empty or "tag" not in points.columns:
-        return pd.DataFrame()
-
-    rows = []
-
-    for (method, display_name), method_rows in points[points["tag"] == tag].groupby(
-        ["method", "display_name"],
-        sort=False,
-    ):
-        seed_curves = []
-
-        for _, seed_rows in method_rows.groupby("train_seed"):
-            seed_rows = seed_rows.groupby("step", as_index=False)["value"].mean().sort_values("step")
-            if not seed_rows.empty:
-                seed_curves.append(
-                    (
-                        seed_rows["step"].to_numpy(float),
-                        seed_rows["value"].to_numpy(float),
-                    )
-                )
-
-        if not seed_curves:
-            continue
-        if len(seed_curves) == 1:
-            grid = seed_curves[0][0]
-        else:
-            start = max(curve[0][0] for curve in seed_curves)
-            end = min(curve[0][-1] for curve in seed_curves)
-            if end < start:
-                continue
-            grid = np.linspace(start, end, min(200, max(len(curve[0]) for curve in seed_curves)))
-
-        values = np.vstack([np.interp(grid, steps, scalar) for steps, scalar in seed_curves])
-        rows.append(
-            pd.DataFrame(
-                {
-                    "method": method,
-                    "display_name": display_name,
-                    "tag": tag,
-                    "step": grid,
-                    "value_mean": values.mean(axis=0),
-                    "value_std": values.std(axis=0, ddof=1) if len(values) > 1 else np.nan,
-                    "seed_count": len(values),
-                }
-            )
-        )
-
-    return pd.concat(rows, ignore_index=True) if rows else pd.DataFrame()
-
-#} End function aggregate_curve
-
 
 # Plot one available training curve.
 def plot_curve(frame: pd.DataFrame, path: Path, ylabel: str) -> None:
@@ -624,6 +366,8 @@ def build_result_figures(protocol_path: str | Path, tables_dir: str | Path, eval
     if require_complete and runs_dir is None:
         raise ValueError("The final analysis protocol requires a runs directory.")
 
+    training_diagnostics_counts = None
+
     if runs_dir is not None:
         points, missing = training_points(
             checkpoint_summary,
@@ -631,14 +375,60 @@ def build_result_figures(protocol_path: str | Path, tables_dir: str | Path, eval
             require_complete=require_complete,
         )
         skipped.extend(missing)
+        rolling_window = int(protocol["training_episode_rolling_window"])
+        episode_diagnostics = training_episode_diagnostics(
+            points,
+            rolling_window=rolling_window,
+            require_complete=require_complete,
+        )
+        rollout_diagnostics = training_rollout_diagnostics(
+            points,
+            require_complete=require_complete,
+        )
+
+        if require_complete and points.empty:
+            raise ValueError("Required training scalar events are unavailable.")
+        if require_complete and episode_diagnostics.empty:
+            raise ValueError("Required training episode diagnostics are unavailable.")
+        if require_complete and rollout_diagnostics.empty:
+            raise ValueError("Required training rollout diagnostics are unavailable.")
+
+        training_tables = (
+            ("training_scalar_events.csv", points),
+            ("training_episode_diagnostics.csv", episode_diagnostics),
+            ("training_rollout_diagnostics.csv", rollout_diagnostics),
+        )
+
+        for filename, frame in training_tables:
+            if frame.empty:
+                skipped.append({"table": filename, "reason": "training_data_unavailable"})
+                continue
+            path = tables / filename
+            frame.to_csv(path, index=False)
+            generated[filename] = path
+
         curve_frames = []
 
-        for tag, filename, ylabel in TRAINING_TAGS:
+        for tag, filename, ylabel in TRAINING_CURVES:
             curve = aggregate_curve(points, tag)
             if curve.empty:
-                if require_complete and tag == "charts/episodic_return":
-                    raise ValueError("Required training-return curve could not be aggregated.")
+                if require_complete:
+                    raise ValueError(f"Required training curve could not be aggregated: {tag}")
                 skipped.append({"figure": filename, "reason": "scalar_unavailable"})
+                continue
+            path = figures / filename
+            plot_curve(curve, path, ylabel)
+            generated[filename] = path
+            curve_frames.append(curve)
+
+        for value_column, filename, ylabel in DERIVED_EPISODE_CURVES:
+            curve = aggregate_episode_curve(episode_diagnostics, value_column)
+            if curve.empty:
+                if require_complete:
+                    raise ValueError(
+                        f"Required derived training curve could not be aggregated: {value_column}"
+                    )
+                skipped.append({"figure": filename, "reason": "episode_data_unavailable"})
                 continue
             path = figures / filename
             plot_curve(curve, path, ylabel)
@@ -649,6 +439,13 @@ def build_result_figures(protocol_path: str | Path, tables_dir: str | Path, eval
             path = tables / "training_curve_points.csv"
             pd.concat(curve_frames, ignore_index=True).to_csv(path, index=False)
             generated[path.name] = path
+
+        training_diagnostics_counts = {
+            "scalar_event_rows": int(len(points)),
+            "episode_rows": int(len(episode_diagnostics)),
+            "rollout_rows": int(len(rollout_diagnostics)),
+            "rolling_window_episodes": rolling_window,
+        }
 
     selection = tables / "representative_trajectory_selection.csv"
     trajectory_figure = figures / "representative_trajectories.pdf"
@@ -676,6 +473,7 @@ def build_result_figures(protocol_path: str | Path, tables_dir: str | Path, eval
                 "protocol_sha256": protocol["_sha256"],
                 "evaluation_dir": str(evaluation),
                 "runs_dir": str(Path(runs_dir).resolve()) if runs_dir is not None else None,
+                "training_diagnostics": training_diagnostics_counts,
                 "generated": {name: str(path) for name, path in generated.items()},
                 "skipped": skipped,
             },

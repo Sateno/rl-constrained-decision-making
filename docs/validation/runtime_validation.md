@@ -74,6 +74,8 @@ Adds:
 ```text
 short baseline, high-penalty, and projection-training runs
 checkpoint and TensorBoard audits
+action-bound clipping and complete projection-burden diagnostics
+episode success, collision, and timeout consistency
 development-layout projection-off/on evaluation
 CSV and NPZ audits
 saved-result table and figure generation
@@ -93,6 +95,51 @@ status=PASS
 ```
 
 The launcher replaces only its reserved validation tree. It does not touch final experiment or calibration artifacts.
+
+## Final-training device benchmark
+
+Run only after the consolidated pre-experiment validation passes:
+
+```bat
+scripts\benchmark_training_devices.bat
+```
+
+Python module:
+
+```text
+experiments/benchmark_training_devices.py
+```
+
+The benchmark uses diagnostic seed `9902` and `10,240` transitions by default.
+It measures baseline and projection-training throughput on CPU and, when
+available, CUDA. The weighted decision represents two baseline-like final
+methods and one projection-training method:
+
+\[
+T_d=2T_{d,\mathrm{baseline}}+T_{d,\mathrm{projection}}.
+\]
+
+CUDA is selected only when every CUDA condition completes stably and its
+weighted time is at least ten percent lower than CPU. Otherwise CPU is selected.
+The benchmark compares runtime and stability only; checkpoint returns are not
+research outcomes.
+
+Output root:
+
+```text
+runs/validation/training_device_benchmark/
+```
+
+PASS and decision records:
+
+```text
+runs/validation/training_device_benchmark/benchmark_summary.txt
+runs/validation/training_device_benchmark/benchmark_decision.json
+```
+
+The benchmark refuses an existing output tree unless `--replace` is explicit.
+It performs no Git operation and its checkpoints are excluded from final
+experimental evidence.
 
 ## Manual inspection of validation figures
 
@@ -150,7 +197,7 @@ scripts\train_ppo_high_penalty.bat
 scripts\train_ppo_projection.bat
 ```
 
-All call `experiments/train_ppo_variant.py` and expose seed, budget, and checkpoint path. Existing checkpoint outputs are refused.
+All call `experiments/train_ppo_variant.py` and expose seed, budget, checkpoint path, and an optional explicit `--device` selection. Existing checkpoint outputs are refused. Every saved checkpoint records the actual device used.
 
 ## Historical clean baseline rebuild
 
@@ -172,7 +219,7 @@ Python module:
 analysis/build_projection_results.py
 ```
 
-It discovers artifacts from metadata, validates protocol completeness, aggregates results, generates tables and figures, and writes a PASS summary. It never trains or evaluates policies. The output directory must not already exist.
+It discovers artifacts from metadata, validates protocol completeness, exports raw TensorBoard events plus episode-level and rollout-level training diagnostics, aggregates results, generates tables and figures, and writes a PASS summary. It never trains or evaluates policies. The output directory must not already exist.
 
 ## Failure handling
 

@@ -26,6 +26,9 @@ class TrainingVariant:
 #} End dataclass TrainingVariant
 
 
+TRAINING_DEVICES = ("auto", "cpu", "cuda")
+
+
 TRAINING_VARIANTS = {
     "baseline": TrainingVariant(
         name="baseline",
@@ -78,8 +81,11 @@ def training_command(
     total_timesteps: int,
     checkpoint_path: Path,
     experiment_name: str | None = None,
+    device: str = "auto",
 ) -> list[str]:
 #{
+    if device not in TRAINING_DEVICES:
+        raise ValueError(f"Unsupported training device: {device!r}")
     selected_experiment_name = experiment_name or (
         f"{variant.experiment_prefix}_{total_timesteps}_seed{seed}"
     )
@@ -118,6 +124,11 @@ def training_command(
         str(checkpoint_path),
     ]
 
+    if device == "cpu":
+        command.append("--no-cuda")
+    elif device == "cuda":
+        command.append("--cuda")
+
     if variant.projection_enabled:
         command.extend(
             [
@@ -146,12 +157,15 @@ def run_training(
     total_timesteps: int,
     checkpoint_path: Path | None,
     experiment_name: str | None = None,
+    device: str = "auto",
 ) -> Path:
 #{
     if seed < 0:
         raise ValueError("Training seed must be nonnegative.")
     if total_timesteps <= 0:
         raise ValueError("Total timesteps must be positive.")
+    if device not in TRAINING_DEVICES:
+        raise ValueError(f"Unsupported training device: {device!r}")
 
     variant = TRAINING_VARIANTS[variant_name]
     selected_path = checkpoint_path or default_checkpoint_path(
@@ -170,11 +184,13 @@ def run_training(
         seed,
         total_timesteps,
         absolute_checkpoint,
-        experiment_name,
+        experiment_name=experiment_name,
+        device=device,
     )
     print(f"Training variant: {variant.name}")
     print(f"Seed:             {seed}")
     print(f"Total timesteps:  {total_timesteps}")
+    print(f"Requested device: {device}")
     print(f"Checkpoint:       {absolute_checkpoint}")
     subprocess.run(command, cwd=REPOSITORY_ROOT, check=True)
 
@@ -203,6 +219,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("total_timesteps", type=int, nargs="?", default=51200)
     parser.add_argument("checkpoint_path", type=Path, nargs="?", default=None)
     parser.add_argument("--experiment-name", default=None)
+    parser.add_argument("--device", choices=TRAINING_DEVICES, default="auto")
     return parser.parse_args()
 #} End function parse_args
 
@@ -217,6 +234,7 @@ def main() -> int:
         total_timesteps=args.total_timesteps,
         checkpoint_path=args.checkpoint_path,
         experiment_name=args.experiment_name,
+        device=args.device,
     )
     return 0
 #} End function main

@@ -13,6 +13,7 @@ import torch.optim as optim
 import tyro
 from torch.utils.tensorboard import SummaryWriter
 
+from algorithms.ppo.action_bound_diagnostics import ActionBoundDiagnostics
 from algorithms.ppo.agent import Agent
 from algorithms.ppo.projection_training import ProjectionTrainingDiagnostics
 from environments.factory import make_env as make_constrained_env
@@ -255,6 +256,7 @@ if __name__ == "__main__":
             lrnow = frac * args.learning_rate
             optimizer.param_groups[0]["lr"] = lrnow
 
+        action_bound_diagnostics = ActionBoundDiagnostics()
         projection_diagnostics = ProjectionTrainingDiagnostics()
 
         for step in range(0, args.num_steps):
@@ -311,9 +313,16 @@ if __name__ == "__main__":
                         float(final_info["success"][env_index]),
                         global_step,
                     )
+                    success = bool(final_info["success"][env_index])
+                    collision = bool(final_info["collision"][env_index])
                     writer.add_scalar(
                         "safety/collision",
-                        float(final_info["collision"][env_index]),
+                        float(collision),
+                        global_step,
+                    )
+                    writer.add_scalar(
+                        "safety/timeout",
+                        float(not success and not collision),
                         global_step,
                     )
                     final_clearance = float(
@@ -327,9 +336,25 @@ if __name__ == "__main__":
                             global_step,
                         )
 
+        action_bound_diagnostics.update(
+            actions_raw.reshape(-1, action_dim).detach().cpu().numpy()
+        )
+        expected_rollout_transitions = args.num_steps * args.num_envs
+
+        if action_bound_diagnostics.transition_count != expected_rollout_transitions:
+            raise RuntimeError(
+                "Action-bound diagnostics do not cover the complete PPO rollout."
+            )
+
+        action_bound_diagnostics.write_tensorboard(writer, global_step)
+
         if args.enable_projection:
+            if projection_diagnostics.transition_count != expected_rollout_transitions:
+                raise RuntimeError(
+                    "Projection diagnostics do not cover the complete PPO rollout."
+                )
             projection_diagnostics.write_tensorboard(writer, global_step)
-        
+
         # bootstrap value if not done
         with torch.no_grad():
             next_value = agent.get_value(next_obs).reshape(1, -1)
@@ -441,6 +466,7 @@ if __name__ == "__main__":
             "action_shape": tuple(envs.single_action_space.shape),
             "obs_dim": obs_dim,
             "action_dim": action_dim,
+            "device": str(device),
         }
 
         torch.save(checkpoint, checkpoint_path)

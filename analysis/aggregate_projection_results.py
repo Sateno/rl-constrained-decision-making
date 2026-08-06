@@ -33,6 +33,14 @@ REQUIRED_COLUMNS = {
     "success",
     "collision",
     "min_obstacle_clearance",
+    "action_bound_clipping_count",
+    "action_bound_clipping_rate",
+    "speed_action_bound_clipping_count",
+    "speed_action_bound_clipping_rate",
+    "turn_rate_action_bound_clipping_count",
+    "turn_rate_action_bound_clipping_rate",
+    "mean_action_bound_clipping_norm",
+    "max_action_bound_clipping_norm",
     "projection_intervention_rate",
     "mean_projection_correction_norm",
     "max_projection_correction_norm",
@@ -50,6 +58,11 @@ SUMMARY_METRICS = (
     "success_rate",
     "collision_rate",
     "min_obstacle_clearance",
+    "action_bound_clipping_rate",
+    "speed_action_bound_clipping_rate",
+    "turn_rate_action_bound_clipping_rate",
+    "action_bound_clipping_norm",
+    "action_bound_clipping_norm_max",
     "projection_intervention_rate",
     "projection_correction_norm",
     "projection_correction_norm_max",
@@ -123,6 +136,11 @@ def load_protocol(path: str | Path) -> dict[str, object]:
     if type(require_complete_artifacts) is not bool:
         raise ValueError("require_complete_artifacts must be Boolean when provided.")
     data["require_complete_artifacts"] = require_complete_artifacts
+
+    training_episode_rolling_window = data.get("training_episode_rolling_window", 20)
+    if type(training_episode_rolling_window) is not int or training_episode_rolling_window <= 0:
+        raise ValueError("training_episode_rolling_window must be a positive integer.")
+    data["training_episode_rolling_window"] = training_episode_rolling_window
 
     suite_path = (source.parent / str(data.get("layout_suite", ""))).resolve()
     suite = load_navigation_layout_suite(suite_path)
@@ -272,6 +290,70 @@ def validate_episodes(protocol: dict[str, object], episodes: pd.DataFrame) -> No
         raise ValueError("episode_return must be finite for every selected episode.")
     if not np.all(np.isfinite(episode_lengths)) or np.any(episode_lengths <= 0.0):
         raise ValueError("episode_length must be finite and positive for every selected episode.")
+
+    action_count_columns = (
+        "action_bound_clipping_count",
+        "speed_action_bound_clipping_count",
+        "turn_rate_action_bound_clipping_count",
+    )
+
+    for column in action_count_columns:
+        values = pd.to_numeric(episodes[column], errors="coerce").to_numpy(float)
+        if not np.all(np.isfinite(values)) or not np.allclose(
+            values,
+            np.round(values),
+            atol=0.0,
+            rtol=0.0,
+        ):
+            raise ValueError(f"{column} must contain finite integers.")
+        if np.any(values < 0.0) or np.any(values > episode_lengths):
+            raise ValueError(f"{column} must be between zero and episode_length.")
+
+    action_rate_columns = (
+        "action_bound_clipping_rate",
+        "speed_action_bound_clipping_rate",
+        "turn_rate_action_bound_clipping_rate",
+    )
+
+    for column in action_rate_columns:
+        values = pd.to_numeric(episodes[column], errors="coerce").to_numpy(float)
+        if not np.all(np.isfinite(values)) or np.any(values < 0.0) or np.any(values > 1.0):
+            raise ValueError(f"{column} must be finite and within [0, 1].")
+
+    action_norm_columns = (
+        "mean_action_bound_clipping_norm",
+        "max_action_bound_clipping_norm",
+    )
+
+    for column in action_norm_columns:
+        values = pd.to_numeric(episodes[column], errors="coerce").to_numpy(float)
+        if not np.all(np.isfinite(values)) or np.any(values < 0.0):
+            raise ValueError(f"{column} must be finite and nonnegative.")
+
+    count_rate_pairs = (
+        ("action_bound_clipping_count", "action_bound_clipping_rate"),
+        ("speed_action_bound_clipping_count", "speed_action_bound_clipping_rate"),
+        ("turn_rate_action_bound_clipping_count", "turn_rate_action_bound_clipping_rate"),
+    )
+
+    for count_column, rate_column in count_rate_pairs:
+        counts = pd.to_numeric(episodes[count_column], errors="coerce").to_numpy(float)
+        rates = pd.to_numeric(episodes[rate_column], errors="coerce").to_numpy(float)
+        if not np.allclose(rates, counts / episode_lengths, atol=1.0e-12, rtol=0.0):
+            raise ValueError(f"{rate_column} does not match {count_column} / episode_length.")
+
+    mean_action_bound_norm = pd.to_numeric(
+        episodes["mean_action_bound_clipping_norm"],
+        errors="coerce",
+    ).to_numpy(float)
+    max_action_bound_norm = pd.to_numeric(
+        episodes["max_action_bound_clipping_norm"],
+        errors="coerce",
+    ).to_numpy(float)
+    if np.any(mean_action_bound_norm > max_action_bound_norm + 1.0e-12):
+        raise ValueError(
+            "mean_action_bound_clipping_norm must not exceed max_action_bound_clipping_norm."
+        )
 
     solver_failures = pd.to_numeric(
         episodes["projection_solver_failure_count"],
@@ -437,6 +519,17 @@ def checkpoint_summary(protocol: dict[str, object], episodes: pd.DataFrame) -> p
         "success_rate": ("success", "mean"),
         "collision_rate": ("collision", "mean"),
         "min_obstacle_clearance": ("min_obstacle_clearance", "mean"),
+        "action_bound_clipping_rate": ("action_bound_clipping_rate", "mean"),
+        "speed_action_bound_clipping_rate": (
+            "speed_action_bound_clipping_rate",
+            "mean",
+        ),
+        "turn_rate_action_bound_clipping_rate": (
+            "turn_rate_action_bound_clipping_rate",
+            "mean",
+        ),
+        "action_bound_clipping_norm": ("mean_action_bound_clipping_norm", "mean"),
+        "action_bound_clipping_norm_max": ("max_action_bound_clipping_norm", "max"),
         "projection_intervention_rate": ("projection_intervention_rate", "mean"),
         "projection_correction_norm": ("mean_projection_correction_norm", "mean"),
         "projection_correction_norm_max": ("max_projection_correction_norm", "max"),
@@ -501,7 +594,18 @@ def paired_deltas(protocol: dict[str, object], episodes: pd.DataFrame) -> pd.Dat
 #{
     rows = []
     pair_columns = ["layout_id", "layout_repeat", "evaluation_seed"]
-    metrics = ["episode_return", "episode_length", "success", "collision", "min_obstacle_clearance"]
+    metrics = [
+        "episode_return",
+        "episode_length",
+        "success",
+        "collision",
+        "min_obstacle_clearance",
+        "action_bound_clipping_rate",
+        "speed_action_bound_clipping_rate",
+        "turn_rate_action_bound_clipping_rate",
+        "mean_action_bound_clipping_norm",
+        "max_action_bound_clipping_norm",
+    ]
 
     for method in protocol["methods"]:
         if not {"disabled", "enabled"}.issubset(method["required_projection_modes"]):

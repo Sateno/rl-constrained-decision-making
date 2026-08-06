@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 from environments.factory import make_env
+from algorithms.ppo.action_bound_diagnostics import ActionBoundDiagnostics
 from algorithms.ppo.agent import Agent
 from projection.cbf_qp_projection import ProjectionParams
 from evaluation.trajectory_recording import (
@@ -37,6 +38,14 @@ class EpisodeResult:
     truncated: bool
     final_distance_to_goal: float
     min_obstacle_clearance: float
+    action_bound_clipping_count: int
+    action_bound_clipping_rate: float
+    speed_action_bound_clipping_count: int
+    speed_action_bound_clipping_rate: float
+    turn_rate_action_bound_clipping_count: int
+    turn_rate_action_bound_clipping_rate: float
+    mean_action_bound_clipping_norm: float
+    max_action_bound_clipping_norm: float
     projection_enabled: bool
     projection_intervention_count: int
     projection_intervention_rate: float
@@ -280,6 +289,14 @@ def run_episode(
         truncated=False,
         final_distance_to_goal=float(info.get("distance_to_goal", np.inf)),
         min_obstacle_clearance=float(info.get("min_obstacle_clearance", np.nan)),
+        action_bound_clipping_count=0,
+        action_bound_clipping_rate=0.0,
+        speed_action_bound_clipping_count=0,
+        speed_action_bound_clipping_rate=0.0,
+        turn_rate_action_bound_clipping_count=0,
+        turn_rate_action_bound_clipping_rate=0.0,
+        mean_action_bound_clipping_norm=0.0,
+        max_action_bound_clipping_norm=0.0,
         projection_enabled=False,
         projection_intervention_count=0,
         projection_intervention_rate=0.0,
@@ -299,12 +316,14 @@ def run_episode(
     max_steps_guard = int(getattr(unwrapped_env, "max_episode_steps", 10_000)) + 1
     
     # Accumulate per-step values before computing episode means.
+    action_bound_diagnostics = ActionBoundDiagnostics()
     projection_correction_sum = 0.0
     projection_slack_sum_total = 0.0
     
     while not (terminated or truncated):
     #{
         action = action_provider(env, obs)
+        action_bound_diagnostics.update(action)
         action_raw_physical = (
             physical_action_from_policy_action(env, action)
             if episode_trajectory is not None
@@ -399,6 +418,36 @@ def run_episode(
             )
 
     #} End loop
+
+    action_bound_metrics = action_bound_diagnostics.metrics()
+
+    if int(action_bound_metrics["transition_count"]) != result.episode_length:
+        raise RuntimeError("Action-bound diagnostics do not match the episode length.")
+
+    result.action_bound_clipping_count = int(
+        action_bound_metrics["clipping_count"]
+    )
+    result.action_bound_clipping_rate = float(
+        action_bound_metrics["clipping_frequency"]
+    )
+    result.speed_action_bound_clipping_count = int(
+        action_bound_metrics["speed_clipping_count"]
+    )
+    result.speed_action_bound_clipping_rate = float(
+        action_bound_metrics["speed_clipping_frequency"]
+    )
+    result.turn_rate_action_bound_clipping_count = int(
+        action_bound_metrics["turn_rate_clipping_count"]
+    )
+    result.turn_rate_action_bound_clipping_rate = float(
+        action_bound_metrics["turn_rate_clipping_frequency"]
+    )
+    result.mean_action_bound_clipping_norm = float(
+        action_bound_metrics["clipping_norm"]
+    )
+    result.max_action_bound_clipping_norm = float(
+        action_bound_metrics["clipping_norm_max"]
+    )
 
     # Compute episode-level projection statistics.
     if result.projection_enabled and result.episode_length > 0:
@@ -530,13 +579,18 @@ def write_results_csv(
     results: list[EpisodeResult],
     output_path: str | Path,
     projection_params: ProjectionParams,
+    row_metadata: dict[str, object] | None = None,
 ) -> None:
 #{
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
     projection_metadata = projection_parameter_metadata(projection_params)
-    rows = [{**asdict(result), **projection_metadata} for result in results]
+    common_metadata = {} if row_metadata is None else dict(row_metadata)
+    rows = [
+        {**common_metadata, **asdict(result), **projection_metadata}
+        for result in results
+    ]
     df = pd.DataFrame(rows)
     df.to_csv(path, index=False)
 
@@ -563,6 +617,27 @@ def summarize_results(results: list[EpisodeResult]) -> dict[str, float | int | b
 
     projection_enabled = bool(results[0].projection_enabled)
 
+    action_bound_clipping_rates = np.asarray(
+        [result.action_bound_clipping_rate for result in results],
+        dtype=np.float64,
+    )
+    speed_action_bound_clipping_rates = np.asarray(
+        [result.speed_action_bound_clipping_rate for result in results],
+        dtype=np.float64,
+    )
+    turn_rate_action_bound_clipping_rates = np.asarray(
+        [result.turn_rate_action_bound_clipping_rate for result in results],
+        dtype=np.float64,
+    )
+    action_bound_clipping_norms = np.asarray(
+        [result.mean_action_bound_clipping_norm for result in results],
+        dtype=np.float64,
+    )
+    action_bound_clipping_maxima = np.asarray(
+        [result.max_action_bound_clipping_norm for result in results],
+        dtype=np.float64,
+    )
+
     summary: dict[str, float | int | bool] = {
         "episodes": len(results),
         "mean_return": float(np.mean(returns)),
@@ -570,6 +645,24 @@ def summarize_results(results: list[EpisodeResult]) -> dict[str, float | int | b
         "success_rate": float(np.mean(successes)),
         "collision_rate": float(np.mean(collisions)),
         "mean_min_obstacle_clearance": mean_min_obstacle_clearance,
+        "total_action_bound_clipping_count": int(
+            sum(result.action_bound_clipping_count for result in results)
+        ),
+        "mean_action_bound_clipping_rate": float(
+            np.mean(action_bound_clipping_rates)
+        ),
+        "mean_speed_action_bound_clipping_rate": float(
+            np.mean(speed_action_bound_clipping_rates)
+        ),
+        "mean_turn_rate_action_bound_clipping_rate": float(
+            np.mean(turn_rate_action_bound_clipping_rates)
+        ),
+        "mean_action_bound_clipping_norm": float(
+            np.mean(action_bound_clipping_norms)
+        ),
+        "max_action_bound_clipping_norm": float(
+            np.max(action_bound_clipping_maxima)
+        ),
         "projection_enabled": projection_enabled,
     }
 
@@ -622,6 +715,30 @@ def print_summary(summary: dict[str, float | int | bool], output_path: str | Pat
     print(f"success_rate:                       {float(summary['success_rate']):.3f}")
     print(f"collision_rate:                     {float(summary['collision_rate']):.3f}")
     print(f"mean_min_obstacle_clearance:        {mean_min_obstacle_clearance_text}")
+    print(
+        "total_action_bound_clipping_count:  "
+        f"{int(summary['total_action_bound_clipping_count'])}"
+    )
+    print(
+        "mean_action_bound_clipping_rate:    "
+        f"{float(summary['mean_action_bound_clipping_rate']):.3f}"
+    )
+    print(
+        "mean_speed_bound_clipping_rate:     "
+        f"{float(summary['mean_speed_action_bound_clipping_rate']):.3f}"
+    )
+    print(
+        "mean_turn_bound_clipping_rate:      "
+        f"{float(summary['mean_turn_rate_action_bound_clipping_rate']):.3f}"
+    )
+    print(
+        "mean_action_bound_clipping_norm:    "
+        f"{float(summary['mean_action_bound_clipping_norm']):.3f}"
+    )
+    print(
+        "max_action_bound_clipping_norm:     "
+        f"{float(summary['max_action_bound_clipping_norm']):.3f}"
+    )
     print(f"projection_enabled:                 {projection_enabled}")
 
     if projection_enabled:

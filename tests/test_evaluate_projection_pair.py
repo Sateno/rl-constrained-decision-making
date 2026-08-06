@@ -22,6 +22,12 @@ def test_paired_projection_evaluation_writes_aligned_artifacts(monkeypatch, tmp_
             "agent_state_dict": agent.state_dict(),
             "obs_dim": 21,
             "action_dim": 2,
+            "args": {
+                "method": "ppo_baseline",
+                "seed": 1,
+                "collision_penalty": 10.0,
+                "enable_projection": False,
+            },
         },
         checkpoint_path,
     )
@@ -33,6 +39,10 @@ def test_paired_projection_evaluation_writes_aligned_artifacts(monkeypatch, tmp_
             "evaluate_projection_pair.py",
             "--checkpoint",
             str(checkpoint_path),
+            "--method",
+            "ppo_baseline",
+            "--train-seed",
+            "1",
             "--episodes",
             "2",
             "--seed",
@@ -41,6 +51,8 @@ def test_paired_projection_evaluation_writes_aligned_artifacts(monkeypatch, tmp_
             "1",
             "--num-active-obstacles",
             "0",
+            "--collision-penalty",
+            "10.0",
             "--projection-lookahead-distance",
             "0.40",
             "--projection-alpha",
@@ -68,10 +80,25 @@ def test_paired_projection_evaluation_writes_aligned_artifacts(monkeypatch, tmp_
     paired_summary = pd.read_csv(output_paths["paired_summary"]).iloc[0]
     expected_checkpoint_sha256 = str(paired_summary["checkpoint_sha256"])
 
+    for frame in (projection_disabled, projection_enabled, paired_episodes):
+        assert frame["method"].tolist() == ["ppo_baseline"] * len(frame)
+        assert frame["train_seed"].tolist() == [1] * len(frame)
+        assert frame["evaluation_collision_penalty"].tolist() == [10.0] * len(frame)
+        assert frame["evaluation_policy_mode"].tolist() == ["deterministic"] * len(frame)
+
+    assert paired_summary["method"] == "ppo_baseline"
+    assert paired_summary["train_seed"] == 1
+    assert paired_summary["evaluation_collision_penalty"] == 10.0
+    assert paired_summary["evaluation_policy_mode"] == "deterministic"
+
     with np.load(output_paths["projection_disabled_trajectories"], allow_pickle=False) as archive:
         assert int(archive["episode_count"]) == 2
         assert archive["episode_keys"].tolist() == ["episode_0000", "episode_0001"]
         assert str(archive["run_projection_mode"]) == "disabled"
+        assert str(archive["run_method"]) == "ppo_baseline"
+        assert int(archive["run_train_seed"]) == 1
+        assert str(archive["run_evaluation_policy_mode"]) == "deterministic"
+        assert float(archive["run_evaluation_collision_penalty"]) == 10.0
         assert str(archive["run_checkpoint_sha256"]) == expected_checkpoint_sha256
         assert int(archive["run_base_seed"]) == 31
         assert int(archive["run_last_seed"]) == 32
@@ -100,6 +127,10 @@ def test_paired_projection_evaluation_writes_aligned_artifacts(monkeypatch, tmp_
         assert int(archive["episode_count"]) == 2
         assert archive["episode_keys"].tolist() == ["episode_0000", "episode_0001"]
         assert str(archive["run_projection_mode"]) == "enabled"
+        assert str(archive["run_method"]) == "ppo_baseline"
+        assert int(archive["run_train_seed"]) == 1
+        assert str(archive["run_evaluation_policy_mode"]) == "deterministic"
+        assert float(archive["run_evaluation_collision_penalty"]) == 10.0
         assert str(archive["run_checkpoint_sha256"]) == expected_checkpoint_sha256
         assert int(archive["run_base_seed"]) == 31
         assert int(archive["run_last_seed"]) == 32
@@ -129,6 +160,14 @@ def test_paired_projection_evaluation_writes_aligned_artifacts(monkeypatch, tmp_
     assert projection_enabled["seed"].tolist() == [31, 32]
     assert not projection_disabled["projection_enabled"].any()
     assert projection_enabled["projection_enabled"].all()
+    np.testing.assert_allclose(
+        projection_disabled["action_bound_clipping_rate"],
+        0.0,
+    )
+    np.testing.assert_allclose(
+        projection_enabled["action_bound_clipping_rate"],
+        0.0,
+    )
 
     np.testing.assert_allclose(
         projection_disabled["episode_return"],
@@ -145,6 +184,10 @@ def test_paired_projection_evaluation_writes_aligned_artifacts(monkeypatch, tmp_
     assert paired_episodes["num_active_obstacles"].tolist() == [0, 0]
     np.testing.assert_allclose(
         paired_episodes["episode_return_delta_enabled_minus_disabled"],
+        0.0,
+    )
+    np.testing.assert_allclose(
+        paired_episodes["action_bound_clipping_rate_delta_enabled_minus_disabled"],
         0.0,
     )
     np.testing.assert_allclose(
@@ -167,6 +210,9 @@ def test_paired_projection_evaluation_writes_aligned_artifacts(monkeypatch, tmp_
     assert paired_summary["mean_return_delta_enabled_minus_disabled"] == 0.0
     assert paired_summary["success_rate_delta_enabled_minus_disabled"] == 0.0
     assert paired_summary["collision_rate_delta_enabled_minus_disabled"] == 0.0
+    assert paired_summary[
+        "mean_action_bound_clipping_rate_delta_enabled_minus_disabled"
+    ] == 0.0
     assert paired_summary["with_projection_total_interventions"] == 0
     assert paired_summary["with_projection_total_solver_failures"] == 0
     assert paired_summary["projection_disabled_trajectory_npz"] == str(

@@ -13,8 +13,10 @@ class ProjectionTrainingDiagnostics:
     transition_count: int = 0
     intervention_count: int = 0
     correction_sum: float = 0.0
+    correction_max: float = 0.0
     slack_sum: float = 0.0
     slack_max: float = 0.0
+    solver_failure_count: int = 0
 
     # Consume one vectorized projection-info mapping.
     def _update_vector(self, infos: dict, num_envs: int) -> None:
@@ -30,6 +32,7 @@ class ProjectionTrainingDiagnostics:
         failed_indices = np.flatnonzero(projection_mask & ~projection_success)
 
         if failed_indices.size:
+            self.solver_failure_count += int(failed_indices.size)
             solver_status = np.asarray(infos["projection_solver_status"], dtype=object)
             failure_details = ", ".join(
                 f"env {index}: {solver_status[index]}" for index in failed_indices
@@ -68,6 +71,10 @@ class ProjectionTrainingDiagnostics:
             np.sum(np.asarray(infos["projection_intervened"], dtype=bool)[valid_indices])
         )
         self.correction_sum += float(np.sum(correction_norms))
+        self.correction_max = max(
+            self.correction_max,
+            float(np.max(correction_norms)),
+        )
         self.slack_sum += float(np.sum(step_slack_sums))
         self.slack_max = max(self.slack_max, float(np.max(step_slack_maxima)))
     #} End function _update_vector
@@ -90,6 +97,16 @@ class ProjectionTrainingDiagnostics:
             return
 
         writer.add_scalar(
+            "projection/transition_count",
+            self.transition_count,
+            global_step,
+        )
+        writer.add_scalar(
+            "projection/intervention_count",
+            self.intervention_count,
+            global_step,
+        )
+        writer.add_scalar(
             "projection/intervention_frequency",
             self.intervention_count / self.transition_count,
             global_step,
@@ -100,11 +117,21 @@ class ProjectionTrainingDiagnostics:
             global_step,
         )
         writer.add_scalar(
+            "projection/correction_norm_max",
+            self.correction_max,
+            global_step,
+        )
+        writer.add_scalar(
             "projection/slack_sum",
             self.slack_sum / self.transition_count,
             global_step,
         )
         writer.add_scalar("projection/slack_max", self.slack_max, global_step)
+        writer.add_scalar(
+            "projection/solver_failure_count",
+            self.solver_failure_count,
+            global_step,
+        )
     #} End function write_tensorboard
 
 #} End class ProjectionTrainingDiagnostics

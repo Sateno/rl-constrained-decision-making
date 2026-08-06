@@ -46,6 +46,17 @@ def parse_args() -> argparse.Namespace:
         required=True,
         help="Path to the PPO checkpoint used in both evaluation modes.",
     )
+    parser.add_argument(
+        "--method",
+        required=True,
+        help="Training-method identifier recorded in every paired artifact.",
+    )
+    parser.add_argument(
+        "--train-seed",
+        type=int,
+        required=True,
+        help="Independent training seed associated with the checkpoint.",
+    )
 
     parser.add_argument(
         "--episodes",
@@ -87,6 +98,12 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=None,
         help="Number of active obstacles in the built-in layout. The default is min(3, max_obstacles).",
+    )
+    parser.add_argument(
+        "--collision-penalty",
+        type=float,
+        default=10.0,
+        help="Common evaluation collision penalty applied in both projection modes.",
     )
 
     parser.add_argument(
@@ -134,6 +151,12 @@ def parse_args() -> argparse.Namespace:
 
     args = parser.parse_args()
 
+    if not args.method.strip():
+        parser.error("--method must be nonempty.")
+
+    if args.train_seed < 0:
+        parser.error("--train-seed must be nonnegative.")
+
     if args.episodes <= 0:
         parser.error("--episodes must be positive.")
 
@@ -148,6 +171,9 @@ def parse_args() -> argparse.Namespace:
             parser.error("--num-active-obstacles must be between 0 and --max-obstacles.")
         if args.num_active_obstacles > 3:
             parser.error("The built-in layout defines at most three active obstacles.")
+
+    if not np.isfinite(args.collision_penalty) or args.collision_penalty < 0.0:
+        parser.error("--collision-penalty must be finite and nonnegative.")
 
     if not np.isfinite(args.projection_lookahead_distance) or args.projection_lookahead_distance < 0.0:
         parser.error("--projection-lookahead-distance must be finite and nonnegative.")
@@ -217,6 +243,7 @@ def run_evaluation_mode(
     episodes: int,
     base_seed: int,
     checkpoint_path: str,
+    method: str,
     projection_enabled: bool,
     device: torch.device,
     trajectory_records: list[EpisodeTrajectory],
@@ -241,7 +268,7 @@ def run_evaluation_mode(
                 action_provider=action_provider,
                 seed=episode_seed,
                 episode=episode_index,
-                policy_name="ppo",
+                policy_name=method,
                 checkpoint_path=checkpoint_path,
                 trajectory_records=trajectory_records,
             )
@@ -263,17 +290,61 @@ def run_evaluation_mode(
 #} End function run_evaluation_mode
 
 
+# Validate explicit labels and return training fields persisted by the checkpoint.
+def checkpoint_training_metadata(
+    checkpoint: dict,
+    *,
+    method: str,
+    train_seed: int,
+) -> dict[str, object]:
+#{
+    checkpoint_args = checkpoint.get("args")
+
+    if not isinstance(checkpoint_args, dict):
+        checkpoint_args = {}
+
+    checkpoint_method = checkpoint_args.get("method")
+    checkpoint_seed = checkpoint_args.get("seed")
+
+    if checkpoint_method is not None and str(checkpoint_method) != method:
+        raise ValueError(
+            f"Checkpoint method={checkpoint_method!r} does not match --method={method!r}."
+        )
+    if checkpoint_seed is not None and int(checkpoint_seed) != int(train_seed):
+        raise ValueError(
+            f"Checkpoint seed={checkpoint_seed} does not match --train-seed={train_seed}."
+        )
+
+    return {
+        "method": method,
+        "train_seed": int(train_seed),
+        "training_collision_penalty": float(
+            checkpoint_args.get("collision_penalty", np.nan)
+        ),
+        "training_projection_enabled": bool(
+            checkpoint_args.get("enable_projection", False)
+        ),
+    }
+
+#} End function checkpoint_training_metadata
+
+
 # Build metadata shared by both modes and every paired artifact row.
 def make_pair_metadata(
     *,
     args: argparse.Namespace,
     projection_params: ProjectionParams,
     checkpoint_sha256: str,
+    training_metadata: dict[str, object],
     device: torch.device,
 ) -> dict[str, object]:
 #{
     metadata: dict[str, object] = {
+        **training_metadata,
         "checkpoint_sha256": checkpoint_sha256,
+        "evaluation_policy_mode": (
+            "stochastic" if args.stochastic else "deterministic"
+        ),
         "stochastic": bool(args.stochastic),
         "device": str(device),
         "requested_episodes": int(args.episodes),
@@ -285,6 +356,7 @@ def make_pair_metadata(
             args.max_obstacles,
             args.num_active_obstacles,
         ),
+        "evaluation_collision_penalty": float(args.collision_penalty),
     }
     metadata.update(projection_parameter_metadata(projection_params))
 
@@ -334,6 +406,14 @@ def build_paired_episode_table(
         "truncated",
         "final_distance_to_goal",
         "min_obstacle_clearance",
+        "action_bound_clipping_count",
+        "action_bound_clipping_rate",
+        "speed_action_bound_clipping_count",
+        "speed_action_bound_clipping_rate",
+        "turn_rate_action_bound_clipping_count",
+        "turn_rate_action_bound_clipping_rate",
+        "mean_action_bound_clipping_norm",
+        "max_action_bound_clipping_norm",
     )
     projection_fields = {
         "projection_intervention_count": "intervention_count",
@@ -351,6 +431,11 @@ def build_paired_episode_table(
         "collision",
         "final_distance_to_goal",
         "min_obstacle_clearance",
+        "action_bound_clipping_rate",
+        "speed_action_bound_clipping_rate",
+        "turn_rate_action_bound_clipping_rate",
+        "mean_action_bound_clipping_norm",
+        "max_action_bound_clipping_norm",
     )
 
     rows: list[dict[str, object]] = []
@@ -431,6 +516,12 @@ def build_paired_summary_table(
         "success_rate",
         "collision_rate",
         "mean_min_obstacle_clearance",
+        "total_action_bound_clipping_count",
+        "mean_action_bound_clipping_rate",
+        "mean_speed_action_bound_clipping_rate",
+        "mean_turn_rate_action_bound_clipping_rate",
+        "mean_action_bound_clipping_norm",
+        "max_action_bound_clipping_norm",
     )
     projection_fields = {
         "total_projection_interventions": "total_interventions",
@@ -447,10 +538,15 @@ def build_paired_summary_table(
         "success_rate",
         "collision_rate",
         "mean_min_obstacle_clearance",
+        "mean_action_bound_clipping_rate",
+        "mean_speed_action_bound_clipping_rate",
+        "mean_turn_rate_action_bound_clipping_rate",
+        "mean_action_bound_clipping_norm",
+        "max_action_bound_clipping_norm",
     )
 
     row: dict[str, object] = {
-        "policy": "ppo",
+        "policy": str(pair_metadata["method"]),
         "checkpoint": checkpoint_path,
     }
     row.update(pair_metadata)
@@ -555,6 +651,7 @@ def main() -> None:
         "max_episode_steps": args.max_episode_steps,
         "max_obstacles": args.max_obstacles,
         "num_active_obstacles": args.num_active_obstacles,
+        "collision_penalty": args.collision_penalty,
     }
 
     projection_disabled_factory = make_env(
@@ -578,6 +675,11 @@ def main() -> None:
     agent, checkpoint = load_ppo_agent(
         checkpoint_path=args.checkpoint,
         device=device,
+    )
+    training_metadata = checkpoint_training_metadata(
+        checkpoint,
+        method=args.method,
+        train_seed=args.train_seed,
     )
 
     validate_checkpoint_environment_compatibility(
@@ -604,6 +706,7 @@ def main() -> None:
         episodes=args.episodes,
         base_seed=args.seed,
         checkpoint_path=checkpoint_path,
+        method=args.method,
         projection_enabled=False,
         device=device,
         trajectory_records=projection_disabled_trajectories,
@@ -614,6 +717,7 @@ def main() -> None:
         episodes=args.episodes,
         base_seed=args.seed,
         checkpoint_path=checkpoint_path,
+        method=args.method,
         projection_enabled=True,
         device=device,
         trajectory_records=projection_enabled_trajectories,
@@ -622,23 +726,26 @@ def main() -> None:
     if file_sha256(args.checkpoint) != checkpoint_sha256:
         raise RuntimeError("Checkpoint file changed during paired evaluation.")
 
+    pair_metadata = make_pair_metadata(
+        args=args,
+        projection_params=projection_params,
+        checkpoint_sha256=checkpoint_sha256,
+        training_metadata=training_metadata,
+        device=device,
+    )
     write_results_csv(
         results=projection_disabled_results,
         output_path=output_paths["projection_disabled"],
         projection_params=projection_params,
+        row_metadata={**pair_metadata, "projection_mode": "disabled"},
     )
     write_results_csv(
         results=projection_enabled_results,
         output_path=output_paths["projection_enabled"],
         projection_params=projection_params,
+        row_metadata={**pair_metadata, "projection_mode": "enabled"},
     )
 
-    pair_metadata = make_pair_metadata(
-        args=args,
-        projection_params=projection_params,
-        checkpoint_sha256=checkpoint_sha256,
-        device=device,
-    )
     write_trajectory_archive(
         trajectories=projection_disabled_trajectories,
         output_path=output_paths["projection_disabled_trajectories"],
