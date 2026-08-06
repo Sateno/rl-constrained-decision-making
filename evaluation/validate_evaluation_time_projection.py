@@ -168,6 +168,10 @@ def paired_evaluation_command(*, output_prefix: Path, stochastic: bool) -> list[
         "evaluation.evaluate_projection_pair",
         "--checkpoint",
         str(CHECKPOINT_PATH),
+        "--method",
+        "ppo_baseline",
+        "--train-seed",
+        "1",
         "--episodes",
         "20",
         "--seed",
@@ -178,6 +182,8 @@ def paired_evaluation_command(*, output_prefix: Path, stochastic: bool) -> list[
         "3",
         "--num-active-obstacles",
         "3",
+        "--collision-penalty",
+        "10.0",
         "--projection-lookahead-distance",
         "0.25",
         "--projection-alpha",
@@ -475,6 +481,39 @@ def csv_boolean_values(series: pd.Series, column_name: str) -> np.ndarray:
 #} End function csv_boolean_values
 
 
+# Verify common final-study metadata on one paired-evaluation table.
+def audit_paired_metadata(
+    frame: pd.DataFrame,
+    *,
+    checkpoint_sha256: str,
+    policy_mode: str,
+    projection_mode: str | None = None,
+) -> None:
+#{
+    require(frame["method"].eq("ppo_baseline").all(), "Paired artifact method mismatch.")
+    require(frame["train_seed"].astype(int).eq(1).all(), "Paired artifact training-seed mismatch.")
+    require(
+        frame["checkpoint_sha256"].astype(str).eq(checkpoint_sha256).all(),
+        "Paired artifact checkpoint SHA-256 mismatch.",
+    )
+    require(
+        frame["evaluation_policy_mode"].eq(policy_mode).all(),
+        "Paired artifact policy mode mismatch.",
+    )
+    require(
+        np.allclose(frame["evaluation_collision_penalty"].astype(float), 10.0),
+        "Paired artifact evaluation collision penalty mismatch.",
+    )
+
+    if projection_mode is not None:
+        require(
+            frame["projection_mode"].eq(projection_mode).all(),
+            "Paired artifact projection mode mismatch.",
+        )
+
+#} End function audit_paired_metadata
+
+
 # Verify deterministic paired CSV alignment, identity, and noninterference.
 def audit_deterministic_csv_artifacts(checkpoint_sha256: str) -> None:
 #{
@@ -485,6 +524,28 @@ def audit_deterministic_csv_artifacts(checkpoint_sha256: str) -> None:
     paired_summary = pd.read_csv(paths["paired_summary"])
 
     require(len(paired_summary) == 1, "Deterministic paired summary must contain one row.")
+    audit_paired_metadata(
+        projection_disabled,
+        checkpoint_sha256=checkpoint_sha256,
+        policy_mode="deterministic",
+        projection_mode="disabled",
+    )
+    audit_paired_metadata(
+        projection_enabled,
+        checkpoint_sha256=checkpoint_sha256,
+        policy_mode="deterministic",
+        projection_mode="enabled",
+    )
+    audit_paired_metadata(
+        paired_episodes,
+        checkpoint_sha256=checkpoint_sha256,
+        policy_mode="deterministic",
+    )
+    audit_paired_metadata(
+        paired_summary,
+        checkpoint_sha256=checkpoint_sha256,
+        policy_mode="deterministic",
+    )
     summary = paired_summary.iloc[0]
     expected_seeds = np.arange(1000, 1020, dtype=np.int64)
 
@@ -679,6 +740,24 @@ def audit_stochastic_artifacts() -> None:
     paired_summary = pd.read_csv(paths["paired_summary"])
 
     require(len(paired_summary) == 1, "Stochastic paired summary must contain one row.")
+    checkpoint_sha256 = str(paired_summary.iloc[0]["checkpoint_sha256"])
+    audit_paired_metadata(
+        projection_disabled,
+        checkpoint_sha256=checkpoint_sha256,
+        policy_mode="stochastic",
+        projection_mode="disabled",
+    )
+    audit_paired_metadata(
+        projection_enabled,
+        checkpoint_sha256=checkpoint_sha256,
+        policy_mode="stochastic",
+        projection_mode="enabled",
+    )
+    audit_paired_metadata(
+        paired_summary,
+        checkpoint_sha256=checkpoint_sha256,
+        policy_mode="stochastic",
+    )
     summary = paired_summary.iloc[0]
     require(
         projection_disabled[["episode", "seed"]].equals(

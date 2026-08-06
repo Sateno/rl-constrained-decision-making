@@ -89,8 +89,8 @@ truncated
 Action meanings:
 
 ```text
-raw normalized   policy output
-raw physical     bounded normalized-wrapper output
+raw normalized   sampled policy output; may lie outside [-1, 1]^2
+raw physical     componentwise-clipped normalized-wrapper output
 executed physical projector output passed to the environment
 correction       executed physical - raw physical
 ```
@@ -164,7 +164,7 @@ CSV: what happened overall
 NPZ: how it happened step by step
 ```
 
-The companion CSV supplies method, training seed, checkpoint hash, layout identity, evaluation seed, projection mode, and episode summary. The NPZ supplies exact geometry and transition arrays.
+The companion CSV supplies method, training seed, checkpoint hash, layout identity, evaluation seed, projection mode, action-bound clipping summary, and projection summary. The NPZ supplies exact geometry and transition arrays. Action-bound clipping can be independently reconstructed from `action_raw_normalized` without changing the trajectory schema.
 
 ## Downstream use and versioning
 

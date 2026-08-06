@@ -46,22 +46,36 @@ BASE_TENSORBOARD_TAGS = {
     "losses/approx_kl",
     "safety/success",
     "safety/collision",
+    "safety/timeout",
     "safety/final_obstacle_clearance",
+    "action_bounds/clipping_frequency",
+    "action_bounds/speed_clipping_frequency",
+    "action_bounds/turn_rate_clipping_frequency",
+    "action_bounds/clipping_norm",
+    "action_bounds/clipping_norm_max",
 }
 PROJECTION_TENSORBOARD_TAGS = {
+    "projection/transition_count",
+    "projection/intervention_count",
     "projection/intervention_frequency",
     "projection/correction_norm",
+    "projection/correction_norm_max",
     "projection/slack_sum",
     "projection/slack_max",
+    "projection/solver_failure_count",
 }
 EXPECTED_RESULT_PDFS = {
     "evaluation_return.pdf",
     "evaluation_success_rate.pdf",
     "evaluation_collision_rate.pdf",
     "evaluation_min_obstacle_clearance.pdf",
+    "evaluation_action_bound_clipping.pdf",
+    "evaluation_action_bound_clipping_norm.pdf",
     "evaluation_projection_intervention.pdf",
     "evaluation_projection_correction.pdf",
+    "evaluation_projection_correction_max.pdf",
     "evaluation_projection_slack.pdf",
+    "evaluation_projection_slack_max.pdf",
     "representative_trajectories.pdf",
 }
 EXPECTED_RESULT_TABLES = {
@@ -228,6 +242,10 @@ def validate_training(checkpoint_directory: Path, output: Path, seed: int, total
         require(checkpoint_path.is_file(), f"Smoke checkpoint not found: {checkpoint_path}")
         checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
         args = checkpoint["args"]
+        require(
+            checkpoint.get("device") in {"cpu", "cuda"},
+            f"Actual training device is missing from {checkpoint_path}.",
+        )
         require(args["method"] == method, f"Method mismatch in {checkpoint_path}.")
         require(int(args["seed"]) == seed, f"Seed mismatch in {checkpoint_path}.")
         require(int(args["total_timesteps"]) == total_timesteps, f"Timestep mismatch in {checkpoint_path}.")
@@ -248,18 +266,110 @@ def validate_training(checkpoint_directory: Path, output: Path, seed: int, total
         require(not missing, f"TensorBoard run {run_directory} is missing tags: {missing}")
         counts = {tag: scalar_event_count(accumulator, tag) for tag in sorted(required_tags)}
 
+        frequency_tags = [
+            "action_bounds/clipping_frequency",
+            "action_bounds/speed_clipping_frequency",
+            "action_bounds/turn_rate_clipping_frequency",
+        ]
         if projection_enabled:
+            frequency_tags.append("projection/intervention_frequency")
+
+        for tag in frequency_tags:
             values = np.asarray(
-                [event.value for event in accumulator.Scalars("projection/intervention_frequency")],
+                [event.value for event in accumulator.Scalars(tag)],
                 dtype=np.float64,
             )
-            require(np.all((0.0 <= values) & (values <= 1.0)), "Projection intervention frequency is outside [0, 1].")
+            require(
+                np.all((0.0 <= values) & (values <= 1.0)),
+                f"TensorBoard frequency is outside [0, 1]: {tag}",
+            )
+
+        nonnegative_tags = [
+            "action_bounds/clipping_norm",
+            "action_bounds/clipping_norm_max",
+        ]
+        if projection_enabled:
+            nonnegative_tags.extend(
+                [
+                    "projection/transition_count",
+                    "projection/intervention_count",
+                    "projection/correction_norm",
+                    "projection/correction_norm_max",
+                    "projection/slack_sum",
+                    "projection/slack_max",
+                    "projection/solver_failure_count",
+                ]
+            )
+
+        for tag in nonnegative_tags:
+            values = np.asarray(
+                [event.value for event in accumulator.Scalars(tag)],
+                dtype=np.float64,
+            )
+            require(np.all(values >= 0.0), f"TensorBoard values are negative: {tag}")
+
+        clipping_mean = np.asarray(
+            [event.value for event in accumulator.Scalars("action_bounds/clipping_norm")],
+            dtype=np.float64,
+        )
+        clipping_max = np.asarray(
+            [event.value for event in accumulator.Scalars("action_bounds/clipping_norm_max")],
+            dtype=np.float64,
+        )
+        require(
+            np.all(clipping_mean <= clipping_max + 1.0e-12),
+            "Mean action-bound clipping norm exceeds the maximum.",
+        )
+
+        success_values = np.asarray(
+            [event.value for event in accumulator.Scalars("safety/success")],
+            dtype=np.float64,
+        )
+        collision_values = np.asarray(
+            [event.value for event in accumulator.Scalars("safety/collision")],
+            dtype=np.float64,
+        )
+        timeout_values = np.asarray(
+            [event.value for event in accumulator.Scalars("safety/timeout")],
+            dtype=np.float64,
+        )
+        require(
+            len(success_values) == len(collision_values) == len(timeout_values),
+            "Training episode outcome event counts differ.",
+        )
+        require(
+            np.allclose(success_values + collision_values + timeout_values, 1.0),
+            "Training episode outcomes are not mutually exclusive and exhaustive.",
+        )
+
+        if projection_enabled:
+            correction_mean = np.asarray(
+                [event.value for event in accumulator.Scalars("projection/correction_norm")],
+                dtype=np.float64,
+            )
+            correction_max = np.asarray(
+                [event.value for event in accumulator.Scalars("projection/correction_norm_max")],
+                dtype=np.float64,
+            )
+            require(
+                np.all(correction_mean <= correction_max + 1.0e-12),
+                "Mean projection correction exceeds the maximum.",
+            )
+            solver_failures = np.asarray(
+                [event.value for event in accumulator.Scalars("projection/solver_failure_count")],
+                dtype=np.float64,
+            )
+            require(
+                np.all(solver_failures == 0.0),
+                "Projection-enabled smoke training recorded a solver failure.",
+            )
 
         audits.append(
             {
                 "method": method,
                 "projection_enabled": projection_enabled,
                 "collision_penalty": collision_penalty,
+                "device": checkpoint["device"],
                 "checkpoint": str(checkpoint_path),
                 "checkpoint_sha256": file_sha256(checkpoint_path),
                 "run_directory": str(run_directory),
@@ -271,6 +381,75 @@ def validate_training(checkpoint_directory: Path, output: Path, seed: int, total
     print("Training smoke artifact audit passed.")
     print(f"audit={output}")
 #} End function validate_training
+
+
+# Cross-check episode clipping metrics against raw normalized trajectory actions.
+def validate_action_bound_trajectory_metrics(
+    rows: pd.DataFrame,
+    archive: Any,
+    label: str,
+) -> None:
+#{
+    for key in archive["episode_keys"].tolist():
+        episode = int(archive[f"{key}_episode"])
+        matching = rows[rows["episode"].astype(int) == episode]
+        require(len(matching) == 1, f"{label} episode {episode} is not unique.")
+        row = matching.iloc[0]
+        raw = np.asarray(archive[f"{key}_action_raw_normalized"], dtype=np.float64)
+        bounded = np.clip(raw, -1.0, 1.0)
+        clipping = raw - bounded
+        component_clipped = clipping != 0.0
+        norms = np.linalg.norm(clipping, axis=1)
+        length = int(len(raw))
+        require(length > 0, f"{label} trajectory {key} contains no actions.")
+        clipping_count = int(np.count_nonzero(np.any(component_clipped, axis=1)))
+        speed_count = int(np.count_nonzero(component_clipped[:, 0]))
+        turn_count = int(np.count_nonzero(component_clipped[:, 1]))
+
+        require(
+            int(row["action_bound_clipping_count"]) == clipping_count,
+            f"{label} clipping count disagrees with trajectory {key}.",
+        )
+        require(
+            int(row["speed_action_bound_clipping_count"]) == speed_count,
+            f"{label} speed clipping count disagrees with trajectory {key}.",
+        )
+        require(
+            int(row["turn_rate_action_bound_clipping_count"]) == turn_count,
+            f"{label} turn-rate clipping count disagrees with trajectory {key}.",
+        )
+        np.testing.assert_allclose(
+            float(row["action_bound_clipping_rate"]),
+            clipping_count / length,
+            rtol=0.0,
+            atol=1.0e-12,
+        )
+        np.testing.assert_allclose(
+            float(row["speed_action_bound_clipping_rate"]),
+            speed_count / length,
+            rtol=0.0,
+            atol=1.0e-12,
+        )
+        np.testing.assert_allclose(
+            float(row["turn_rate_action_bound_clipping_rate"]),
+            turn_count / length,
+            rtol=0.0,
+            atol=1.0e-12,
+        )
+        np.testing.assert_allclose(
+            float(row["mean_action_bound_clipping_norm"]),
+            float(np.mean(norms)),
+            rtol=0.0,
+            atol=1.0e-12,
+        )
+        np.testing.assert_allclose(
+            float(row["max_action_bound_clipping_norm"]),
+            float(np.max(norms)),
+            rtol=0.0,
+            atol=1.0e-12,
+        )
+
+#} End function validate_action_bound_trajectory_metrics
 
 
 # Audit fresh development-layout CSV and NPZ artifacts.
@@ -306,6 +485,8 @@ def validate_layouts(evaluation_directory: Path, output: Path) -> None:
         require(disabled["run_layout_suite_sha256"].item() == suite.sha256, "Disabled trajectory layout identity mismatch.")
         require(enabled["run_layout_suite_sha256"].item() == suite.sha256, "Enabled trajectory layout identity mismatch.")
         require(episode_keys == enabled["episode_keys"].tolist(), "Trajectory episode keys differ.")
+        validate_action_bound_trajectory_metrics(disabled_rows, disabled, "Disabled")
+        validate_action_bound_trajectory_metrics(enabled_rows, enabled, "Enabled")
 
         for key in episode_keys:
             require(disabled[f"{key}_positions"].shape[0] == disabled[f"{key}_action_raw_physical"].shape[0] + 1, f"Disabled trajectory alignment failed for {key}.")
@@ -351,7 +532,8 @@ def validate_results(result_directory: Path, output: Path) -> None:
     require(int(table_audit.get("selected_csv_count", 0)) == 2, "Result build must select exactly two development CSVs.")
     require(int(table_audit.get("projection_solver_failure_count", -1)) == 0, "Result build reports a projection solver failure.")
 
-    pdf_names = {path.name for path in figures.glob("*.pdf")}
+    pdf_paths = sorted(figures.glob("*.pdf"))
+    pdf_names = {path.name for path in pdf_paths}
     table_names = {path.name for path in tables.iterdir() if path.is_file()}
     require(not (EXPECTED_RESULT_PDFS - pdf_names), f"Missing required PDFs: {sorted(EXPECTED_RESULT_PDFS - pdf_names)}")
     require(not (EXPECTED_RESULT_TABLES - table_names), f"Missing required tables: {sorted(EXPECTED_RESULT_TABLES - table_names)}")

@@ -127,6 +127,14 @@ def episode_row(
         "success": success,
         "collision": collision,
         "min_obstacle_clearance": np.nan if layout_id == "layout_a" else 0.2,
+        "action_bound_clipping_count": 0,
+        "action_bound_clipping_rate": 0.0,
+        "speed_action_bound_clipping_count": 0,
+        "speed_action_bound_clipping_rate": 0.0,
+        "turn_rate_action_bound_clipping_count": 0,
+        "turn_rate_action_bound_clipping_rate": 0.0,
+        "mean_action_bound_clipping_norm": 0.0,
+        "max_action_bound_clipping_norm": 0.0,
         "projection_intervention_rate": 0.1 if enabled else 0.0,
         "mean_projection_correction_norm": 0.02 if enabled else 0.0,
         "max_projection_correction_norm": 0.05 if enabled else 0.0,
@@ -368,7 +376,7 @@ def test_training_curve_discovery_uses_tensorboard_checkpoint_metadata(tmp_path:
     import builtins
     import hashlib
 
-    from analysis import plot_projection_results
+    from analysis import training_diagnostics
 
     runs_dir = tmp_path / "runs"
     checkpoint_dir = runs_dir / "checkpoints"
@@ -418,24 +426,25 @@ def test_training_curve_discovery_uses_tensorboard_checkpoint_metadata(tmp_path:
 
     #} End function guarded_import
 
-    monkeypatch.setattr(plot_projection_results, "load_tensorboard_run", fake_tensorboard_run)
+    monkeypatch.setattr(training_diagnostics, "load_tensorboard_run", fake_tensorboard_run)
     monkeypatch.setattr(builtins, "__import__", guarded_import)
-    points, skipped = plot_projection_results.training_points(checkpoint_summary, runs_dir)
+    points, skipped = training_diagnostics.training_points(checkpoint_summary, runs_dir)
 
-    assert skipped == [
-        {
-            "method": "ppo_baseline",
-            "train_seed": 1,
-            "tag": "projection/intervention_frequency",
-            "reason": "scalar_not_found",
-        },
-        {
-            "method": "ppo_baseline",
-            "train_seed": 1,
-            "tag": "projection/correction_norm",
-            "reason": "scalar_not_found",
-        },
-    ]
+    assert {
+        item["tag"]
+        for item in skipped
+        if item.get("reason") == "scalar_not_found"
+    } == {
+        "charts/episodic_length",
+        "safety/success",
+        "safety/collision",
+        "safety/timeout",
+        "action_bounds/clipping_frequency",
+        "action_bounds/speed_clipping_frequency",
+        "action_bounds/turn_rate_clipping_frequency",
+        "action_bounds/clipping_norm",
+        "action_bounds/clipping_norm_max",
+    }
     assert points["tag"].unique().tolist() == ["charts/episodic_return"]
     assert points["step"].tolist() == [10, 20]
     assert points["value"].tolist() == [1.0, 2.0]
@@ -448,7 +457,7 @@ def test_training_curve_discovery_uses_tensorboard_checkpoint_metadata(tmp_path:
 # Development builds tolerate the absence of optional TensorBoard curve data.
 def test_training_curve_aggregation_accepts_empty_optional_data() -> None:
 #{
-    from analysis.plot_projection_results import aggregate_curve
+    from analysis.training_diagnostics import aggregate_curve
 
     assert aggregate_curve(pd.DataFrame(), "charts/episodic_return").empty
 #} End function test_training_curve_aggregation_accepts_empty_optional_data
@@ -456,7 +465,7 @@ def test_training_curve_aggregation_accepts_empty_optional_data() -> None:
 # Final protocols require a TensorBoard training-return source for every checkpoint.
 def test_final_result_build_rejects_missing_training_run(tmp_path: Path) -> None:
 #{
-    from analysis.plot_projection_results import training_points
+    from analysis.training_diagnostics import training_points
 
     checkpoint_summary = pd.DataFrame(
         [

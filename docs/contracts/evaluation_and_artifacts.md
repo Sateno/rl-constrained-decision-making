@@ -13,10 +13,13 @@ Evaluation loads fixed parameters, runs complete episodes, writes metrics and op
 Action modes:
 
 ```text
-deterministic actor mean   primary reproducible tables
-stochastic sample          robustness and active-projection diagnostics
+deterministic actor mean   reproducible policy-mean evaluation
+stochastic sample          sampled-policy safety and robustness evaluation
 random action              smoke validation
 ```
+
+The frozen experimental protocol assigns the primary and secondary roles. The
+evaluator itself does not privilege one policy-action mode.
 
 ## Episode CSV schema
 
@@ -27,6 +30,10 @@ policy, checkpoint, episode, seed
 episode_return, episode_length
 success, collision, terminated, truncated
 final_distance_to_goal, min_obstacle_clearance
+action_bound_clipping_count, action_bound_clipping_rate
+speed_action_bound_clipping_count, speed_action_bound_clipping_rate
+turn_rate_action_bound_clipping_count, turn_rate_action_bound_clipping_rate
+mean_action_bound_clipping_norm, max_action_bound_clipping_norm
 projection_enabled
 projection_intervention_count, projection_intervention_rate
 mean_projection_correction_norm, max_projection_correction_norm
@@ -50,6 +57,9 @@ Projection-disabled rows keep the same schema with `projection_enabled=False` an
 - `episode_return`: sum of rewards.
 - `episode_length`: executed transitions.
 - `min_obstacle_clearance`: minimum signed collision-boundary clearance during the episode; `NaN` when no obstacle is active.
+- action-bound clipping rate: transitions in which at least one sampled normalized action component lies outside `[-1, 1]`, divided by complete episode length.
+- speed and turn-rate clipping rates: corresponding per-component frequencies.
+- action-bound clipping norm: norm of the sampled normalized action minus its componentwise clipped value; means include zero-clipping transitions.
 - intervention rate: intervention count divided by complete episode length.
 - mean correction: mean over all transitions, including zero-correction steps.
 - mean summed slack: mean per-step sum of active slack, including zero-slack steps.
@@ -106,7 +116,18 @@ For prefix `<prefix>` it writes:
 <prefix>_paired_summary.csv
 ```
 
-The checkpoint is hashed before and after evaluation. Paired tables contain enabled-minus-disabled deltas.
+The checkpoint is hashed before and after evaluation. Every paired artifact records:
+
+```text
+method, train_seed
+training_collision_penalty, training_projection_enabled
+checkpoint_sha256
+evaluation_policy_mode, evaluation_collision_penalty
+base_seed, last_seed, requested_episodes
+projection parameters and projection mode
+```
+
+Paired tables contain enabled-minus-disabled deltas.
 
 For stochastic evaluation, both modes begin each episode with the same random state. Trajectories may diverge after projection changes an executed action.
 
@@ -126,6 +147,7 @@ expected training seeds
 required method/projection groups
 representative layout
 whether complete training and trajectory evidence is mandatory
+training-episode rolling-window length
 ```
 
 They do not hardcode generated checkpoint, CSV, NPZ, TensorBoard, timestamped-directory, or machine-specific filenames.
@@ -138,11 +160,25 @@ duplicate episode keys
 mismatched checkpoint or layout identities
 different evaluation key sets
 non-finite returns or invalid lengths
-invalid projection diagnostics
+invalid action-bound or projection diagnostics
 solver failures in accepted final evidence
 ```
 
-Final protocols require a training-return curve and representative trajectory for every required checkpoint/mode. Projection-specific training curves remain optional.
+Final protocols require complete TensorBoard evidence for every checkpoint:
+
+```text
+episode return and length
+success, collision, and timeout outcomes
+action-bound clipping frequency and magnitude
+projection intervention, correction, slack, and solver diagnostics
+for projection-enabled training
+```
+
+Training events are exported into raw scalar, episode-level safety, and
+rollout-level burden tables. Projection-trained checkpoints must provide both
+mean and maximum correction and slack metrics. Accepted training runs record
+zero solver failures; a solver failure aborts the run and is handled as a
+technical incident rather than as valid zero burden.
 
 ## Aggregation hierarchy
 
@@ -163,7 +199,7 @@ then aggregate independently trained checkpoints across seeds
 
 Projection off/on differences are paired by checkpoint and layout before seed-level aggregation.
 
-With three seeds, report individual seeds, mean, standard deviation, and effect magnitude. Strong significance claims are not justified by layout count alone.
+Report every independently trained seed, the seed-level mean and standard deviation, paired effect magnitudes, and the individual seed values. Strong significance claims are not justified by layout or episode count alone.
 
 ## Generated outputs
 
@@ -177,10 +213,14 @@ paired_projection_deltas.csv
 paired_projection_summary.csv
 generated_method_summary.tex
 generated_paired_projection_deltas.tex
+training_scalar_events.csv
+training_episode_diagnostics.csv
+training_rollout_diagnostics.csv
+training_curve_points.csv
 result_build_audit.json
 ```
 
-Figures may include training return, task/safety comparisons, projection burden, and predeclared trajectories.
+Figures may include training return, cumulative collisions, rolling safety rates, action-bound clipping, projection burden, task/safety comparisons, and predeclared trajectories.
 
 Plotting consumes saved artifacts only and never launches training or evaluation. The builder refuses an existing output directory to prevent stale figures.
 
@@ -198,4 +238,4 @@ docs/records/         concise decisions and provenance
 
 ## Change-control boundary
 
-Contract review is required for changes to episode-field meaning, parameter metadata, failure-time `NaN` semantics, layout identity, pairing keys, aggregation hierarchy, or required final evidence.
+Contract review is required for changes to episode-field meaning, action-bound diagnostic meaning, training-safety exports, parameter metadata, failure-time `NaN` semantics, layout identity, pairing keys, aggregation hierarchy, or required final evidence.

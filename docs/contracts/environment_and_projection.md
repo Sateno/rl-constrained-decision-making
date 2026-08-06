@@ -67,15 +67,24 @@ v_max=1.0
 omega_max=2.0
 ```
 
-The policy-facing normalized action is `a in [-1, 1]^2`:
+The PPO actor samples a raw normalized action in `R^2`. Before physical conversion,
+the normalized-action wrapper applies componentwise bounds:
 
 \[
-v=\tfrac12 v_{\max}(a_v+1),
-\qquad
-\omega=\omega_{\max}a_\omega.
+a_t^{\mathrm{bounded}}
+=\operatorname{clip}(a_t^{\mathrm{sample}},-1,1).
 \]
 
-Thus a policy mean near zero maps to forward motion `[0.5 * v_max, 0]`.
+The bounded normalized action is mapped to physical control by
+
+\[
+v=\tfrac12 v_{\max}(a_v^{\mathrm{bounded}}+1),
+\qquad
+\omega=\omega_{\max}a_\omega^{\mathrm{bounded}}.
+\]
+
+Thus a bounded action near zero maps to forward motion `[0.5 * v_max, 0]`.
+The sampled action remains the action stored and scored by PPO.
 
 ## Dynamics, reward, and episode flags
 
@@ -164,7 +173,8 @@ ConstrainedNavigationEnv
 Action path:
 
 ```text
-raw normalized policy action
+sampled raw normalized policy action
+-> bounded normalized action in [-1, 1]^2
 -> bounded physical raw action
 -> physical executed action after optional projection
 -> environment transition
@@ -173,11 +183,35 @@ raw normalized policy action
 Ownership:
 
 ```text
-policy distribution        raw normalized action
-normalized wrapper         normalized-to-physical mapping
+policy distribution        sampled raw normalized action
+normalized wrapper         clipping and normalized-to-physical mapping
 projection wrapper         raw-to-executed physical action
 environment                state, reward, termination
 ```
+
+## Action-bound diagnostics
+
+Action-bound clipping and predictive projection are separate transformations.
+For one sampled action,
+
+\[
+c_t^{\mathrm{bound}}
+=a_t^{\mathrm{sample}}-a_t^{\mathrm{bounded}}.
+\]
+
+Training and evaluation record:
+
+```text
+any-component clipping frequency
+speed-component clipping frequency
+turn-rate-component clipping frequency
+mean clipping-excess norm
+maximum clipping-excess norm
+```
+
+These values describe normalized-action clipping only. They must not be merged
+with the physical QP correction
+`u_exec - u_raw`.
 
 ## Projection geometry and QP
 
@@ -295,7 +329,7 @@ The vector trainer uses Gymnasium same-step autoreset. Terminal episode and proj
 
 ## Change-control boundary
 
-Contract review and regression validation are required for changes to observation ordering, action mapping, dynamics, reward semantics, clearance meaning, projection geometry, QP formulation, stationary fallback, or raw-action PPO likelihood semantics.
+Contract review and regression validation are required for changes to observation ordering, action clipping or mapping, action-bound diagnostic meaning, dynamics, reward semantics, clearance meaning, projection geometry, QP formulation, stationary fallback, or raw-action PPO likelihood semantics.
 
 Geometry references:
 

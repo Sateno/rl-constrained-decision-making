@@ -163,6 +163,10 @@ def test_evaluator_projection_parameters_reach_wrapper_and_csv(monkeypatch, tmp_
     assert result.projection_solver_failure_count == 0
     assert result.mean_projection_slack_sum == 0.0
     assert result.max_projection_slack == 0.0
+    assert result.action_bound_clipping_count == 0
+    assert result.action_bound_clipping_rate == 0.0
+    assert result.mean_action_bound_clipping_norm == 0.0
+    assert result.max_action_bound_clipping_norm == 0.0
     assert np.isnan(result.min_obstacle_clearance)
 
     summary = summarize_results([result])
@@ -188,6 +192,9 @@ def test_evaluator_projection_parameters_reach_wrapper_and_csv(monkeypatch, tmp_
     assert "min_obstacle_distance" not in row.index
     assert pd.isna(row["min_obstacle_clearance"])
     np.testing.assert_allclose(row["mean_projection_slack_sum"], 0.0)
+    assert row["action_bound_clipping_count"] == 0
+    np.testing.assert_allclose(row["action_bound_clipping_rate"], 0.0)
+    np.testing.assert_allclose(row["mean_action_bound_clipping_norm"], 0.0)
 
     np.testing.assert_allclose(row["projection_lookahead_distance"], 0.40)
     np.testing.assert_allclose(row["projection_alpha"], 3.50)
@@ -252,6 +259,55 @@ def test_evaluator_computes_mean_projection_slack_sum(tmp_path, capsys) -> None:
     assert "max_projection_slack:               0.500000" in printed
 
 #} End function test_evaluator_computes_mean_projection_slack_sum
+
+
+# Verify evaluator clipping metrics describe the raw normalized action before wrappers.
+def test_evaluator_records_action_bound_clipping_metrics() -> None:
+#{
+    env = ScriptedProjectionEnv(
+        slack_sums=[0.0, 0.0, 0.0],
+        slack_maxes=[0.0, 0.0, 0.0],
+    )
+
+    def out_of_bounds_action(env, obs) -> np.ndarray:
+    #{
+        del env, obs
+        return np.asarray([1.5, -2.0], dtype=np.float32)
+    #} End function out_of_bounds_action
+
+    result = run_episode(
+        env=env,
+        action_provider=out_of_bounds_action,
+        seed=19,
+        episode=0,
+        policy_name="ppo",
+    )
+
+    assert result.episode_length == 3
+    assert result.action_bound_clipping_count == 3
+    assert result.speed_action_bound_clipping_count == 3
+    assert result.turn_rate_action_bound_clipping_count == 3
+    np.testing.assert_allclose(result.action_bound_clipping_rate, 1.0)
+    np.testing.assert_allclose(result.speed_action_bound_clipping_rate, 1.0)
+    np.testing.assert_allclose(result.turn_rate_action_bound_clipping_rate, 1.0)
+    np.testing.assert_allclose(
+        result.mean_action_bound_clipping_norm,
+        np.sqrt(1.25),
+    )
+    np.testing.assert_allclose(
+        result.max_action_bound_clipping_norm,
+        np.sqrt(1.25),
+    )
+
+    summary = summarize_results([result])
+    assert summary["total_action_bound_clipping_count"] == 3
+    np.testing.assert_allclose(summary["mean_action_bound_clipping_rate"], 1.0)
+    np.testing.assert_allclose(
+        summary["max_action_bound_clipping_norm"],
+        np.sqrt(1.25),
+    )
+
+#} End function test_evaluator_records_action_bound_clipping_metrics
 
 
 # Verify that projection solver failures preserve unknown slack diagnostics.

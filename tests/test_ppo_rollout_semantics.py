@@ -137,8 +137,10 @@ def test_projection_training_diagnostics_include_terminal_final_info() -> None:
     assert diagnostics.transition_count == 2
     assert diagnostics.intervention_count == 1
     assert diagnostics.correction_sum == pytest.approx(0.3)
+    assert diagnostics.correction_max == pytest.approx(0.3)
     assert diagnostics.slack_sum == pytest.approx(0.02)
     assert diagnostics.slack_max == pytest.approx(0.02)
+    assert diagnostics.solver_failure_count == 0
 #} End function test_projection_training_diagnostics_include_terminal_final_info
 
 
@@ -157,4 +159,6 @@ def test_projection_training_diagnostics_reject_terminal_solver_failure() -> Non
 
     with pytest.raises(RuntimeError, match="env 0: solver_error"):
         diagnostics.update(infos, num_envs=1)
+
+    assert diagnostics.solver_failure_count == 1
 #} End function test_projection_training_diagnostics_reject_terminal_solver_failure

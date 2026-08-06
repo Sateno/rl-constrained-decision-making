@@ -5,11 +5,14 @@ import pytest
 from analysis import build_projection_results
 from evaluation import validate_pre_experiment_codebase
 from experiments import calibrate_core_layouts
+from experiments import benchmark_training_devices
+from experiments.benchmark_training_devices import select_training_device
 from experiments.train_ppo_variant import TRAINING_VARIANTS, training_command
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_BATCH_FILES = {
+    "benchmark_training_devices.bat",
     "calibrate_core_layouts.bat",
     "evaluate_policy.bat",
     "evaluate_projection_pair.bat",
@@ -90,7 +93,50 @@ def test_training_variant_commands_preserve_experiment_contract(tmp_path: Path) 
     assert "--projection-alpha" not in commands["baseline"]
     assert option_value(commands["projection"], "--projection-alpha") == "2.0"
 
+    cpu_command = training_command(
+        TRAINING_VARIANTS["baseline"],
+        seed=7,
+        total_timesteps=4096,
+        checkpoint_path=tmp_path / "cpu.pt",
+        device="cpu",
+    )
+    cuda_command = training_command(
+        TRAINING_VARIANTS["projection"],
+        seed=7,
+        total_timesteps=4096,
+        checkpoint_path=tmp_path / "cuda.pt",
+        device="cuda",
+    )
+    assert "--no-cuda" in cpu_command
+    assert "--cuda" in cuda_command
+
 #} End function test_training_variant_commands_preserve_experiment_contract
+
+
+# Device selection uses the predeclared weighted runtime and ten-percent margin.
+def test_training_device_selection_uses_weighted_runtime_margin() -> None:
+#{
+    import pandas as pd
+
+    rows = pd.DataFrame(
+        [
+            {"variant": "baseline", "requested_device": "cpu", "status": "PASS", "elapsed_seconds": 10.0},
+            {"variant": "projection", "requested_device": "cpu", "status": "PASS", "elapsed_seconds": 30.0},
+            {"variant": "baseline", "requested_device": "cuda", "status": "PASS", "elapsed_seconds": 5.0},
+            {"variant": "projection", "requested_device": "cuda", "status": "PASS", "elapsed_seconds": 25.0},
+        ]
+    )
+    decision = select_training_device(rows)
+    assert decision["cpu_weighted_seconds"] == 50.0
+    assert decision["cuda_weighted_seconds"] == 35.0
+    assert decision["cuda_benchmark_complete"]
+    assert decision["selected_device"] == "cuda"
+
+    rows.loc[rows["requested_device"] == "cuda", "elapsed_seconds"] = [9.5, 29.0]
+    decision = select_training_device(rows)
+    assert decision["selected_device"] == "cpu"
+
+#} End function test_training_device_selection_uses_weighted_runtime_margin
 
 
 # Verify the result orchestrator writes PASS only after both builders complete.
@@ -141,6 +187,9 @@ def test_orchestration_cleanup_guards_reject_unsafe_paths() -> None:
 
     with pytest.raises(ValueError, match="unsafe validation path"):
         validate_pre_experiment_codebase.validate_cleanup_target(REPOSITORY_ROOT)
+
+    with pytest.raises(ValueError, match="Unsafe training-device benchmark path"):
+        benchmark_training_devices.validate_cleanup_target(REPOSITORY_ROOT)
 
 #} End function test_orchestration_cleanup_guards_reject_unsafe_paths
 
