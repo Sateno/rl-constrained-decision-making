@@ -31,7 +31,11 @@ assets/      Small static visual references used by the documentation.
    for the consolidated mathematical, architectural, algorithmic, artifact,
    and verification specification.
 
-4. Use the focused Markdown contracts for exact subsystem interfaces, persisted
+4. Read the
+   [Frozen Experimental Protocol](records/predictive_action_projection_experimental_protocol.md)
+   before launching or interpreting final training and evaluation.
+
+5. Use the focused Markdown contracts for exact subsystem interfaces, persisted
    schemas, metric meanings, and failure semantics.
 
 The guides are pedagogical and do not supersede the implementation design,
@@ -67,6 +71,18 @@ change-control boundaries.
 The editable source is maintained in Overleaf. The repository contains the
 compiled PDF as the authoritative implementation-design artifact.
 
+### Frozen experimental protocol
+
+- [Predictive Action Projection Final Experimental Protocol](records/predictive_action_projection_experimental_protocol.md)
+- [Primary fixed-training-geometry analysis protocol](../experiments/fixed_training_geometry_analysis_protocol.json)
+- [Secondary core-layout transfer analysis protocol](../experiments/projection_analysis_protocol.json)
+- [Fixed training-geometry serialization](../evaluation/layouts/fixed_training_geometry.json)
+
+The protocol freezes the methods, independently initialized runs, transition
+budget, selected device, evaluation matrix, episode and layout seeds,
+diagnostics, aggregation hierarchy, rerun rules, and claim boundaries before
+final outcomes are observed.
+
 ### Contracts
 
 - [Environment and projection contract](contracts/environment_and_projection.md)
@@ -92,6 +108,7 @@ their internal command sequences.
 - [Historical PPO baseline regression record](records/baseline_regression_record.md)
 - [Evaluation-time projection regression record](records/evaluation_time_projection_regression_record.md)
 - [Core layout calibration and freeze record](records/core_layout_calibration_record.md)
+- [Predictive action projection final experimental protocol](records/predictive_action_projection_experimental_protocol.md)
 
 Records preserve decisions and evidence tied to a particular source revision,
 checkpoint, protocol, benchmark, or dataset. Accepted records are not silently
