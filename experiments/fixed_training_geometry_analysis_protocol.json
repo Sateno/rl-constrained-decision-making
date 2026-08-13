@@ -1,8 +1,9 @@
 {
   "schema_version": "projection_analysis_protocol_v1",
-  "study_id": "predictive_action_projection_core_transfer",
-  "protocol_role": "secondary_deterministic_layout_transfer",
-  "layout_suite": "../evaluation/layouts/core_navigation_layouts.json",
+  "study_id": "predictive_action_projection_fixed_training_geometry",
+  "protocol_role": "primary_stochastic_fixed_training_geometry",
+  "validated_implementation_base_commit": "d0548b3e6729571113675b6f4ccad6401f27f167",
+  "layout_suite": "../evaluation/layouts/fixed_training_geometry.json",
   "expected_train_seeds": [
     1,
     2,
@@ -11,12 +12,12 @@
     5
   ],
   "expected_training_timesteps": 51200,
-  "expected_repeats_per_layout": 1,
-  "evaluation_policy_mode": "deterministic",
+  "expected_repeats_per_layout": 100,
+  "evaluation_policy_mode": "stochastic",
   "evaluation_device": "cpu",
   "evaluation_collision_penalty": 10.0,
-  "evaluation_base_seed": 1000,
-  "evaluation_last_seed": 1023,
+  "evaluation_base_seed": 10000,
+  "evaluation_last_seed": 10099,
   "max_episode_steps": 200,
   "training_episode_rolling_window": 20,
   "projection_parameters": {
@@ -25,7 +26,7 @@
     "slack_penalty": 1000.0,
     "extra_clearance": 0.0
   },
-  "representative_layout_id": "triple_mild_slalom_upper_first",
+  "representative_layout_id": "fixed_training_geometry",
   "methods": [
     {
       "method": "ppo_baseline",
