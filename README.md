@@ -67,12 +67,12 @@ suite passed with 71 tests.
 ## Start here
 
 Readers new to the study should begin with the
-[Orientation Guide to Predictive Action Projection with PPO](docs/guides/orientation_guide_to_predictive_action_projection_with_ppo.pdf).
+[Orientation Guide to Predictive Action Projection with PPO](docs/guides/Orientation_Guide_to_Predictive_Action_Projection_with_PPO.pdf).
 It provides a concise conceptual introduction to the research question,
 architecture, and recommended reading path.
 
 Next, read the
-[Predictive Action Projection Software and Artifact Companion](docs/guides/predictive_action_projection_software_companion.pdf).
+[Predictive Action Projection Software and Artifact Companion](docs/guides/Predictive_Action_Projection_Software_Companion.pdf).
 It explains how the design appears in the repository during practical code
 reading, training, evaluation, debugging, artifact inspection, and result
 interpretation.
