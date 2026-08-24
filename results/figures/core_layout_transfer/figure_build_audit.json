@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "study_id": "predictive_action_projection_core_transfer",
+  "protocol_path": "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\experiments\\projection_analysis_protocol.json",
+  "protocol_sha256": "f0f853fb53b910cdd9227e1562fc227201b08a6926d8895d430e507944b659d1",
+  "evaluation_dir": "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\runs\\evaluation\\final\\core_layout_transfer",
+  "runs_dir": "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\runs",
+  "training_diagnostics_included": false,
+  "artifact_scope": "evaluation_only",
+  "intentional_omissions": [
+    {
+      "category": "shared_training_diagnostics",
+      "reason": "disabled_by_command"
+    }
+  ],
+  "training_diagnostics": {
+    "included": false,
+    "reason": "disabled_by_command"
+  },
+  "generated": {
+    "evaluation_return.pdf": "results\\figures\\core_layout_transfer\\evaluation_return.pdf",
+    "evaluation_success_rate.pdf": "results\\figures\\core_layout_transfer\\evaluation_success_rate.pdf",
+    "evaluation_collision_rate.pdf": "results\\figures\\core_layout_transfer\\evaluation_collision_rate.pdf",
+    "evaluation_timeout_rate.pdf": "results\\figures\\core_layout_transfer\\evaluation_timeout_rate.pdf",
+    "evaluation_min_obstacle_clearance.pdf": "results\\figures\\core_layout_transfer\\evaluation_min_obstacle_clearance.pdf",
+    "evaluation_action_bound_clipping.pdf": "results\\figures\\core_layout_transfer\\evaluation_action_bound_clipping.pdf",
+    "evaluation_action_bound_clipping_norm.pdf": "results\\figures\\core_layout_transfer\\evaluation_action_bound_clipping_norm.pdf",
+    "evaluation_projection_intervention.pdf": "results\\figures\\core_layout_transfer\\evaluation_projection_intervention.pdf",
+    "evaluation_projection_correction.pdf": "results\\figures\\core_layout_transfer\\evaluation_projection_correction.pdf",
+    "evaluation_projection_correction_max.pdf": "results\\figures\\core_layout_transfer\\evaluation_projection_correction_max.pdf",
+    "evaluation_projection_slack.pdf": "results\\figures\\core_layout_transfer\\evaluation_projection_slack.pdf",
+    "evaluation_projection_slack_max.pdf": "results\\figures\\core_layout_transfer\\evaluation_projection_slack_max.pdf",
+    "representative_trajectories.pdf": "results\\figures\\core_layout_transfer\\representative_trajectories.pdf",
+    "representative_trajectory_selection.csv": "results\\tables\\core_layout_transfer\\representative_trajectory_selection.csv"
+  },
+  "skipped": []
+}
