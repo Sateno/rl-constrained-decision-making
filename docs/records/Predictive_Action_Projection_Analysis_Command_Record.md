@@ -803,6 +803,68 @@ git diff --cached --stat
 
 The whitespace command must produce no output, and the privacy command must print its `PASS` message. The status must contain only the approved staged files, with no unstaged or untracked entry. The staged statistic must report 64 files. Do not commit until all four conditions pass.
 
+## 58. Commit the audited result set
+
+```bat
+git commit -m "Add audited predictive action projection results"
+```
+
+Result: PASS. Commit `b005123cb2c6c754a991d1e7fdc709437b90e915` was created with exactly 64 files.
+
+## 59. Verify the local commit
+
+```bat
+git status --short
+git show --no-patch --format="%H%n%an <%ae>%n%ad%n%s" --date=iso-strict HEAD
+git diff-tree --no-commit-id --name-only -r HEAD | find /c /v ""
+```
+
+Result: PASS. The working tree was clean, the commit identity and message were correct, and the file count was `64`.
+
+## 60. Push the final result branch privately
+
+```bat
+git push -u origin final_evaluation_runs
+```
+
+Result: PASS. The new remote branch was created and configured as the upstream tracking branch. The repository remained private.
+
+Direct remote inspection then confirmed that `final_evaluation_runs` is one commit ahead of and zero commits behind `main`, with `b005123c` at its tip. No CI workflow or commit status is configured.
+
+## 61. Run the full-history public-release audit
+
+The audit traversed all reachable textual patch history and Git objects for high-confidence credential signatures, literal Windows user-profile paths, suspicious credential-related filenames, and blobs larger than 20 MB.
+
+The exact detector expressions are intentionally not copied into this versioned record because embedding credential signatures in the repository would cause future scans to match the scanner's own rule definitions.
+
+Result:
+
+```text
+PASS: full-history public-release audit
+```
+
+## 62. Install and validate the documentation-only release patch
+
+The reviewed patch contains exactly these repository-root files:
+
+```text
+README.md
+LICENSE
+THIRD_PARTY_NOTICES.md
+docs/records/Predictive_Action_Projection_Analysis_Record.md
+docs/records/Predictive_Action_Projection_Analysis_Command_Record.md
+```
+
+After installing the full files, verify the documentation-only scope:
+
+```bat
+git status --short
+git diff --check
+git diff --stat
+```
+
+Expected scope: three new or modified root documentation files and the two updated living repository records. No source, test, result, protocol, or evidence file may change. Do not commit until this exact scope and a silent whitespace check are confirmed.
+
 ## Commands still to be added
 
-- Exact commit, push, and public-release verification commands after command 57 passes.
+- Exact documentation staging, commit, pull-request, merge, and visibility-verification commands after command 62 passes.

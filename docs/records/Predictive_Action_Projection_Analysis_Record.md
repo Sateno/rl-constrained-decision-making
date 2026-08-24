@@ -1085,7 +1085,42 @@ A public-release scan found no credential, access token, API key, client secret,
 
 The privacy-clean records must be installed and restaged, followed by a silent cached whitespace check, a passing staged scan for machine-specific Windows user paths, confirmation of the exact staged status, and confirmation that the cached statistic still reports 64 files. Commit authorization remains pending those final checks.
 
+### Final result commit and remote branch verification
+
+The final staged privacy and scope gate passed with exactly 64 files. The approved result set was committed as:
+
+```text
+b005123cb2c6c754a991d1e7fdc709437b90e915
+Add audited predictive action projection results
+```
+
+The working tree was clean after the commit, and `git diff-tree` confirmed that the commit contains exactly 64 files. The branch `final_evaluation_runs` was pushed to `origin` and configured to track `origin/final_evaluation_runs`.
+
+Direct remote verification confirmed that the repository remains private, its default branch is `main`, the pushed commit is the tip of `final_evaluation_runs`, and the branch is exactly one commit ahead of and zero commits behind `main`. No GitHub Actions workflow or commit-status check is configured. No pull request has been opened and no merge or visibility change has occurred.
+
+### Full-history public-release audit
+
+A local audit traversed the complete reachable Git patch history and object inventory. It found no high-confidence private-key or service-token signature, no machine-specific Windows user-profile path, no suspicious credential-file name, and no blob larger than 20 MB. The audit passed:
+
+```text
+PASS: full-history public-release audit
+```
+
+The GitHub-connected current-tree search independently found no private-key marker, API-key assignment, client-secret assignment, access-token assignment, password assignment, GitHub token signature, OpenAI-style key signature, literal Windows user-profile path, or embedded project-contact email. The committed result branch is therefore cleared from the security and privacy perspective for eventual public exposure.
+
+### Public landing-page and attribution review
+
+The security audit found no blocker, but the repository landing page still described a pre-results workflow and did not guide reviewers to the completed result set. The repository also lacked a license even though `algorithms/ppo/ppo_continuous_action.py` is explicitly adapted from CleanRL's MIT-licensed continuous-action PPO implementation.
+
+A documentation-only release patch has therefore been prepared with:
+
+- a full `README.md` replacement that states the completed evaluation scope, reports the paired projection deltas with an explicit preliminary-analysis boundary, links directly to the committed tables, figures, and audit records, and preserves the non-overclaiming scope statement;
+- a source-code-scoped `LICENSE` containing the MIT terms and both Salvador Tenorio and CleanRL developer notices while excluding generated figures, result tables, datasets, and documentation from that source-code grant; and
+- `THIRD_PARTY_NOTICES.md`, which records the adapted CleanRL file, upstream links, and retained MIT notice.
+
+Every percentage and paired-difference value in the proposed README was independently reconciled against the committed fixed-geometry and transfer CSV summaries. The patch changes documentation and attribution only; it does not alter source behavior, tests, protocols, evidence, figures, tables, or scientific interpretation inputs.
+
 ## Analysis still to add
 
 - Final separation of supported conclusions, limitations, and follow-up hypotheses.
-- Commit, public-release verification, and paper-results drafting.
+- Documentation-only release commit, pull-request merge, visibility verification, and paper-results drafting.
