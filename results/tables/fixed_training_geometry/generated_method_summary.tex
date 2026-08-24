@@ -1,0 +1,12 @@
+\begin{tabular}{llrrrrrrr}
+\toprule
+Method & Projection & Return & Success & Collision & Clearance & Intervention & Correction & Slack \\
+\midrule
+PPO baseline & Off & -5.086 $\pm$ 3.997 & 0.152 $\pm$ 0.212 & 0.140 $\pm$ 0.072 & 0.375 $\pm$ 0.131 & -- & -- & -- \\
+PPO baseline & On & -3.912 $\pm$ 4.565 & 0.178 $\pm$ 0.250 & 0.002 $\pm$ 0.004 & 0.414 $\pm$ 0.126 & 0.034 $\pm$ 0.014 & 0.015 $\pm$ 0.008 & 0.000056 $\pm$ 0.000036 \\
+PPO high penalty & Off & -9.364 $\pm$ 0.448 & 0.000 $\pm$ 0.000 & 0.134 $\pm$ 0.063 & 0.543 $\pm$ 0.116 & -- & -- & -- \\
+PPO high penalty & On & -8.659 $\pm$ 0.695 & 0.002 $\pm$ 0.004 & 0.006 $\pm$ 0.009 & 0.582 $\pm$ 0.102 & 0.028 $\pm$ 0.015 & 0.012 $\pm$ 0.008 & 0.000048 $\pm$ 0.000036 \\
+PPO trained with projection & Off & -5.357 $\pm$ 1.644 & 0.174 $\pm$ 0.080 & 0.818 $\pm$ 0.076 & -0.016 $\pm$ 0.009 & -- & -- & -- \\
+PPO trained with projection & On & 10.004 $\pm$ 1.599 & 0.936 $\pm$ 0.088 & 0.014 $\pm$ 0.021 & 0.067 $\pm$ 0.014 & 0.414 $\pm$ 0.025 & 0.208 $\pm$ 0.041 & 0.000521 $\pm$ 0.000170 \\
+\bottomrule
+\end{tabular}

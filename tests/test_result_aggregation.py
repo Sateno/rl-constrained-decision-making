@@ -508,3 +508,348 @@ def test_final_result_build_rejects_missing_representative_trajectory(tmp_path: 
             require_complete=True,
         )
 #} End function test_final_result_build_rejects_missing_representative_trajectory
+
+
+# Generated PDFs carry author metadata and embedded TrueType-compatible fonts.
+def test_result_figure_pdf_metadata_and_font_type(tmp_path: Path) -> None:
+#{
+    import os
+    import subprocess
+    import sys
+
+    path = tmp_path / "test-figure.pdf"
+    script = "\n".join(
+        [
+            "import sys",
+            "from pathlib import Path",
+            "from analysis.plot_projection_results import save_figure",
+            "import matplotlib.pyplot as plt",
+            "figure, axis = plt.subplots()",
+            "axis.plot([0.0, 1.0], [0.0, 1.0])",
+            "save_figure(figure, Path(sys.argv[1]), title='Test figure')",
+        ]
+    )
+    environment = os.environ.copy()
+    environment["MPLBACKEND"] = "Agg"
+    environment["MPLCONFIGDIR"] = str(tmp_path / "matplotlib-config")
+    completed = subprocess.run(
+        [sys.executable, "-c", script, str(path)],
+        cwd=Path(__file__).resolve().parents[1],
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, (
+        f"PDF smoke subprocess exited {completed.returncode}.\n"
+        f"stdout:\n{completed.stdout}\n"
+        f"stderr:\n{completed.stderr}"
+    )
+    payload = path.read_bytes()
+
+    assert b"/Author (Salvador Tenorio)" in payload
+    assert b"/Title (Test figure)" in payload
+    assert b"/Subject (Predictive action projection with PPO)" in payload
+    assert b"/Subtype /Type3" not in payload
+    assert b"/Subtype /Type0" in payload
+    assert b"/FontFile2" in payload
+
+#} End function test_result_figure_pdf_metadata_and_font_type
+
+
+# Projection-only evaluation figures retain the complete rightmost method label.
+def test_projection_only_figure_reserves_right_label_margin(
+    tmp_path: Path,
+) -> None:
+#{
+    import os
+    import subprocess
+    import sys
+
+    script = r'''
+import sys
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
+from analysis import plot_projection_results
+
+rows = []
+for method, display_name in (
+    ("ppo_baseline", "PPO baseline"),
+    ("ppo_high_penalty", "PPO high penalty"),
+    ("ppo_train_projection", "PPO trained with projection"),
+):
+    for train_seed in range(1, 6):
+        rows.append(
+            {
+                "method": method,
+                "display_name": display_name,
+                "train_seed": train_seed,
+                "projection_mode": "enabled",
+                "projection_intervention_rate": 0.1 * train_seed,
+            }
+        )
+
+def inspect_figure(figure, path, **kwargs):
+    assert kwargs["right"] == 0.94
+    figure.subplots_adjust(
+        left=0.16,
+        right=kwargs["right"],
+        top=0.90,
+        bottom=kwargs["bottom"],
+    )
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    rightmost_label = figure.axes[0].get_xticklabels()[-1]
+    assert rightmost_label.get_window_extent(renderer).x1 <= figure.bbox.x1
+    plt.close(figure)
+
+plot_projection_results.save_figure = inspect_figure
+assert plot_projection_results.plot_evaluation_checkpoints(
+    pd.DataFrame(rows),
+    "projection_intervention_rate",
+    Path(sys.argv[1]),
+    "Projection intervention rate",
+    True,
+)
+print("PASS: projection-only right label remains inside the figure")
+'''
+    environment = os.environ.copy()
+    environment["MPLBACKEND"] = "Agg"
+    environment["MPLCONFIGDIR"] = str(tmp_path / "matplotlib-label-config")
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            script,
+            str(tmp_path / "evaluation_projection_intervention.pdf"),
+        ],
+        cwd=Path(__file__).resolve().parents[1],
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, (
+        f"Label-layout subprocess exited {completed.returncode}.\n"
+        f"stdout:\n{completed.stdout}\n"
+        f"stderr:\n{completed.stderr}"
+    )
+    assert "PASS: projection-only right label" in completed.stdout
+
+#} End function test_projection_only_figure_reserves_right_label_margin
+
+
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "training_action_bound_clipping.pdf",
+        "training_projection_intervention.pdf",
+        "training_rolling_collision_rate.pdf",
+        "training_rolling_success_rate.pdf",
+    ],
+)
+# Displayed uncertainty for every bounded training rate remains inside [0, 1].
+def test_training_rate_uncertainty_band_is_clipped_to_feasible_interval(
+    filename: str,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+#{
+    import matplotlib.pyplot as plt
+
+    from analysis import plot_projection_results
+
+    captured = {}
+
+    def capture_figure(figure, path, **kwargs):
+        captured["figure"] = figure
+
+    monkeypatch.setattr(plot_projection_results, "save_figure", capture_figure)
+    frame = pd.DataFrame(
+        {
+            "method": ["ppo_baseline", "ppo_baseline"],
+            "display_name": ["PPO baseline", "PPO baseline"],
+            "step": [1_000.0, 2_000.0],
+            "value_mean": [0.05, 0.95],
+            "value_std": [0.20, 0.20],
+        }
+    )
+    plot_projection_results.plot_curve(
+        frame,
+        tmp_path / filename,
+        "Rolling success rate",
+    )
+    figure = captured["figure"]
+    axis = figure.axes[0]
+    vertices = axis.collections[0].get_paths()[0].vertices[:, 1]
+
+    assert float(np.min(vertices)) >= 0.0
+    assert float(np.max(vertices)) <= 1.0
+    assert axis.get_ylim() == pytest.approx((0.0, 1.0))
+    plt.close(figure)
+
+#} End function test_training_rate_uncertainty_band_is_clipped_to_feasible_interval
+
+
+# The training-return artifact states that method reward scales differ.
+def test_training_return_figure_warns_against_cross_method_scale_comparison(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+#{
+    import matplotlib.pyplot as plt
+
+    from analysis import plot_projection_results
+
+    captured = {}
+
+    monkeypatch.setattr(
+        plot_projection_results,
+        "save_figure",
+        lambda figure, path, **kwargs: captured.update(
+            {"figure": figure, "top": kwargs["top"]}
+        ),
+    )
+    frame = pd.DataFrame(
+        {
+            "method": ["ppo_baseline", "ppo_baseline"],
+            "display_name": ["PPO baseline", "PPO baseline"],
+            "step": [1_000.0, 2_000.0],
+            "value_mean": [-10.0, -5.0],
+            "value_std": [1.0, 1.0],
+        }
+    )
+    checkpoints = pd.DataFrame(
+        {
+            "method": [
+                "ppo_baseline",
+                "ppo_high_penalty",
+                "ppo_train_projection",
+            ],
+            "display_name": [
+                "PPO baseline",
+                "PPO high penalty",
+                "PPO trained with projection",
+            ],
+            "training_collision_penalty": [10.0, 50.0, 10.0],
+        }
+    )
+    caveat = plot_projection_results.training_return_caveat(checkpoints)
+    plot_projection_results.plot_curve(
+        frame,
+        tmp_path / "training_return.pdf",
+        "Episode return",
+        caveat=caveat,
+    )
+    title = captured["figure"].axes[0].get_title()
+
+    assert "Not directly comparable" in title
+    assert "collision penalty 50" in title
+    assert "PPO high penalty" in title
+    assert "vs 10" in title
+    assert captured["top"] == pytest.approx(0.86)
+    assert plot_projection_results.training_return_caveat(
+        checkpoints.assign(training_collision_penalty=10.0)
+    ) is None
+    plt.close(captured["figure"])
+
+#} End function test_training_return_figure_warns_against_cross_method_scale_comparison
+
+
+# A secondary suite can intentionally omit shared training diagnostics.
+def test_final_result_figure_build_can_skip_shared_training_diagnostics(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+#{
+    from analysis import plot_projection_results
+
+    tables = tmp_path / "tables"
+    evaluation = tmp_path / "evaluation"
+    figures = tmp_path / "figures"
+    tables.mkdir()
+    evaluation.mkdir()
+    pd.DataFrame({"method": []}).to_csv(tables / "checkpoint_summary.csv", index=False)
+    pd.DataFrame({"method": []}).to_csv(
+        tables / "evaluation_episode_results.csv",
+        index=False,
+    )
+    protocol = {
+        "study_id": "skip_training_diagnostics_test",
+        "require_complete_artifacts": True,
+        "_source_path": tmp_path / "protocol.json",
+        "_sha256": "a" * 64,
+    }
+    monkeypatch.setattr(plot_projection_results, "load_protocol", lambda _: protocol)
+    monkeypatch.setattr(plot_projection_results, "EVALUATION_PLOTS", ())
+    monkeypatch.setattr(plot_projection_results, "plot_trajectories", lambda *args, **kwargs: False)
+    outputs = plot_projection_results.build_result_figures(
+        tmp_path / "protocol.json",
+        tables,
+        evaluation,
+        figures,
+        include_training_diagnostics=False,
+    )
+    audit = json.loads(outputs["figure_build_audit.json"].read_text(encoding="utf-8"))
+
+    assert audit["training_diagnostics_included"] is False
+    assert audit["artifact_scope"] == "evaluation_only"
+    assert audit["intentional_omissions"] == [
+        {
+            "category": "shared_training_diagnostics",
+            "reason": "disabled_by_command",
+        }
+    ]
+    assert audit["training_diagnostics"] == {
+        "included": False,
+        "reason": "disabled_by_command",
+    }
+    assert not list(figures.glob("training_*.pdf"))
+
+#} End function test_final_result_figure_build_can_skip_shared_training_diagnostics
+
+
+@pytest.mark.parametrize(
+    ("values", "outcome"),
+    [
+        ({"success": True, "collision": False, "terminated": True, "truncated": False}, "success"),
+        ({"success": False, "collision": True, "terminated": True, "truncated": False}, "collision"),
+        ({"success": False, "collision": False, "terminated": False, "truncated": True}, "timeout"),
+    ],
+)
+# Trajectory outcomes are assigned only from one valid exhaustive terminal state.
+def test_trajectory_episode_outcome_classification(
+    values: dict[str, bool],
+    outcome: str,
+) -> None:
+#{
+    from analysis.plot_projection_results import episode_outcome
+
+    assert episode_outcome(pd.Series(values)) == outcome
+
+#} End function test_trajectory_episode_outcome_classification
+
+
+# Ambiguous or technical terminal states are not silently relabeled as timeouts.
+def test_trajectory_episode_outcome_rejects_unclassified_state() -> None:
+#{
+    from analysis.plot_projection_results import episode_outcome
+
+    with pytest.raises(ValueError, match="not exactly one valid"):
+        episode_outcome(
+            pd.Series(
+                {
+                    "success": False,
+                    "collision": False,
+                    "terminated": True,
+                    "truncated": False,
+                }
+            )
+        )
+
+#} End function test_trajectory_episode_outcome_rejects_unclassified_state
