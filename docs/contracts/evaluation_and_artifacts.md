@@ -101,9 +101,11 @@ Existing CSV or NPZ output is refused unless `--overwrite` is explicit.
 
 The development suite validates software and pipelines. The frozen core suite measures deterministic obstacle-layout transfer and robustness.
 
-## Same-checkpoint paired evaluation
+## Same-final-checkpoint paired evaluation
 
-`evaluation.evaluate_projection_pair` runs one checkpoint with projection disabled and enabled under one shared configuration and aligned seeds.
+`evaluation.evaluate_projection_pair` runs one retained final checkpoint with
+projection disabled and enabled under one shared configuration and aligned
+seeds. Each final checkpoint represents one separately seeded training run.
 
 For prefix `<prefix>` it writes:
 
@@ -182,7 +184,9 @@ technical incident rather than as valid zero burden.
 
 ## Aggregation hierarchy
 
-Layouts are repeated test cases for one checkpoint, not independent trained-policy replicates.
+Layouts are repeated test cases for one retained final checkpoint, not
+training replicates. The separately seeded training run is the empirical
+replicate; one final checkpoint is retained from each run.
 
 \[
 \bar y_{m,s}=\frac{1}{L}\sum_l y_{m,s,l},
@@ -193,15 +197,25 @@ Layouts are repeated test cases for one checkpoint, not independent trained-poli
 Thus:
 
 ```text
-average layouts within checkpoint
-then aggregate independently trained checkpoints across seeds
+average layouts within each run's final checkpoint
+then aggregate training-run quantities across seeds
 ```
 
-Projection off/on differences are paired by checkpoint and layout before seed-level aggregation.
+Projection off/on differences are paired within a training run through the same
+final checkpoint and, for layout suites, by layout before run-level
+aggregation. Comparisons between training histories use unpaired five-run
+samples.
 
-Report every independently trained seed, the seed-level mean and standard deviation, paired effect magnitudes, and the individual seed values. Strong significance claims are not justified by layout or episode count alone.
+Report every separately seeded training run, the run-level mean and sample
+standard deviation, paired effect magnitudes, and the individual run values.
+Strong significance claims are not justified by layout or episode count alone.
 
 ## Generated outputs
+
+The current builder emits scientific CSV/JSON tables. LaTeX table exports and
+paper-specific figure production belong to the separate paper project. Historical
+build audits retain their original output paths, including retired LaTeX exports;
+those audit records describe the historical build, not the current file inventory.
 
 Curated tables include:
 
@@ -211,8 +225,6 @@ checkpoint_summary.csv
 method_summary.csv
 paired_projection_deltas.csv
 paired_projection_summary.csv
-generated_method_summary.tex
-generated_paired_projection_deltas.tex
 training_scalar_events.csv
 training_episode_diagnostics.csv
 training_rollout_diagnostics.csv
@@ -225,6 +237,12 @@ Figures may include training return, cumulative collisions, rolling safety rates
 Plotting consumes saved artifacts only and never launches training or evaluation. The builder refuses an existing output directory to prevent stale figures.
 
 ## Artifact locations
+
+Raw artifacts use the local `runs/` paths below and are excluded from Git.
+Preserve them in the existing local archives. Curated `results/` files,
+protocols, analysis tools, and documentation form the repository reproduction
+package. The manifest separates required repository files from optional
+local-archive checksums.
 
 ```text
 runs/checkpoints/     raw checkpoints

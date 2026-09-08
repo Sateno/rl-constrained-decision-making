@@ -1,0 +1,17 @@
+{
+  "python": "3.12.13 (main, Aug  7 2026, 02:25:39) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+  "packages": {
+    "numpy": "2.5.3",
+    "pandas": "2.2.3",
+    "scipy": "1.18.1",
+    "torch": "2.12.0+cpu",
+    "gymnasium": "1.3.0",
+    "cvxpy": "1.9.2",
+    "osqp": "1.1.3",
+    "pytest": "9.1.1",
+    "tensorboard": "2.21.0",
+    "tyro": "1.0.16",
+    "matplotlib": "3.10.8"
+  }
+}

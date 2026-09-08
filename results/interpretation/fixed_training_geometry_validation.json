@@ -1,0 +1,226 @@
+{
+  "build_audit_checks": {
+    "counts_exact": true,
+    "hashes_exact": true,
+    "status": "PASS"
+  },
+  "cross_table_checkpoint_comparisons": [],
+  "design": {
+    "expected_checkpoint_rows": 30,
+    "expected_episode_rows": 3000,
+    "expected_method_rows": 6,
+    "expected_paired_checkpoint_rows": 15,
+    "expected_paired_method_rows": 3,
+    "expected_train_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "layout_count": 1,
+    "layout_ids": [
+      "fixed_training_geometry"
+    ],
+    "methods": [
+      "ppo_baseline",
+      "ppo_high_penalty",
+      "ppo_train_projection"
+    ],
+    "projection_modes_by_method": {
+      "ppo_baseline": [
+        "disabled",
+        "enabled"
+      ],
+      "ppo_high_penalty": [
+        "disabled",
+        "enabled"
+      ],
+      "ppo_train_projection": [
+        "disabled",
+        "enabled"
+      ]
+    },
+    "repeats_per_layout": 100
+  },
+  "episode_checks": {
+    "checkpoint_identity_count": 15,
+    "clearance_nan_pattern_exact": true,
+    "evaluation_mapping_exact": true,
+    "outcome_partition_exact": true,
+    "pairing_keys_exact": true,
+    "rate_formula_max_abs_errors": {
+      "action_bound_clipping_rate": 5.551115123125783e-17,
+      "projection_intervention_rate": 9.367506770274758e-17,
+      "speed_action_bound_clipping_rate": 8.326672684688674e-17,
+      "turn_rate_action_bound_clipping_rate": 8.326672684688674e-17
+    },
+    "result_build_schema_version": "projection_result_tables_v1",
+    "seed_identity_exact": true,
+    "structural_zero_counts_when_projection_disabled": {
+      "max_projection_correction_norm": 1500,
+      "max_projection_slack": 1500,
+      "mean_projection_correction_norm": 1500,
+      "mean_projection_slack_sum": 1500,
+      "projection_intervention_count": 1500,
+      "projection_intervention_rate": 1500,
+      "projection_solver_failure_count": 1500
+    }
+  },
+  "implementation": {
+    "entrypoint": "validate_evaluation_tables.py",
+    "entrypoint_sha256": "97aa4f0c6bfebb3dd71069eebb191239359292267bf873af7c554a695ac54fbe",
+    "evidence_module": "_evaluation_evidence.py",
+    "evidence_module_sha256": "250789508fba8850e07bc19d1aef0b93ea8348b6b14eb09594469a6c62b53d5f"
+  },
+  "inputs": {
+    "build_audit": {
+      "path": "results/tables/fixed_training_geometry/result_build_audit.json",
+      "sha256": "e756ce0569e73d6be6f6d4f5aacfcfed1deb77bc186e2c87d9f24cdd3b37aae0"
+    },
+    "checkpoint_summary": {
+      "path": "results/tables/fixed_training_geometry/checkpoint_summary.csv",
+      "sha256": "ed6cea5664594c59fac5957612855bcd52e8eaa413fc9d69b1d3c2cf34644a2a"
+    },
+    "episodes": {
+      "path": "results/tables/fixed_training_geometry/evaluation_episode_results.csv",
+      "sha256": "e3042413d20458dd5fb0bda526a66c59375d55f4e03882788605ade59a78dd85"
+    },
+    "layout_suite": {
+      "path": "evaluation/layouts/fixed_training_geometry.json",
+      "sha256": "42cd7d589e49483d86d46dce5c7c48387894241ad333d409ddee93124ab698d2"
+    },
+    "method_summary": {
+      "path": "results/tables/fixed_training_geometry/method_summary.csv",
+      "sha256": "d0009e23e453d32e564ef04ce1d653973ba041aac0ebca4f0f4fc1095ce8df60"
+    },
+    "paired_deltas": {
+      "path": "results/tables/fixed_training_geometry/paired_projection_deltas.csv",
+      "sha256": "7a2de5960ac0fa882765bb8c37e2b6ba9b377c38337bf0638a2e89abafd4221c"
+    },
+    "paired_summary": {
+      "path": "results/tables/fixed_training_geometry/paired_projection_summary.csv",
+      "sha256": "4c504ce10b8dc368ad767f3174c414125abe9266402582cf03bbd090482a279d"
+    },
+    "protocol": {
+      "path": "experiments/fixed_training_geometry_analysis_protocol.json",
+      "sha256": "b7779a161aee898a10ddf32377a75ea1ba19875526806fb5239ad966b387f7d5"
+    }
+  },
+  "output_schema": "interpretation_analysis_output_v1",
+  "reconciliation": {
+    "checkpoint_max_abs_errors": {
+      "action_bound_clipping_norm": 1.1102230246251565e-16,
+      "action_bound_clipping_norm_max": 0.0,
+      "action_bound_clipping_rate": 0.0,
+      "collision_rate": 0.0,
+      "episode_count": 0.0,
+      "episode_length": 0.0,
+      "episode_return": 1.7763568394002505e-15,
+      "layout_count": 0.0,
+      "min_obstacle_clearance": 9.71445146547012e-17,
+      "projection_correction_norm": 9.540979117872439e-17,
+      "projection_correction_norm_max": 0.0,
+      "projection_intervention_rate": 9.367506770274758e-17,
+      "projection_slack_max": 0.0,
+      "projection_slack_sum": 9.356664748549903e-17,
+      "speed_action_bound_clipping_rate": 5.551115123125783e-17,
+      "success_rate": 0.0,
+      "training_collision_penalty": 0.0,
+      "turn_rate_action_bound_clipping_rate": 5.551115123125783e-17
+    },
+    "method_max_abs_errors": {
+      "action_bound_clipping_norm_max_mean": 8.881784197001252e-16,
+      "action_bound_clipping_norm_max_std": 5.551115123125783e-17,
+      "action_bound_clipping_norm_mean": 5.551115123125783e-17,
+      "action_bound_clipping_norm_std": 5.551115123125783e-17,
+      "action_bound_clipping_rate_mean": 0.0,
+      "action_bound_clipping_rate_std": 9.020562075079397e-17,
+      "collision_rate_mean": 8.326672684688674e-17,
+      "collision_rate_std": 7.979727989493313e-17,
+      "episode_length_mean": 2.842170943040401e-14,
+      "episode_length_std": 5.551115123125783e-17,
+      "episode_return_mean": 1.7763568394002505e-15,
+      "episode_return_std": 0.0,
+      "min_obstacle_clearance_mean": 8.326672684688674e-17,
+      "min_obstacle_clearance_std": 8.326672684688674e-17,
+      "projection_correction_norm_max_mean": 4.440892098500626e-16,
+      "projection_correction_norm_max_std": 8.326672684688674e-17,
+      "projection_correction_norm_mean": 5.551115123125783e-17,
+      "projection_correction_norm_std": 9.020562075079397e-17,
+      "projection_intervention_rate_mean": 5.551115123125783e-17,
+      "projection_intervention_rate_std": 7.632783294297951e-17,
+      "projection_slack_max_mean": 6.245004513516506e-17,
+      "projection_slack_max_std": 9.71445146547012e-17,
+      "projection_slack_sum_mean": 3.5236570605778894e-17,
+      "projection_slack_sum_std": 2.9544509200229996e-17,
+      "seed_count": 0.0,
+      "speed_action_bound_clipping_rate_mean": 5.551115123125783e-17,
+      "speed_action_bound_clipping_rate_std": 8.326672684688674e-17,
+      "success_rate_mean": 1.1102230246251565e-16,
+      "success_rate_std": 7.979727989493313e-17,
+      "turn_rate_action_bound_clipping_rate_mean": 5.551115123125783e-17,
+      "turn_rate_action_bound_clipping_rate_std": 6.245004513516506e-17
+    },
+    "paired_delta_max_abs_errors": {
+      "action_bound_clipping_rate_delta_enabled_minus_disabled": 9.71445146547012e-17,
+      "collision_delta_enabled_minus_disabled": 0.0,
+      "episode_length_delta_enabled_minus_disabled": 0.0,
+      "episode_return_delta_enabled_minus_disabled": 1.7763568394002505e-15,
+      "max_action_bound_clipping_norm_delta_enabled_minus_disabled": 9.71445146547012e-17,
+      "mean_action_bound_clipping_norm_delta_enabled_minus_disabled": 8.543513119185775e-17,
+      "min_obstacle_clearance_delta_enabled_minus_disabled": 9.020562075079397e-17,
+      "paired_layout_count": 0.0,
+      "speed_action_bound_clipping_rate_delta_enabled_minus_disabled": 7.632783294297951e-17,
+      "success_delta_enabled_minus_disabled": 0.0,
+      "turn_rate_action_bound_clipping_rate_delta_enabled_minus_disabled": 9.90960785651751e-17
+    },
+    "paired_summary_max_abs_errors": {
+      "action_bound_clipping_rate_delta_enabled_minus_disabled_mean": 4.336808689942018e-17,
+      "action_bound_clipping_rate_delta_enabled_minus_disabled_std": 4.423544863740858e-17,
+      "collision_delta_enabled_minus_disabled_mean": 0.0,
+      "collision_delta_enabled_minus_disabled_std": 9.020562075079397e-17,
+      "episode_length_delta_enabled_minus_disabled_mean": 7.105427357601002e-15,
+      "episode_length_delta_enabled_minus_disabled_std": 0.0,
+      "episode_return_delta_enabled_minus_disabled_mean": 0.0,
+      "episode_return_delta_enabled_minus_disabled_std": 0.0,
+      "max_action_bound_clipping_norm_delta_enabled_minus_disabled_mean": 1.1102230246251565e-16,
+      "max_action_bound_clipping_norm_delta_enabled_minus_disabled_std": 8.326672684688674e-17,
+      "mean_action_bound_clipping_norm_delta_enabled_minus_disabled_mean": 9.194034422677078e-17,
+      "mean_action_bound_clipping_norm_delta_enabled_minus_disabled_std": 9.974659986866641e-17,
+      "min_obstacle_clearance_delta_enabled_minus_disabled_mean": 2.7755575615628914e-17,
+      "min_obstacle_clearance_delta_enabled_minus_disabled_std": 8.673617379884035e-17,
+      "seed_count": 0.0,
+      "speed_action_bound_clipping_rate_delta_enabled_minus_disabled_mean": 5.117434254131581e-17,
+      "speed_action_bound_clipping_rate_delta_enabled_minus_disabled_std": 6.375108774214766e-17,
+      "success_delta_enabled_minus_disabled_mean": 3.469446951953614e-18,
+      "success_delta_enabled_minus_disabled_std": 9.020562075079397e-17,
+      "turn_rate_action_bound_clipping_rate_delta_enabled_minus_disabled_mean": 8.229094489164979e-17,
+      "turn_rate_action_bound_clipping_rate_delta_enabled_minus_disabled_std": 7.22078646875346e-17
+    }
+  },
+  "script": "validate_evaluation_tables",
+  "status": "PASS",
+  "table_shapes": {
+    "checkpoint_summary": [
+      30,
+      26
+    ],
+    "episodes": [
+      3000,
+      53
+    ],
+    "method_summary": [
+      6,
+      35
+    ],
+    "paired_deltas": [
+      15,
+      16
+    ],
+    "paired_summary": [
+      3,
+      24
+    ]
+  }
+}

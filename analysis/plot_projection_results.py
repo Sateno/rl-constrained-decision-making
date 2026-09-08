@@ -202,7 +202,7 @@ def training_return_caveat(checkpoints: pd.DataFrame) -> str | None:
 #} End function training_return_caveat
 
 
-# Plot checkpoint-level evaluation values while preserving off/on pairing.
+# Plot run-level values represented by final checkpoints while preserving off/on pairing.
 def plot_evaluation_checkpoints(
     checkpoints: pd.DataFrame,
     metric: str,
@@ -241,7 +241,7 @@ def plot_evaluation_checkpoints(
                 alpha=0.80,
                 s=34,
                 zorder=3,
-                label="Training checkpoint" if method_index == 0 else None,
+                label="Run final checkpoint" if method_index == 0 else None,
             )
             axis.scatter(
                 [x[method_index]],
@@ -250,7 +250,7 @@ def plot_evaluation_checkpoints(
                 color="black",
                 s=42,
                 zorder=4,
-                label="Across-checkpoint mean" if method_index == 0 else None,
+                label="Mean across training runs" if method_index == 0 else None,
             )
     else:
         offsets = {"disabled": -0.14, "enabled": 0.14}
@@ -300,7 +300,7 @@ def plot_evaluation_checkpoints(
                     linewidth=1.5,
                     s=48,
                     zorder=4,
-                    label="Across-checkpoint mean"
+                    label="Mean across training runs"
                     if method_index == 0 and mode == "disabled"
                     else None,
                 )
@@ -311,9 +311,9 @@ def plot_evaluation_checkpoints(
     axis.grid(axis="y", alpha=0.25)
     handles, labels = axis.get_legend_handles_labels()
     preferred = (
-        ["Training checkpoint", "Across-checkpoint mean"]
+        ["Run final checkpoint", "Mean across training runs"]
         if projection_only
-        else ["Projection off", "Projection on", "Across-checkpoint mean"]
+        else ["Projection off", "Projection on", "Mean across training runs"]
     )
     legend_items = {label: handle for handle, label in zip(handles, labels)}
     axis.legend(

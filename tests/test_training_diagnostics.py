@@ -11,6 +11,7 @@ from analysis.training_diagnostics import (
     aggregate_episode_curve,
     training_episode_diagnostics,
     training_rollout_diagnostics,
+    resolve_recorded_checkpoint,
 )
 
 
@@ -22,6 +23,24 @@ IDENTITY = {
     "training_projection_enabled": True,
     "run_dir": "runs/example",
 }
+
+
+@pytest.mark.parametrize("recorded", [
+    r"C:\old\checkout\runs\checkpoints\final\model.pt",
+    "/old/checkout/runs/checkpoints/final/model.pt",
+    "runs/checkpoints/final/model.pt",
+])
+def test_frozen_checkpoint_lookup_survives_checkout_and_platform_changes(tmp_path, recorded):
+    runs = tmp_path / "runs"
+    checkpoint = runs / "checkpoints/final/model.pt"
+    checkpoint.parent.mkdir(parents=True)
+    checkpoint.write_bytes(b"unchanged checkpoint")
+    assert resolve_recorded_checkpoint(recorded, runs) == checkpoint
+
+
+def test_relocated_checkpoint_cannot_escape_runs(tmp_path):
+    with pytest.raises(ValueError, match="escapes"):
+        resolve_recorded_checkpoint("C:/old/runs/../../model.pt", tmp_path / "runs")
 
 
 # Return long-form TensorBoard points for one tag.

@@ -196,6 +196,15 @@ def resolve_recorded_checkpoint(path_text: str, runs_dir: Path) -> Path:
 #{
     normalized = Path(path_text.strip().replace("\\", "/"))
 
+    # Frozen events can name a different checkout or a Windows drive. Resolve
+    # their declared runs/ suffix within the caller's evidence directory. The
+    # downstream checkpoint SHA-256 check still determines artifact identity.
+    if "runs" in normalized.parts:
+        suffix = normalized.parts[normalized.parts.index("runs") + 1:]
+        if ".." in suffix:
+            raise ValueError("Recorded checkpoint path escapes the runs directory.")
+        return runs_dir.joinpath(*suffix).resolve()
+
     if normalized.is_absolute():
         return normalized
 

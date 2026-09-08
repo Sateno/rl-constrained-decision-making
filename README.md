@@ -1,91 +1,167 @@
 # Constrained Policy Learning with Predictive Action Projection
 
-Research code and audited simulation results for a compact constrained
-continuous-control benchmark using a CleanRL-style PPO baseline and an optional
-predictive action-projection safety filter.
+Research code, curated result tables, and reproducible analysis tools for
+a compact continuous-control benchmark using PPO and an optional predictive
+action-projection controller.
 
-> **Study status, 24 August 2026:** Training, frozen evaluation, dataset audit,
-> and result generation are complete. Scientific interpretation and a short
-> empirical technical report are in preparation. The numerical snapshot below
-> is deliberately preliminary and does not represent the final conclusions of
-> the study.
+This repository accompanies **Runtime Attribution in PPO with Predictive Action
+Projection: An Independent-Run Fixed-to-Transfer Audit**. The experiment and
+interpretation are complete. The manuscript, its bibliography, and its four
+figure-production sources are maintained in a separate Overleaf/GitHub project.
 
-## Evaluation snapshot
+## Study design
 
 The completed experiment contains:
 
 - three PPO training conditions;
-- five independently trained checkpoints per condition;
+- five independently initialized training runs per condition;
+- one final checkpoint retained from each run;
 - 3,000 stochastic fixed-geometry evaluation episodes;
-- 720 deterministic episodes across a 24-layout transfer suite; and
-- 3,720 evaluated episodes in total, with projection disabled and enabled under
-  frozen protocols.
+- 720 deterministic actor-mean executions across 24 prespecified transfer
+  layouts; and
+- paired projector-off and projector-on evaluation of every retained final
+  checkpoint.
 
-The table reports projection-on minus projection-off paired differences as
-mean plus or minus sample standard deviation across five independently trained
-checkpoints. Values are percentage-point changes. A negative collision value
-means that enabling projection reduced collision rate.
+The training run is the empirical replicate, with `n=5` runs per condition.
+The checkpoint is the retained model artifact representing that run. Episodes
+and layouts provide evaluation coverage, not additional independent policy
+replicates.
 
-| Training condition | Fixed Δ success | Fixed Δ collision | Transfer Δ success | Transfer Δ collision |
+## Result snapshot
+
+The table reports projector-on minus projector-off differences as the mean and
+sample standard deviation across the five training runs. Values are percentage
+point changes. A negative collision value means that enabling projection
+reduced the observed collision rate.
+
+| Training condition | Fixed delta success | Fixed delta collision | Transfer delta success | Transfer delta collision |
 | --- | ---: | ---: | ---: | ---: |
-| PPO baseline | +2.6 ± 3.8 pp | -13.8 ± 7.3 pp | 0.0 ± 0.0 pp | -1.7 ± 2.3 pp |
-| PPO high penalty | +0.2 ± 0.4 pp | -12.8 ± 5.8 pp | 0.0 ± 0.0 pp | -1.7 ± 3.7 pp |
-| PPO trained with projection | +76.2 ± 4.5 pp | -80.4 ± 6.1 pp | +5.8 ± 2.3 pp | -50.8 ± 9.5 pp |
+| PPO baseline | +2.6 +/- 3.8 pp | -13.8 +/- 7.3 pp | 0.0 +/- 0.0 pp | -1.7 +/- 2.3 pp |
+| PPO high penalty | +0.2 +/- 0.4 pp | -12.8 +/- 5.8 pp | 0.0 +/- 0.0 pp | -1.7 +/- 3.7 pp |
+| PPO trained with projection | +76.2 +/- 4.6 pp | -80.4 +/- 6.1 pp | +5.8 +/- 2.3 pp | -50.8 +/- 9.5 pp |
 
-For checkpoints trained with projection, fixed-geometry success increased from
-17.4% to 93.6% when projection was enabled, while collision rate decreased
-from 81.8% to 1.4%. The projector intervened on 41.4% of executed steps. In the
-transfer suite, success increased from 27.5% to 33.3%, collision rate decreased
-from 63.3% to 12.5%, and intervention increased to 56.7%. A substantial share
-of avoided transfer collisions became timeouts rather than successes.
+For projection-trained runs in fixed geometry, projector-off evaluation
+produced 17.4% success, 81.8% collision, and 0.8% timeout. Projector-on
+evaluation produced 93.6% success, 1.4% collision, and 5.0% timeout. On the
+transfer layouts, projector-off evaluation produced 27.50% success, 63.33%
+collision, and 9.17% timeout, while projector-on evaluation produced 33.33%
+success, 12.50% collision, and 54.17% timeout.
 
-These observations describe the complete policy-plus-projector controller.
-They do not establish that the nominal policy is independently safe, that the
-method provides a global safety guarantee, or that the present interpretation
-is final. No projection solver failure was recorded in the frozen evaluation
-dataset.
-
-## Results and audit trail
-
-The committed result set is intentionally curated. Raw checkpoints,
-TensorBoard logs, and trajectory archives remain outside normal source control.
-
-- [Fixed-geometry tables](results/tables/fixed_training_geometry/)
-- [Fixed-geometry figures](results/figures/fixed_training_geometry/)
-- [Transfer tables](results/tables/core_layout_transfer/)
-- [Transfer figures](results/figures/core_layout_transfer/)
-- [Analysis record](docs/records/Predictive_Action_Projection_Analysis_Record.md)
-- [Exact analysis command record](docs/records/Predictive_Action_Projection_Analysis_Command_Record.md)
-
-Each result suite includes machine-readable build audits. The final committed
-set contains 23 primary PDFs and 13 evaluation-only transfer PDFs. All figures
-passed direct visual review, metadata and embedded-font checks, and numerical
-reconciliation against their committed tables and underlying evidence. The
-evaluation tables contain 3,720 episode rows, and the complete repository test
-suite passed with 71 tests.
+These results describe the tested policy-plus-projector composite controller
+when projection is enabled. They do not establish that the nominal policy is
+independently safe, a projector-only causal effect, a global safety guarantee,
+or generalization to arbitrary geometries.
 
 ## Start here
 
-Readers new to the study should begin with the
-[Orientation Guide to Predictive Action Projection with PPO](docs/guides/Orientation_Guide_to_Predictive_Action_Projection_with_PPO.pdf).
-It provides a concise conceptual introduction to the research question,
-architecture, and recommended reading path.
+1. Read the focused contracts under [`docs/contracts/`](docs/contracts/).
+2. Read the
+   [frozen experimental protocol](docs/records/predictive_action_projection_experimental_protocol.md)
+   before interpreting or rerunning the study.
+3. Inspect the machine-readable protocols under [`experiments/`](experiments/)
+   and the executable validators and tests.
+4. Read the [final study record](docs/records/final_study_record.md) for the
+   completed findings and their evidence locations.
+5. Use the [release verification guide](docs/validation/release_verification.md)
+   to check an installation without generating new training or evaluation data.
 
-Next, read the
-[Predictive Action Projection Software and Artifact Companion](docs/guides/Predictive_Action_Projection_Software_Companion.pdf).
-It explains how the design appears in the repository during practical code
-reading, training, evaluation, debugging, artifact inspection, and result
-interpretation.
+The software manuals, focused contracts, protocols, and executable checks
+describe the completed study. The manuals are compiled in separate Overleaf
+projects and copied into `docs/guides/` and `docs/design/`. Their LaTeX sources
+and build tools are maintained outside this code repository.
 
-For exact implemented behavior, mathematical definitions, component ownership,
-interfaces, algorithms, artifact schemas, failure semantics, and verification
-contracts, consult the
-[Predictive Action Projection Implementation Design](docs/design/predictive_action_projection_implementation_design.pdf).
+## Repository map
 
-The guides are pedagogical. When exact field names, array shapes, formulas,
-protocol requirements, or runtime behavior matter, consult the implementation
-design, the focused contracts under `docs/contracts/`, the machine-readable
-protocols, the executable validators, and the source code.
+```text
+algorithms/               PPO and projection-training semantics
+analysis/                 result construction, diagnostic plots, and interpretation
+docs/                     design, guides, contracts, validation, and records
+environments/             constrained-navigation environment and action wrappers
+evaluation/               fixed and layout-suite evaluation entry points
+experiments/              training, calibration, and frozen protocols
+projection/               predictive CBF-QP projector and wrapper
+results/tables/            frozen episode, run-level, and method summaries
+results/figures/           curated generated result figures
+scripts/                  Windows convenience launchers
+tests/                    regression and scientific-integrity tests
+verification/             audited file inventory and evidence provenance
+runs/                     local generated evidence and archives; excluded from Git
+```
+
+The [layout atlas](docs/assets/layouts/Predictive_Action_Projection_Core_Layout_Atlas.pdf)
+is benchmark documentation, generated by
+`analysis.render_transfer_layout_atlas`. Diagnostic plots under `results/figures/`
+record the completed analysis. Paper layout, TikZ/PGFPlots figure templates,
+paper-specific compact data, and LaTeX result-table exports are maintained
+outside this repository.
+
+## Verify the completed repository
+
+From the repository root, with `RL_PROJECTS` active:
+
+```sh
+python -m pytest -q -rs
+python -m evaluation.verify_repository_release --base-ref main
+```
+
+The second command verifies the repository inventory, protected source against
+the local `main` reference, published-table hashes, complete evaluation coverage,
+recorded checkpoint identities, summary reconstruction, and active documentation
+links. It works with `runs/` entirely absent and performs no training, policy
+evaluation, calibration, or benchmark. After staging, add `--require-tracked`
+to verify the exact intended Git files and content. Tracked files under `runs/`
+are rejected; local archives are preserved.
+
+The [verification guide](docs/validation/release_verification.md) describes the
+optional `--archive-root` check for a separately preserved run archive and the
+comparison with the separate Overleaf ZIP.
+
+## Reproduce the reported analysis
+
+The [interpretation tools](analysis/interpretation/README.md) reconstruct the
+completed findings from explicit frozen inputs. The committed
+[interpretation outputs](results/interpretation/README.md) preserve absolute
+outcomes, paired runtime contrasts, layout summaries, and matched terminal
+correspondences. Reconstruction creates new analysis files from existing data;
+it does not generate new experimental observations.
+
+The independent training run is the empirical replicate, with five runs per
+history and one final checkpoint per run. OFF/ON is paired within run.
+Cross-history comparisons are unpaired. The final paper emphasis was selected
+retrospectively; the evaluation conditions and transfer suite preceded the
+final outcomes. Findings are descriptive, with no significance, equivalence,
+or non-inferiority test.
+
+## Evidence and reproducibility
+
+The repository contains the implementation, environment specification, frozen
+training/evaluation protocols, layouts, curated endpoint and summary tables,
+training diagnostic exports, and analysis tools. These support executing the
+study and reconstructing the reported numerical analysis from the supplied
+tables. The paper and its production assets are maintained separately.
+
+All raw files under `runs/`, including final checkpoints, TensorBoard events,
+evaluation CSVs, trajectories, and validation/calibration logs, remain in the
+author's local archives and are excluded from Git. Preserving those archives
+supports inspection of the exact historical executions; a fresh checkout does
+not contain them. Analyses needing raw trajectories or model parameters require
+the corresponding archive or newly generated outputs. Re-training from the
+recorded seeds is a new execution and is not guaranteed to reproduce historical
+checkpoint bytes. See the [evidence inventory](verification/README.md).
+
+Historical Windows paths are retained as provenance. Optional archive
+verification resolves their `runs/` suffix below the supplied archive root.
+Binary hashes cover exact bytes; text hashes normalize only CRLF to LF.
+
+## Results and audit trail
+
+- [Fixed-geometry tables](results/tables/fixed_training_geometry/)
+- [Fixed-geometry diagnostic figures](results/figures/fixed_training_geometry/)
+- [Transfer tables](results/tables/core_layout_transfer/)
+- [Transfer diagnostic figures](results/figures/core_layout_transfer/)
+- [Final study record](docs/records/final_study_record.md)
+- [Historical analysis record](docs/records/Predictive_Action_Projection_Analysis_Record.md)
+- [Historical analysis command record](docs/records/Predictive_Action_Projection_Analysis_Command_Record.md)
 
 ## Implemented workflow
 
@@ -95,37 +171,21 @@ protocols, the executable validators, and the source code.
   projection-enabled interaction variants.
 - The action path records normalized action-bound clipping separately from
   physical CBF-QP intervention, correction, slack, and solver diagnostics.
-- Evaluation supports built-in regression scenarios and frozen named layout
-  suites, with per-episode CSV summaries and trajectory NPZ archives.
-- Result scripts audit saved artifacts and export episode-level training
-  safety, rollout-level intervention burden, aggregate CSV and LaTeX tables,
-  and PDF figures.
-
-## Canonical validation
-
-Activate the `RL_PROJECTS` Conda environment, then run the consolidated
-pre-experiment validation:
-
-```bat
-scripts\validate_pre_experiment_codebase.bat
-```
-
-After the consolidated validation passes, the engineering-only CPU/CUDA
-throughput comparison is run with:
-
-```bat
-scripts\benchmark_training_devices.bat
-```
-
-The exact commands used for the frozen evaluation, aggregation, figure builds,
-audits, and final quality gates are preserved in the
-[analysis command record](docs/records/Predictive_Action_Projection_Analysis_Command_Record.md).
+- Evaluation supports regression scenarios and frozen named layout suites with
+  per-execution CSV summaries and optional trajectory archives.
+- Result tools validate saved evidence and export training diagnostics,
+  evaluation summaries and vector diagnostic plots.
 
 ## Artifact policy
 
-Raw checkpoints, TensorBoard logs, evaluation CSV files, and trajectory NPZ
-archives are written under `runs/` and are not normal source-control content.
-Curated result tables and figures are generated from saved artifacts only.
+The manifest's `files` mapping defines the Git inventory. Its separate
+`local_archive_files` mapping records checksums for optional local verification
+and never requires those files in Git. All `runs/` contents, local environments,
+caches, and temporary outputs remain ignored. Keep the raw archives intact;
+restoring the ignore rule does not delete them.
+
+Keep the paper project, paper-production assets, private working notes, and
+handoff ZIP files outside this repository.
 
 ## Attribution and licensing
 
@@ -137,11 +197,11 @@ Original project source code, machine-readable protocols and configurations,
 and executable scripts are available under the MIT terms in
 [LICENSE](LICENSE). Generated figures, result tables, datasets, and
 documentation are not covered by that source-code license unless a file states
-otherwise; they remain copyright Salvador Tenorio and are currently provided
-for scholarly inspection.
+otherwise; they remain copyright Salvador Tenorio and are provided for
+scholarly inspection.
 
 ## Scope
 
 This repository supports simulated numerical experiments. It does not claim
-global safety guarantees, real-world deployment readiness, or an unbiased
-projected policy-gradient formulation.
+formal safety, real-world deployment readiness, an unbiased projected
+policy-gradient formulation, or broad navigation generalization.

@@ -1,0 +1,3806 @@
+{
+  "analysis_schema": "paired_terminal_outcome_correspondences_v1",
+  "coverage": {
+    "independent_unit": "training_run_represented_by_final_checkpoint",
+    "paired_evaluation_observations_per_training_run": 100,
+    "paired_method_count": 3,
+    "total_paired_evaluation_observations": 1500,
+    "training_run_count_per_method": 5
+  },
+  "design": {
+    "expected_checkpoint_rows": 30,
+    "expected_episode_rows": 3000,
+    "expected_method_rows": 6,
+    "expected_paired_checkpoint_rows": 15,
+    "expected_paired_method_rows": 3,
+    "expected_train_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "layout_count": 1,
+    "layout_ids": [
+      "fixed_training_geometry"
+    ],
+    "methods": [
+      "ppo_baseline",
+      "ppo_high_penalty",
+      "ppo_train_projection"
+    ],
+    "projection_modes_by_method": {
+      "ppo_baseline": [
+        "disabled",
+        "enabled"
+      ],
+      "ppo_high_penalty": [
+        "disabled",
+        "enabled"
+      ],
+      "ppo_train_projection": [
+        "disabled",
+        "enabled"
+      ]
+    },
+    "repeats_per_layout": 100
+  },
+  "episode_checks": {
+    "checkpoint_identity_count": 15,
+    "clearance_nan_pattern_exact": true,
+    "evaluation_mapping_exact": true,
+    "outcome_partition_exact": true,
+    "pairing_keys_exact": true,
+    "rate_formula_max_abs_errors": {
+      "action_bound_clipping_rate": 5.551115123125783e-17,
+      "projection_intervention_rate": 9.367506770274758e-17,
+      "speed_action_bound_clipping_rate": 8.326672684688674e-17,
+      "turn_rate_action_bound_clipping_rate": 8.326672684688674e-17
+    },
+    "result_build_schema_version": "projection_result_tables_v1",
+    "seed_identity_exact": true,
+    "structural_zero_counts_when_projection_disabled": {
+      "max_projection_correction_norm": 1500,
+      "max_projection_slack": 1500,
+      "mean_projection_correction_norm": 1500,
+      "mean_projection_slack_sum": 1500,
+      "projection_intervention_count": 1500,
+      "projection_intervention_rate": 1500,
+      "projection_solver_failure_count": 1500
+    }
+  },
+  "implementation": {
+    "entrypoint": "summarize_paired_terminal_outcome_correspondences.py",
+    "entrypoint_sha256": "7d049c8c9c8f04c25908b4ff398688b5631745391340f921ad058298e5399089",
+    "evidence_module": "_evaluation_evidence.py",
+    "evidence_module_sha256": "250789508fba8850e07bc19d1aef0b93ea8348b6b14eb09594469a6c62b53d5f"
+  },
+  "inputs": {
+    "build_audit": {
+      "path": "results/tables/fixed_training_geometry/result_build_audit.json",
+      "sha256": "e756ce0569e73d6be6f6d4f5aacfcfed1deb77bc186e2c87d9f24cdd3b37aae0"
+    },
+    "checkpoint_summary": {
+      "path": "results/tables/fixed_training_geometry/checkpoint_summary.csv",
+      "sha256": "ed6cea5664594c59fac5957612855bcd52e8eaa413fc9d69b1d3c2cf34644a2a"
+    },
+    "episodes": {
+      "path": "results/tables/fixed_training_geometry/evaluation_episode_results.csv",
+      "sha256": "e3042413d20458dd5fb0bda526a66c59375d55f4e03882788605ade59a78dd85"
+    },
+    "layout_suite": {
+      "path": "evaluation/layouts/fixed_training_geometry.json",
+      "sha256": "42cd7d589e49483d86d46dce5c7c48387894241ad333d409ddee93124ab698d2"
+    },
+    "method_summary": {
+      "path": "results/tables/fixed_training_geometry/method_summary.csv",
+      "sha256": "d0009e23e453d32e564ef04ce1d653973ba041aac0ebca4f0f4fc1095ce8df60"
+    },
+    "paired_deltas": {
+      "path": "results/tables/fixed_training_geometry/paired_projection_deltas.csv",
+      "sha256": "7a2de5960ac0fa882765bb8c37e2b6ba9b377c38337bf0638a2e89abafd4221c"
+    },
+    "paired_summary": {
+      "path": "results/tables/fixed_training_geometry/paired_projection_summary.csv",
+      "sha256": "4c504ce10b8dc368ad767f3174c414125abe9266402582cf03bbd090482a279d"
+    },
+    "protocol": {
+      "path": "experiments/fixed_training_geometry_analysis_protocol.json",
+      "sha256": "b7779a161aee898a10ddf32377a75ea1ba19875526806fb5239ad966b387f7d5"
+    }
+  },
+  "interpretation_boundary": {
+    "arrow_meaning": "The arrow maps a matched projection-disabled terminal outcome to the projection-enabled terminal outcome for the same training run, represented by the same final checkpoint, and evaluation key.",
+    "not_mechanism_proof": "The correspondence does not prove deliberate projector reliance, policy-projector co-adaptation, formal safety, or behavior under another projector or arbitrary geometry.",
+    "not_temporal": "It is not a temporal transition within one trajectory; the two controller executions can diverge after their actions differ.",
+    "replication": "Training-run-level proportions are summarized across training runs; pooled episode counts describe matched evaluation coverage, not additional training-run replication."
+  },
+  "matrix_definition": {
+    "arrow_direction": "projection disabled outcome -> projection enabled outcome",
+    "column_outcomes_projection_enabled": [
+      "success",
+      "collision",
+      "timeout"
+    ],
+    "column_projection_mode": "enabled",
+    "complete_cell_count": 9,
+    "conditional_proportion_denominator": "matched pairs having the reported projection-disabled row outcome; null when that row count is zero",
+    "count_unit": "matched evaluation observation pair",
+    "delta_direction": "projection enabled minus projection disabled",
+    "joint_proportion_denominator": "all matched pairs in the reported training run or pooled method group",
+    "outcome_order": [
+      "success",
+      "collision",
+      "timeout"
+    ],
+    "pair_keys_excluding_projection_mode": [
+      "method",
+      "train_seed",
+      "checkpoint_sha256",
+      "layout_id",
+      "layout_repeat",
+      "evaluation_seed"
+    ],
+    "row_outcomes_projection_disabled": [
+      "success",
+      "collision",
+      "timeout"
+    ],
+    "row_projection_mode": "disabled",
+    "timeout_source": "validated truncated indicator in the exhaustive success/collision/timeout outcome partition"
+  },
+  "method_correspondence_summaries": [
+    {
+      "display_name": "PPO baseline",
+      "enabled_minus_disabled_outcome_rate_delta_summary": [
+        {
+          "maximum": 0.08999999999999997,
+          "mean": 0.02599999999999999,
+          "minimum": 0.0,
+          "outcome": "success",
+          "sample_sd": 0.03781534080237806,
+          "sign_counts": {
+            "negative": 0,
+            "positive": 3,
+            "zero": 2
+          }
+        },
+        {
+          "maximum": -0.05,
+          "mean": -0.138,
+          "minimum": -0.24,
+          "outcome": "collision",
+          "sample_sd": 0.07328028384224504,
+          "sign_counts": {
+            "negative": 5,
+            "positive": 0,
+            "zero": 0
+          }
+        },
+        {
+          "maximum": 0.24,
+          "mean": 0.11200000000000006,
+          "minimum": 0.050000000000000044,
+          "outcome": "timeout",
+          "sample_sd": 0.07463243262818114,
+          "sign_counts": {
+            "negative": 0,
+            "positive": 5,
+            "zero": 0
+          }
+        }
+      ],
+      "maximum_training_run_correspondence_proportion_matrix": [
+        [
+          0.49,
+          0.0,
+          0.02
+        ],
+        [
+          0.08,
+          0.01,
+          0.24
+        ],
+        [
+          0.03,
+          0.0,
+          0.95
+        ]
+      ],
+      "mean_training_run_correspondence_proportion_matrix": [
+        [
+          0.146,
+          0.0,
+          0.006
+        ],
+        [
+          0.024,
+          0.002,
+          0.11400000000000002
+        ],
+        [
+          0.008,
+          0.0,
+          0.7
+        ]
+      ],
+      "mean_training_run_projection_disabled_outcome_rates": [
+        0.152,
+        0.14,
+        0.708
+      ],
+      "mean_training_run_projection_enabled_outcome_rates": [
+        0.178,
+        0.002,
+        0.82
+      ],
+      "method": "ppo_baseline",
+      "minimum_training_run_correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.05
+        ],
+        [
+          0.0,
+          0.0,
+          0.29
+        ]
+      ],
+      "paired_evaluation_observations_per_training_run": 100,
+      "pooled_conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          0.9605263157894737,
+          0.0,
+          0.039473684210526314
+        ],
+        [
+          0.17142857142857143,
+          0.014285714285714285,
+          0.8142857142857143
+        ],
+        [
+          0.011299435028248588,
+          0.0,
+          0.9887005649717514
+        ]
+      ],
+      "pooled_correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9605263157894737,
+          "count": 73,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.146
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.039473684210526314,
+          "count": 3,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.006
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.17142857142857143,
+          "count": 12,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.024
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.014285714285714285,
+          "count": 1,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.002
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.8142857142857143,
+          "count": 57,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.114
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.011299435028248588,
+          "count": 4,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.008
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9887005649717514,
+          "count": 350,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.7
+        }
+      ],
+      "pooled_correspondence_count_matrix": [
+        [
+          73,
+          0,
+          3
+        ],
+        [
+          12,
+          1,
+          57
+        ],
+        [
+          4,
+          0,
+          350
+        ]
+      ],
+      "pooled_correspondence_proportion_matrix": [
+        [
+          0.146,
+          0.0,
+          0.006
+        ],
+        [
+          0.024,
+          0.002,
+          0.114
+        ],
+        [
+          0.008,
+          0.0,
+          0.7
+        ]
+      ],
+      "pooled_different_outcome_count": 76,
+      "pooled_enabled_minus_disabled_outcome_count_deltas": [
+        13,
+        -69,
+        56
+      ],
+      "pooled_paired_evaluation_observation_count": 500,
+      "pooled_projection_disabled_outcome_counts": [
+        76,
+        70,
+        354
+      ],
+      "pooled_projection_enabled_outcome_counts": [
+        89,
+        1,
+        410
+      ],
+      "pooled_same_outcome_count": 424,
+      "pooled_vs_equal_training_run_proportion_max_abs_error": 1.3877787807814457e-17,
+      "sample_sd_training_run_correspondence_proportion_matrix": [
+        [
+          0.20342074623793904,
+          0.0,
+          0.00894427190999916
+        ],
+        [
+          0.03361547262794322,
+          0.00447213595499958,
+          0.07368853370776215
+        ],
+        [
+          0.013038404810405297,
+          0.0,
+          0.24949949899749296
+        ]
+      ],
+      "sample_sd_training_run_projection_disabled_outcome_rates": [
+        0.21206131188880256,
+        0.07176350047203661,
+        0.23700210969525143
+      ],
+      "sample_sd_training_run_projection_enabled_outcome_rates": [
+        0.24983994876720575,
+        0.00447213595499958,
+        0.24899799195977462
+      ],
+      "training_run_correspondence_cell_summaries": [
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.49,
+          "mean_training_run_proportion_of_all_pairs": 0.146,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.9605263157894737,
+          "pooled_count": 73,
+          "pooled_proportion_of_all_pairs": 0.146,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.20342074623793904
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.0,
+          "mean_training_run_proportion_of_all_pairs": 0.0,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.0,
+          "pooled_count": 0,
+          "pooled_proportion_of_all_pairs": 0.0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.0
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.02,
+          "mean_training_run_proportion_of_all_pairs": 0.006,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.039473684210526314,
+          "pooled_count": 3,
+          "pooled_proportion_of_all_pairs": 0.006,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.00894427190999916
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.08,
+          "mean_training_run_proportion_of_all_pairs": 0.024,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.17142857142857143,
+          "pooled_count": 12,
+          "pooled_proportion_of_all_pairs": 0.024,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.03361547262794322
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.01,
+          "mean_training_run_proportion_of_all_pairs": 0.002,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.014285714285714285,
+          "pooled_count": 1,
+          "pooled_proportion_of_all_pairs": 0.002,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.00447213595499958
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.24,
+          "mean_training_run_proportion_of_all_pairs": 0.11400000000000002,
+          "minimum_training_run_proportion_of_all_pairs": 0.05,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.8142857142857143,
+          "pooled_count": 57,
+          "pooled_proportion_of_all_pairs": 0.114,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.07368853370776215
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.03,
+          "mean_training_run_proportion_of_all_pairs": 0.008,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.011299435028248588,
+          "pooled_count": 4,
+          "pooled_proportion_of_all_pairs": 0.008,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.013038404810405297
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.0,
+          "mean_training_run_proportion_of_all_pairs": 0.0,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.0,
+          "pooled_count": 0,
+          "pooled_proportion_of_all_pairs": 0.0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.0
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.95,
+          "mean_training_run_proportion_of_all_pairs": 0.7,
+          "minimum_training_run_proportion_of_all_pairs": 0.29,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.9887005649717514,
+          "pooled_count": 350,
+          "pooled_proportion_of_all_pairs": 0.7,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.24949949899749296
+        }
+      ],
+      "training_run_count": 5
+    },
+    {
+      "display_name": "PPO high penalty",
+      "enabled_minus_disabled_outcome_rate_delta_summary": [
+        {
+          "maximum": 0.01,
+          "mean": 0.002,
+          "minimum": 0.0,
+          "outcome": "success",
+          "sample_sd": 0.00447213595499958,
+          "sign_counts": {
+            "negative": 0,
+            "positive": 1,
+            "zero": 4
+          }
+        },
+        {
+          "maximum": -0.07,
+          "mean": -0.128,
+          "minimum": -0.22,
+          "outcome": "collision",
+          "sample_sd": 0.05805170109479997,
+          "sign_counts": {
+            "negative": 5,
+            "positive": 0,
+            "zero": 0
+          }
+        },
+        {
+          "maximum": 0.21999999999999997,
+          "mean": 0.12599999999999997,
+          "minimum": 0.05999999999999994,
+          "outcome": "timeout",
+          "sample_sd": 0.060663003552412414,
+          "sign_counts": {
+            "negative": 0,
+            "positive": 5,
+            "zero": 0
+          }
+        }
+      ],
+      "maximum_training_run_correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.02,
+          0.22
+        ],
+        [
+          0.01,
+          0.0,
+          0.92
+        ]
+      ],
+      "mean_training_run_correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.006,
+          0.128
+        ],
+        [
+          0.002,
+          0.0,
+          0.8640000000000001
+        ]
+      ],
+      "mean_training_run_projection_disabled_outcome_rates": [
+        0.0,
+        0.13399999999999998,
+        0.866
+      ],
+      "mean_training_run_projection_enabled_outcome_rates": [
+        0.002,
+        0.006,
+        0.992
+      ],
+      "method": "ppo_high_penalty",
+      "minimum_training_run_correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.07
+        ],
+        [
+          0.0,
+          0.0,
+          0.77
+        ]
+      ],
+      "paired_evaluation_observations_per_training_run": 100,
+      "pooled_conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          0.0,
+          0.04477611940298507,
+          0.9552238805970149
+        ],
+        [
+          0.0023094688221709007,
+          0.0,
+          0.9976905311778291
+        ]
+      ],
+      "pooled_correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.04477611940298507,
+          "count": 3,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.006
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9552238805970149,
+          "count": 64,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.128
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0023094688221709007,
+          "count": 1,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.002
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9976905311778291,
+          "count": 432,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.864
+        }
+      ],
+      "pooled_correspondence_count_matrix": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          64
+        ],
+        [
+          1,
+          0,
+          432
+        ]
+      ],
+      "pooled_correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.006,
+          0.128
+        ],
+        [
+          0.002,
+          0.0,
+          0.864
+        ]
+      ],
+      "pooled_different_outcome_count": 65,
+      "pooled_enabled_minus_disabled_outcome_count_deltas": [
+        1,
+        -64,
+        63
+      ],
+      "pooled_paired_evaluation_observation_count": 500,
+      "pooled_projection_disabled_outcome_counts": [
+        0,
+        67,
+        433
+      ],
+      "pooled_projection_enabled_outcome_counts": [
+        1,
+        3,
+        496
+      ],
+      "pooled_same_outcome_count": 435,
+      "pooled_vs_equal_training_run_proportion_max_abs_error": 1.1102230246251565e-16,
+      "sample_sd_training_run_correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.00894427190999916,
+          0.05805170109479997
+        ],
+        [
+          0.00447213595499958,
+          0.0,
+          0.061073725938409894
+        ]
+      ],
+      "sample_sd_training_run_projection_disabled_outcome_rates": [
+        0.0,
+        0.06348228099241551,
+        0.06348228099241553
+      ],
+      "sample_sd_training_run_projection_enabled_outcome_rates": [
+        0.00447213595499958,
+        0.00894427190999916,
+        0.008366600265340763
+      ],
+      "training_run_correspondence_cell_summaries": [
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.0,
+          "mean_training_run_proportion_of_all_pairs": 0.0,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": null,
+          "pooled_count": 0,
+          "pooled_proportion_of_all_pairs": 0.0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.0
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.0,
+          "mean_training_run_proportion_of_all_pairs": 0.0,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": null,
+          "pooled_count": 0,
+          "pooled_proportion_of_all_pairs": 0.0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.0
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.0,
+          "mean_training_run_proportion_of_all_pairs": 0.0,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": null,
+          "pooled_count": 0,
+          "pooled_proportion_of_all_pairs": 0.0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.0
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.0,
+          "mean_training_run_proportion_of_all_pairs": 0.0,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.0,
+          "pooled_count": 0,
+          "pooled_proportion_of_all_pairs": 0.0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.0
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.02,
+          "mean_training_run_proportion_of_all_pairs": 0.006,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.04477611940298507,
+          "pooled_count": 3,
+          "pooled_proportion_of_all_pairs": 0.006,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.00894427190999916
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.22,
+          "mean_training_run_proportion_of_all_pairs": 0.128,
+          "minimum_training_run_proportion_of_all_pairs": 0.07,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.9552238805970149,
+          "pooled_count": 64,
+          "pooled_proportion_of_all_pairs": 0.128,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.05805170109479997
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.01,
+          "mean_training_run_proportion_of_all_pairs": 0.002,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.0023094688221709007,
+          "pooled_count": 1,
+          "pooled_proportion_of_all_pairs": 0.002,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.00447213595499958
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.0,
+          "mean_training_run_proportion_of_all_pairs": 0.0,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.0,
+          "pooled_count": 0,
+          "pooled_proportion_of_all_pairs": 0.0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.0
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.92,
+          "mean_training_run_proportion_of_all_pairs": 0.8640000000000001,
+          "minimum_training_run_proportion_of_all_pairs": 0.77,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.9976905311778291,
+          "pooled_count": 432,
+          "pooled_proportion_of_all_pairs": 0.864,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.061073725938409894
+        }
+      ],
+      "training_run_count": 5
+    },
+    {
+      "display_name": "PPO trained with projection",
+      "enabled_minus_disabled_outcome_rate_delta_summary": [
+        {
+          "maximum": 0.84,
+          "mean": 0.762,
+          "minimum": 0.72,
+          "outcome": "success",
+          "sample_sd": 0.04549725266430929,
+          "sign_counts": {
+            "negative": 0,
+            "positive": 5,
+            "zero": 0
+          }
+        },
+        {
+          "maximum": -0.75,
+          "mean": -0.8039999999999999,
+          "minimum": -0.87,
+          "outcome": "collision",
+          "sample_sd": 0.060663003552412394,
+          "sign_counts": {
+            "negative": 5,
+            "positive": 0,
+            "zero": 0
+          }
+        },
+        {
+          "maximum": 0.15000000000000002,
+          "mean": 0.042,
+          "minimum": 0.0,
+          "outcome": "timeout",
+          "sample_sd": 0.061400325732035015,
+          "sign_counts": {
+            "negative": 0,
+            "positive": 4,
+            "zero": 1
+          }
+        }
+      ],
+      "maximum_training_run_correspondence_proportion_matrix": [
+        [
+          0.24,
+          0.01,
+          0.01
+        ],
+        [
+          0.84,
+          0.05,
+          0.14
+        ],
+        [
+          0.01,
+          0.0,
+          0.02
+        ]
+      ],
+      "mean_training_run_correspondence_proportion_matrix": [
+        [
+          0.16799999999999998,
+          0.002,
+          0.004
+        ],
+        [
+          0.764,
+          0.012,
+          0.042
+        ],
+        [
+          0.004,
+          0.0,
+          0.004
+        ]
+      ],
+      "mean_training_run_projection_disabled_outcome_rates": [
+        0.174,
+        0.818,
+        0.008
+      ],
+      "mean_training_run_projection_enabled_outcome_rates": [
+        0.9359999999999999,
+        0.014000000000000002,
+        0.05
+      ],
+      "method": "ppo_train_projection",
+      "minimum_training_run_correspondence_proportion_matrix": [
+        [
+          0.05,
+          0.0,
+          0.0
+        ],
+        [
+          0.73,
+          0.0,
+          0.01
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "paired_evaluation_observations_per_training_run": 100,
+      "pooled_conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          0.9655172413793104,
+          0.011494252873563218,
+          0.022988505747126436
+        ],
+        [
+          0.9339853300733496,
+          0.014669926650366748,
+          0.05134474327628362
+        ],
+        [
+          0.5,
+          0.0,
+          0.5
+        ]
+      ],
+      "pooled_correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9655172413793104,
+          "count": 84,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.168
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.011494252873563218,
+          "count": 1,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.002
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.022988505747126436,
+          "count": 2,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.004
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9339853300733496,
+          "count": 382,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.764
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.014669926650366748,
+          "count": 6,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.012
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.05134474327628362,
+          "count": 21,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.042
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.5,
+          "count": 2,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.004
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.5,
+          "count": 2,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.004
+        }
+      ],
+      "pooled_correspondence_count_matrix": [
+        [
+          84,
+          1,
+          2
+        ],
+        [
+          382,
+          6,
+          21
+        ],
+        [
+          2,
+          0,
+          2
+        ]
+      ],
+      "pooled_correspondence_proportion_matrix": [
+        [
+          0.168,
+          0.002,
+          0.004
+        ],
+        [
+          0.764,
+          0.012,
+          0.042
+        ],
+        [
+          0.004,
+          0.0,
+          0.004
+        ]
+      ],
+      "pooled_different_outcome_count": 408,
+      "pooled_enabled_minus_disabled_outcome_count_deltas": [
+        381,
+        -402,
+        21
+      ],
+      "pooled_paired_evaluation_observation_count": 500,
+      "pooled_projection_disabled_outcome_counts": [
+        87,
+        409,
+        4
+      ],
+      "pooled_projection_enabled_outcome_counts": [
+        468,
+        7,
+        25
+      ],
+      "pooled_same_outcome_count": 92,
+      "pooled_vs_equal_training_run_proportion_max_abs_error": 2.7755575615628914e-17,
+      "sample_sd_training_run_correspondence_proportion_matrix": [
+        [
+          0.08043631020876081,
+          0.004472135954999579,
+          0.005477225575051661
+        ],
+        [
+          0.04335896677735759,
+          0.021679483388678804,
+          0.05540758070878028
+        ],
+        [
+          0.005477225575051661,
+          0.0,
+          0.00894427190999916
+        ]
+      ],
+      "sample_sd_training_run_projection_disabled_outcome_rates": [
+        0.07987490219086343,
+        0.0762889244910426,
+        0.008366600265340755
+      ],
+      "sample_sd_training_run_projection_enabled_outcome_rates": [
+        0.08792041856133304,
+        0.020736441353327723,
+        0.0678232998312527
+      ],
+      "training_run_correspondence_cell_summaries": [
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.24,
+          "mean_training_run_proportion_of_all_pairs": 0.16799999999999998,
+          "minimum_training_run_proportion_of_all_pairs": 0.05,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.9655172413793104,
+          "pooled_count": 84,
+          "pooled_proportion_of_all_pairs": 0.168,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.08043631020876081
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.01,
+          "mean_training_run_proportion_of_all_pairs": 0.002,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.011494252873563218,
+          "pooled_count": 1,
+          "pooled_proportion_of_all_pairs": 0.002,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.004472135954999579
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.01,
+          "mean_training_run_proportion_of_all_pairs": 0.004,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.022988505747126436,
+          "pooled_count": 2,
+          "pooled_proportion_of_all_pairs": 0.004,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.005477225575051661
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.84,
+          "mean_training_run_proportion_of_all_pairs": 0.764,
+          "minimum_training_run_proportion_of_all_pairs": 0.73,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.9339853300733496,
+          "pooled_count": 382,
+          "pooled_proportion_of_all_pairs": 0.764,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.04335896677735759
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.05,
+          "mean_training_run_proportion_of_all_pairs": 0.012,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.014669926650366748,
+          "pooled_count": 6,
+          "pooled_proportion_of_all_pairs": 0.012,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.021679483388678804
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.14,
+          "mean_training_run_proportion_of_all_pairs": 0.042,
+          "minimum_training_run_proportion_of_all_pairs": 0.01,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.05134474327628362,
+          "pooled_count": 21,
+          "pooled_proportion_of_all_pairs": 0.042,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.05540758070878028
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.01,
+          "mean_training_run_proportion_of_all_pairs": 0.004,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.5,
+          "pooled_count": 2,
+          "pooled_proportion_of_all_pairs": 0.004,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.005477225575051661
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.0,
+          "mean_training_run_proportion_of_all_pairs": 0.0,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.0,
+          "pooled_count": 0,
+          "pooled_proportion_of_all_pairs": 0.0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.0
+        },
+        {
+          "maximum_training_run_proportion_of_all_pairs": 0.02,
+          "mean_training_run_proportion_of_all_pairs": 0.004,
+          "minimum_training_run_proportion_of_all_pairs": 0.0,
+          "pooled_conditional_proportion_given_disabled_outcome": 0.5,
+          "pooled_count": 2,
+          "pooled_proportion_of_all_pairs": 0.004,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "sample_sd_training_run_proportion_of_all_pairs": 0.00894427190999916
+        }
+      ],
+      "training_run_count": 5
+    }
+  ],
+  "output_schema": "interpretation_analysis_output_v1",
+  "reconciliation": {
+    "build_audit": {
+      "counts_exact": true,
+      "hashes_exact": true,
+      "status": "PASS"
+    },
+    "checkpoint_and_method_tables": {
+      "checkpoint_max_abs_errors": {
+        "action_bound_clipping_norm": 1.1102230246251565e-16,
+        "action_bound_clipping_norm_max": 0.0,
+        "action_bound_clipping_rate": 0.0,
+        "collision_rate": 0.0,
+        "episode_count": 0.0,
+        "episode_length": 0.0,
+        "episode_return": 1.7763568394002505e-15,
+        "layout_count": 0.0,
+        "min_obstacle_clearance": 9.71445146547012e-17,
+        "projection_correction_norm": 9.540979117872439e-17,
+        "projection_correction_norm_max": 0.0,
+        "projection_intervention_rate": 9.367506770274758e-17,
+        "projection_slack_max": 0.0,
+        "projection_slack_sum": 9.356664748549903e-17,
+        "speed_action_bound_clipping_rate": 5.551115123125783e-17,
+        "success_rate": 0.0,
+        "training_collision_penalty": 0.0,
+        "turn_rate_action_bound_clipping_rate": 5.551115123125783e-17
+      },
+      "method_max_abs_errors": {
+        "action_bound_clipping_norm_max_mean": 8.881784197001252e-16,
+        "action_bound_clipping_norm_max_std": 5.551115123125783e-17,
+        "action_bound_clipping_norm_mean": 5.551115123125783e-17,
+        "action_bound_clipping_norm_std": 5.551115123125783e-17,
+        "action_bound_clipping_rate_mean": 0.0,
+        "action_bound_clipping_rate_std": 9.020562075079397e-17,
+        "collision_rate_mean": 8.326672684688674e-17,
+        "collision_rate_std": 7.979727989493313e-17,
+        "episode_length_mean": 2.842170943040401e-14,
+        "episode_length_std": 5.551115123125783e-17,
+        "episode_return_mean": 1.7763568394002505e-15,
+        "episode_return_std": 0.0,
+        "min_obstacle_clearance_mean": 8.326672684688674e-17,
+        "min_obstacle_clearance_std": 8.326672684688674e-17,
+        "projection_correction_norm_max_mean": 4.440892098500626e-16,
+        "projection_correction_norm_max_std": 8.326672684688674e-17,
+        "projection_correction_norm_mean": 5.551115123125783e-17,
+        "projection_correction_norm_std": 9.020562075079397e-17,
+        "projection_intervention_rate_mean": 5.551115123125783e-17,
+        "projection_intervention_rate_std": 7.632783294297951e-17,
+        "projection_slack_max_mean": 6.245004513516506e-17,
+        "projection_slack_max_std": 9.71445146547012e-17,
+        "projection_slack_sum_mean": 3.5236570605778894e-17,
+        "projection_slack_sum_std": 2.9544509200229996e-17,
+        "seed_count": 0.0,
+        "speed_action_bound_clipping_rate_mean": 5.551115123125783e-17,
+        "speed_action_bound_clipping_rate_std": 8.326672684688674e-17,
+        "success_rate_mean": 1.1102230246251565e-16,
+        "success_rate_std": 7.979727989493313e-17,
+        "turn_rate_action_bound_clipping_rate_mean": 5.551115123125783e-17,
+        "turn_rate_action_bound_clipping_rate_std": 6.245004513516506e-17
+      }
+    },
+    "paired_tables": {
+      "paired_delta_max_abs_errors": {
+        "action_bound_clipping_rate_delta_enabled_minus_disabled": 9.71445146547012e-17,
+        "collision_delta_enabled_minus_disabled": 0.0,
+        "episode_length_delta_enabled_minus_disabled": 0.0,
+        "episode_return_delta_enabled_minus_disabled": 1.7763568394002505e-15,
+        "max_action_bound_clipping_norm_delta_enabled_minus_disabled": 9.71445146547012e-17,
+        "mean_action_bound_clipping_norm_delta_enabled_minus_disabled": 8.543513119185775e-17,
+        "min_obstacle_clearance_delta_enabled_minus_disabled": 9.020562075079397e-17,
+        "paired_layout_count": 0.0,
+        "speed_action_bound_clipping_rate_delta_enabled_minus_disabled": 7.632783294297951e-17,
+        "success_delta_enabled_minus_disabled": 0.0,
+        "turn_rate_action_bound_clipping_rate_delta_enabled_minus_disabled": 9.90960785651751e-17
+      },
+      "paired_summary_max_abs_errors": {
+        "action_bound_clipping_rate_delta_enabled_minus_disabled_mean": 4.336808689942018e-17,
+        "action_bound_clipping_rate_delta_enabled_minus_disabled_std": 4.423544863740858e-17,
+        "collision_delta_enabled_minus_disabled_mean": 0.0,
+        "collision_delta_enabled_minus_disabled_std": 9.020562075079397e-17,
+        "episode_length_delta_enabled_minus_disabled_mean": 7.105427357601002e-15,
+        "episode_length_delta_enabled_minus_disabled_std": 0.0,
+        "episode_return_delta_enabled_minus_disabled_mean": 0.0,
+        "episode_return_delta_enabled_minus_disabled_std": 0.0,
+        "max_action_bound_clipping_norm_delta_enabled_minus_disabled_mean": 1.1102230246251565e-16,
+        "max_action_bound_clipping_norm_delta_enabled_minus_disabled_std": 8.326672684688674e-17,
+        "mean_action_bound_clipping_norm_delta_enabled_minus_disabled_mean": 9.194034422677078e-17,
+        "mean_action_bound_clipping_norm_delta_enabled_minus_disabled_std": 9.974659986866641e-17,
+        "min_obstacle_clearance_delta_enabled_minus_disabled_mean": 2.7755575615628914e-17,
+        "min_obstacle_clearance_delta_enabled_minus_disabled_std": 8.673617379884035e-17,
+        "seed_count": 0.0,
+        "speed_action_bound_clipping_rate_delta_enabled_minus_disabled_mean": 5.117434254131581e-17,
+        "speed_action_bound_clipping_rate_delta_enabled_minus_disabled_std": 6.375108774214766e-17,
+        "success_delta_enabled_minus_disabled_mean": 3.469446951953614e-18,
+        "success_delta_enabled_minus_disabled_std": 9.020562075079397e-17,
+        "turn_rate_action_bound_clipping_rate_delta_enabled_minus_disabled_mean": 8.229094489164979e-17,
+        "turn_rate_action_bound_clipping_rate_delta_enabled_minus_disabled_std": 7.22078646875346e-17
+      }
+    },
+    "terminal_outcome_correspondences": {
+      "all_checks_pass": true,
+      "comparison_count": 270,
+      "integer_row_and_column_margins_exact": true,
+      "maximum_absolute_errors": {
+        "method_margin_max_abs_error": 3.122502256758253e-17,
+        "method_paired_delta_max_abs_error": 4.163336342344337e-17,
+        "training_run_margin_max_abs_error": 1.1102230246251565e-16,
+        "training_run_paired_delta_max_abs_error": 8.326672684688674e-17
+      },
+      "outcome_delta_sum_zero_exact": true,
+      "tolerance": 1e-12
+    }
+  },
+  "script": "summarize_paired_terminal_outcome_correspondences",
+  "status": "PASS",
+  "training_run_correspondence_matrices": [
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_baseline_51200_seed1.pt",
+      "checkpoint_sha256": "ac9747daee76239c878cc1339dfbe72a8ed020eaae9d3f5013a7ce78b8a07836",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.1,
+          0.1,
+          0.8
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 8,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.08
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.1,
+          "count": 1,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.1,
+          "count": 1,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.8,
+          "count": 8,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.08
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 82,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.82
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          8,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          8
+        ],
+        [
+          0,
+          0,
+          82
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.08,
+          0.0,
+          0.0
+        ],
+        [
+          0.01,
+          0.01,
+          0.08
+        ],
+        [
+          0.0,
+          0.0,
+          0.82
+        ]
+      ],
+      "different_outcome_count": 9,
+      "display_name": "PPO baseline",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        1,
+        -9,
+        8
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        1.0,
+        -9.0,
+        8.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.01,
+        -0.09,
+        0.08
+      ],
+      "layout_count": 1,
+      "method": "ppo_baseline",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        8,
+        10,
+        82
+      ],
+      "projection_disabled_outcome_rates": [
+        0.08,
+        0.1,
+        0.82
+      ],
+      "projection_enabled_outcome_counts": [
+        9,
+        1,
+        90
+      ],
+      "projection_enabled_outcome_rates": [
+        0.09,
+        0.01,
+        0.9
+      ],
+      "same_outcome_count": 91,
+      "train_seed": 1
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_baseline_51200_seed2.pt",
+      "checkpoint_sha256": "b739ee92df7f8c5ecbcf3078764cb694532485a0a8395cabcc5b5e283ae77f58",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 5,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.05
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 95,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.95
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          95
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.05
+        ],
+        [
+          0.0,
+          0.0,
+          0.95
+        ]
+      ],
+      "different_outcome_count": 5,
+      "display_name": "PPO baseline",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        0,
+        -5,
+        5
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        0.0,
+        -5.0,
+        5.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.0,
+        -0.05,
+        0.05
+      ],
+      "layout_count": 1,
+      "method": "ppo_baseline",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        0,
+        5,
+        95
+      ],
+      "projection_disabled_outcome_rates": [
+        0.0,
+        0.05,
+        0.95
+      ],
+      "projection_enabled_outcome_counts": [
+        0,
+        0,
+        100
+      ],
+      "projection_enabled_outcome_rates": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "same_outcome_count": 95,
+      "train_seed": 2
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_baseline_51200_seed3.pt",
+      "checkpoint_sha256": "8a5e7c0edb9e277062afa2433ca3ef1568bb909b75bf3bdb82e42469e8e81171",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          0.9607843137254902,
+          0.0,
+          0.0392156862745098
+        ],
+        [
+          0.47058823529411764,
+          0.0,
+          0.5294117647058824
+        ],
+        [
+          0.09375,
+          0.0,
+          0.90625
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9607843137254902,
+          "count": 49,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.49
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0392156862745098,
+          "count": 2,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.02
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.47058823529411764,
+          "count": 8,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.08
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.5294117647058824,
+          "count": 9,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.09
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.09375,
+          "count": 3,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.03
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.90625,
+          "count": 29,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.29
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          49,
+          0,
+          2
+        ],
+        [
+          8,
+          0,
+          9
+        ],
+        [
+          3,
+          0,
+          29
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.49,
+          0.0,
+          0.02
+        ],
+        [
+          0.08,
+          0.0,
+          0.09
+        ],
+        [
+          0.03,
+          0.0,
+          0.29
+        ]
+      ],
+      "different_outcome_count": 22,
+      "display_name": "PPO baseline",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        9,
+        -17,
+        8
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        9.0,
+        -17.0,
+        8.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.09,
+        -0.17,
+        0.08
+      ],
+      "layout_count": 1,
+      "method": "ppo_baseline",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        51,
+        17,
+        32
+      ],
+      "projection_disabled_outcome_rates": [
+        0.51,
+        0.17,
+        0.32
+      ],
+      "projection_enabled_outcome_counts": [
+        60,
+        0,
+        40
+      ],
+      "projection_enabled_outcome_rates": [
+        0.6,
+        0.0,
+        0.4
+      ],
+      "same_outcome_count": 78,
+      "train_seed": 3
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_baseline_51200_seed4.pt",
+      "checkpoint_sha256": "d0cdbe0eae3327affadf64e343d3519ee3e91fd82a805e833c9068c467b1af7c",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          0.9411764705882353,
+          0.0,
+          0.058823529411764705
+        ],
+        [
+          0.21428571428571427,
+          0.0,
+          0.7857142857142857
+        ],
+        [
+          0.014492753623188406,
+          0.0,
+          0.9855072463768116
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9411764705882353,
+          "count": 16,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.16
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.058823529411764705,
+          "count": 1,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.21428571428571427,
+          "count": 3,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.03
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.7857142857142857,
+          "count": 11,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.11
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.014492753623188406,
+          "count": 1,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9855072463768116,
+          "count": 68,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.68
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          16,
+          0,
+          1
+        ],
+        [
+          3,
+          0,
+          11
+        ],
+        [
+          1,
+          0,
+          68
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.16,
+          0.0,
+          0.01
+        ],
+        [
+          0.03,
+          0.0,
+          0.11
+        ],
+        [
+          0.01,
+          0.0,
+          0.68
+        ]
+      ],
+      "different_outcome_count": 16,
+      "display_name": "PPO baseline",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        3,
+        -14,
+        11
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        3.0,
+        -14.000000000000002,
+        11.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.03,
+        -0.14,
+        0.11
+      ],
+      "layout_count": 1,
+      "method": "ppo_baseline",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        17,
+        14,
+        69
+      ],
+      "projection_disabled_outcome_rates": [
+        0.17,
+        0.14,
+        0.69
+      ],
+      "projection_enabled_outcome_counts": [
+        20,
+        0,
+        80
+      ],
+      "projection_enabled_outcome_rates": [
+        0.2,
+        0.0,
+        0.8
+      ],
+      "same_outcome_count": 84,
+      "train_seed": 4
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_baseline_51200_seed5.pt",
+      "checkpoint_sha256": "c7238f982b6e88a89665a3aced8c737fb05966ff76f926fe7592d6e0924664e1",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 24,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.24
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 76,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.76
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          24
+        ],
+        [
+          0,
+          0,
+          76
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.24
+        ],
+        [
+          0.0,
+          0.0,
+          0.76
+        ]
+      ],
+      "different_outcome_count": 24,
+      "display_name": "PPO baseline",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        0,
+        -24,
+        24
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        0.0,
+        -24.0,
+        24.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.0,
+        -0.24,
+        0.24
+      ],
+      "layout_count": 1,
+      "method": "ppo_baseline",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        0,
+        24,
+        76
+      ],
+      "projection_disabled_outcome_rates": [
+        0.0,
+        0.24,
+        0.76
+      ],
+      "projection_enabled_outcome_counts": [
+        0,
+        0,
+        100
+      ],
+      "projection_enabled_outcome_rates": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "same_outcome_count": 76,
+      "train_seed": 5
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_high_penalty_51200_seed1.pt",
+      "checkpoint_sha256": "f946099fe7e2006e7a6b1a59938504d3e9d7e397fcb8eed0c86e6acc71637c88",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.010752688172043012,
+          0.0,
+          0.989247311827957
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 7,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.07
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.010752688172043012,
+          "count": 1,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.989247311827957,
+          "count": 92,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.92
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          7
+        ],
+        [
+          1,
+          0,
+          92
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.07
+        ],
+        [
+          0.01,
+          0.0,
+          0.92
+        ]
+      ],
+      "different_outcome_count": 8,
+      "display_name": "PPO high penalty",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        1,
+        -7,
+        6
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        1.0,
+        -7.000000000000001,
+        6.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.01,
+        -0.07,
+        0.06
+      ],
+      "layout_count": 1,
+      "method": "ppo_high_penalty",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        0,
+        7,
+        93
+      ],
+      "projection_disabled_outcome_rates": [
+        0.0,
+        0.07,
+        0.93
+      ],
+      "projection_enabled_outcome_counts": [
+        1,
+        0,
+        99
+      ],
+      "projection_enabled_outcome_rates": [
+        0.01,
+        0.0,
+        0.99
+      ],
+      "same_outcome_count": 92,
+      "train_seed": 1
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_high_penalty_51200_seed2.pt",
+      "checkpoint_sha256": "a3f683d8d1172d90a5f45a00f31759384b305350c48b5c24f09595e607c90545",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 12,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.12
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 88,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.88
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          12
+        ],
+        [
+          0,
+          0,
+          88
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.12
+        ],
+        [
+          0.0,
+          0.0,
+          0.88
+        ]
+      ],
+      "different_outcome_count": 12,
+      "display_name": "PPO high penalty",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        0,
+        -12,
+        12
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        0.0,
+        -12.0,
+        12.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.0,
+        -0.12,
+        0.12
+      ],
+      "layout_count": 1,
+      "method": "ppo_high_penalty",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        0,
+        12,
+        88
+      ],
+      "projection_disabled_outcome_rates": [
+        0.0,
+        0.12,
+        0.88
+      ],
+      "projection_enabled_outcome_counts": [
+        0,
+        0,
+        100
+      ],
+      "projection_enabled_outcome_rates": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "same_outcome_count": 88,
+      "train_seed": 2
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_high_penalty_51200_seed3.pt",
+      "checkpoint_sha256": "48e6b29f11086f82bb7f139dd80c052e298b8823ceb40af4967097c4f8743b97",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          0.0,
+          0.125,
+          0.875
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.125,
+          "count": 2,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.02
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.875,
+          "count": 14,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.14
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 84,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.84
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          14
+        ],
+        [
+          0,
+          0,
+          84
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.02,
+          0.14
+        ],
+        [
+          0.0,
+          0.0,
+          0.84
+        ]
+      ],
+      "different_outcome_count": 14,
+      "display_name": "PPO high penalty",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        0,
+        -14,
+        14
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        0.0,
+        -14.000000000000002,
+        14.000000000000002
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.0,
+        -0.14,
+        0.14
+      ],
+      "layout_count": 1,
+      "method": "ppo_high_penalty",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        0,
+        16,
+        84
+      ],
+      "projection_disabled_outcome_rates": [
+        0.0,
+        0.16,
+        0.84
+      ],
+      "projection_enabled_outcome_counts": [
+        0,
+        2,
+        98
+      ],
+      "projection_enabled_outcome_rates": [
+        0.0,
+        0.02,
+        0.98
+      ],
+      "same_outcome_count": 86,
+      "train_seed": 3
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_high_penalty_51200_seed4.pt",
+      "checkpoint_sha256": "c57feec3843b8e3e585dc713ff618665322279b1975ee8277d305a134b7bbb80",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          0.0,
+          0.043478260869565216,
+          0.9565217391304348
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.043478260869565216,
+          "count": 1,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9565217391304348,
+          "count": 22,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.22
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 77,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.77
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          22
+        ],
+        [
+          0,
+          0,
+          77
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.01,
+          0.22
+        ],
+        [
+          0.0,
+          0.0,
+          0.77
+        ]
+      ],
+      "different_outcome_count": 22,
+      "display_name": "PPO high penalty",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        0,
+        -22,
+        22
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        0.0,
+        -22.0,
+        22.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.0,
+        -0.22,
+        0.22
+      ],
+      "layout_count": 1,
+      "method": "ppo_high_penalty",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        0,
+        23,
+        77
+      ],
+      "projection_disabled_outcome_rates": [
+        0.0,
+        0.23,
+        0.77
+      ],
+      "projection_enabled_outcome_counts": [
+        0,
+        1,
+        99
+      ],
+      "projection_enabled_outcome_rates": [
+        0.0,
+        0.01,
+        0.99
+      ],
+      "same_outcome_count": 78,
+      "train_seed": 4
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_high_penalty_51200_seed5.pt",
+      "checkpoint_sha256": "45d8ccefb072cbd8badc1551770d69a5c5a31c61b936add71224ea5172ff83d4",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 9,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.09
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 91,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.91
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          9
+        ],
+        [
+          0,
+          0,
+          91
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.09
+        ],
+        [
+          0.0,
+          0.0,
+          0.91
+        ]
+      ],
+      "different_outcome_count": 9,
+      "display_name": "PPO high penalty",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        0,
+        -9,
+        9
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        0.0,
+        -9.0,
+        9.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.0,
+        -0.09,
+        0.09
+      ],
+      "layout_count": 1,
+      "method": "ppo_high_penalty",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        0,
+        9,
+        91
+      ],
+      "projection_disabled_outcome_rates": [
+        0.0,
+        0.09,
+        0.91
+      ],
+      "projection_enabled_outcome_counts": [
+        0,
+        0,
+        100
+      ],
+      "projection_enabled_outcome_rates": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "same_outcome_count": 91,
+      "train_seed": 5
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_train_projection_51200_seed1.pt",
+      "checkpoint_sha256": "3c5949efe582518ed18dd33bd0066b919e2240bf8d1a1675995de14bf291227d",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          0.8333333333333334,
+          0.0,
+          0.16666666666666666
+        ],
+        [
+          0.7934782608695652,
+          0.05434782608695652,
+          0.15217391304347827
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": 0.8333333333333334,
+          "count": 5,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.05
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.16666666666666666,
+          "count": 1,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.7934782608695652,
+          "count": 73,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.73
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.05434782608695652,
+          "count": 5,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.05
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.15217391304347827,
+          "count": 14,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.14
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 2,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.02
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          5,
+          0,
+          1
+        ],
+        [
+          73,
+          5,
+          14
+        ],
+        [
+          0,
+          0,
+          2
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.05,
+          0.0,
+          0.01
+        ],
+        [
+          0.73,
+          0.05,
+          0.14
+        ],
+        [
+          0.0,
+          0.0,
+          0.02
+        ]
+      ],
+      "different_outcome_count": 88,
+      "display_name": "PPO trained with projection",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        72,
+        -87,
+        15
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        72.0,
+        -87.0,
+        15.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.72,
+        -0.87,
+        0.15
+      ],
+      "layout_count": 1,
+      "method": "ppo_train_projection",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        6,
+        92,
+        2
+      ],
+      "projection_disabled_outcome_rates": [
+        0.06,
+        0.92,
+        0.02
+      ],
+      "projection_enabled_outcome_counts": [
+        78,
+        5,
+        17
+      ],
+      "projection_enabled_outcome_rates": [
+        0.78,
+        0.05,
+        0.17
+      ],
+      "same_outcome_count": 12,
+      "train_seed": 1
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_train_projection_51200_seed2.pt",
+      "checkpoint_sha256": "94a7e01271b6c4fdc2c40ab4df16731f351c85303fbfdd4a66df84cf7df61528",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9545454545454546,
+          0.011363636363636364,
+          0.03409090909090909
+        ],
+        [
+          null,
+          null,
+          null
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 12,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.12
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9545454545454546,
+          "count": 84,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.84
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.011363636363636364,
+          "count": 1,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.03409090909090909,
+          "count": 3,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.03
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          12,
+          0,
+          0
+        ],
+        [
+          84,
+          1,
+          3
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.12,
+          0.0,
+          0.0
+        ],
+        [
+          0.84,
+          0.01,
+          0.03
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "different_outcome_count": 87,
+      "display_name": "PPO trained with projection",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        84,
+        -87,
+        3
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        84.0,
+        -87.0,
+        3.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.84,
+        -0.87,
+        0.03
+      ],
+      "layout_count": 1,
+      "method": "ppo_train_projection",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        12,
+        88,
+        0
+      ],
+      "projection_disabled_outcome_rates": [
+        0.12,
+        0.88,
+        0.0
+      ],
+      "projection_enabled_outcome_counts": [
+        96,
+        1,
+        3
+      ],
+      "projection_enabled_outcome_rates": [
+        0.96,
+        0.01,
+        0.03
+      ],
+      "same_outcome_count": 13,
+      "train_seed": 2
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_train_projection_51200_seed3.pt",
+      "checkpoint_sha256": "8dd06c30b16fafd91d3e679f5262588e83f69345442e3f605e40213d266208ef",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          0.9545454545454546,
+          0.0,
+          0.045454545454545456
+        ],
+        [
+          0.974025974025974,
+          0.0,
+          0.025974025974025976
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9545454545454546,
+          "count": 21,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.21
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.045454545454545456,
+          "count": 1,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.974025974025974,
+          "count": 75,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.75
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.025974025974025976,
+          "count": 2,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.02
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 1,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          21,
+          0,
+          1
+        ],
+        [
+          75,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.21,
+          0.0,
+          0.01
+        ],
+        [
+          0.75,
+          0.0,
+          0.02
+        ],
+        [
+          0.01,
+          0.0,
+          0.0
+        ]
+      ],
+      "different_outcome_count": 79,
+      "display_name": "PPO trained with projection",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        75,
+        -77,
+        2
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        75.0,
+        -77.0,
+        2.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.75,
+        -0.77,
+        0.02
+      ],
+      "layout_count": 1,
+      "method": "ppo_train_projection",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        22,
+        77,
+        1
+      ],
+      "projection_disabled_outcome_rates": [
+        0.22,
+        0.77,
+        0.01
+      ],
+      "projection_enabled_outcome_counts": [
+        97,
+        0,
+        3
+      ],
+      "projection_enabled_outcome_rates": [
+        0.97,
+        0.0,
+        0.03
+      ],
+      "same_outcome_count": 21,
+      "train_seed": 3
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_train_projection_51200_seed4.pt",
+      "checkpoint_sha256": "fe5cf72639d7b42227099dba859c4bc05d33760b1ab46464c8237636967b6f16",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9868421052631579,
+          0.0,
+          0.013157894736842105
+        ],
+        [
+          null,
+          null,
+          null
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 24,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.24
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9868421052631579,
+          "count": 75,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.75
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.013157894736842105,
+          "count": 1,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": null,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          24,
+          0,
+          0
+        ],
+        [
+          75,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.24,
+          0.0,
+          0.0
+        ],
+        [
+          0.75,
+          0.0,
+          0.01
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "different_outcome_count": 76,
+      "display_name": "PPO trained with projection",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        75,
+        -76,
+        1
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        75.0,
+        -76.0,
+        1.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.75,
+        -0.76,
+        0.01
+      ],
+      "layout_count": 1,
+      "method": "ppo_train_projection",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        24,
+        76,
+        0
+      ],
+      "projection_disabled_outcome_rates": [
+        0.24,
+        0.76,
+        0.0
+      ],
+      "projection_enabled_outcome_counts": [
+        99,
+        0,
+        1
+      ],
+      "projection_enabled_outcome_rates": [
+        0.99,
+        0.0,
+        0.01
+      ],
+      "same_outcome_count": 24,
+      "train_seed": 4
+    },
+    {
+      "checkpoint": "runs\\checkpoints\\final\\ppo_train_projection_51200_seed5.pt",
+      "checkpoint_sha256": "152c446a47682b6accaa1d5d54a6c547bcf0772aac856079d10c709b5dea791d",
+      "conditional_enabled_outcome_given_disabled_matrix": [
+        [
+          0.9565217391304348,
+          0.043478260869565216,
+          0.0
+        ],
+        [
+          0.9868421052631579,
+          0.0,
+          0.013157894736842105
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "correspondence_cells": [
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9565217391304348,
+          "count": 22,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.22
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.043478260869565216,
+          "count": 1,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "success",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.9868421052631579,
+          "count": 75,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.75
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.013157894736842105,
+          "count": 1,
+          "projection_disabled_outcome": "collision",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 1.0,
+          "count": 1,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "success",
+          "proportion_of_all_pairs": 0.01
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "collision",
+          "proportion_of_all_pairs": 0.0
+        },
+        {
+          "conditional_proportion_given_disabled_outcome": 0.0,
+          "count": 0,
+          "projection_disabled_outcome": "timeout",
+          "projection_enabled_outcome": "timeout",
+          "proportion_of_all_pairs": 0.0
+        }
+      ],
+      "correspondence_count_matrix": [
+        [
+          22,
+          1,
+          0
+        ],
+        [
+          75,
+          0,
+          1
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "correspondence_proportion_matrix": [
+        [
+          0.22,
+          0.01,
+          0.0
+        ],
+        [
+          0.75,
+          0.0,
+          0.01
+        ],
+        [
+          0.01,
+          0.0,
+          0.0
+        ]
+      ],
+      "different_outcome_count": 78,
+      "display_name": "PPO trained with projection",
+      "enabled_minus_disabled_outcome_count_deltas": [
+        75,
+        -75,
+        0
+      ],
+      "enabled_minus_disabled_outcome_percentage_point_deltas": [
+        75.0,
+        -75.0,
+        0.0
+      ],
+      "enabled_minus_disabled_outcome_rate_deltas": [
+        0.75,
+        -0.75,
+        0.0
+      ],
+      "layout_count": 1,
+      "method": "ppo_train_projection",
+      "paired_evaluation_observation_count": 100,
+      "projection_disabled_outcome_counts": [
+        23,
+        76,
+        1
+      ],
+      "projection_disabled_outcome_rates": [
+        0.23,
+        0.76,
+        0.01
+      ],
+      "projection_enabled_outcome_counts": [
+        98,
+        1,
+        1
+      ],
+      "projection_enabled_outcome_rates": [
+        0.98,
+        0.01,
+        0.01
+      ],
+      "same_outcome_count": 22,
+      "train_seed": 5
+    }
+  ]
+}

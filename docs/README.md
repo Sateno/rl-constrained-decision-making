@@ -17,37 +17,30 @@ assets/      Small static visual references used by the documentation.
 
 ## Suggested reading order
 
-1. Begin with the
-   [Orientation Guide to Predictive Action Projection with PPO](guides/orientation_guide_to_predictive_action_projection_with_ppo.pdf)
-   for a concise conceptual introduction.
+1. Begin with the focused Markdown contracts for exact subsystem interfaces,
+   persisted schemas, metric meanings, and failure semantics.
 
-2. Continue with the
-   [Predictive Action Projection Software and Artifact Companion](guides/predictive_action_projection_software_companion.pdf)
-   for practical mental models covering code reading, action flow, rollout
-   semantics, diagnostics, evaluation, debugging, and artifact interpretation.
-
-3. Consult the
-   [Predictive Action Projection Implementation Design](design/predictive_action_projection_implementation_design.pdf)
-   for the consolidated mathematical, architectural, algorithmic, artifact,
-   and verification specification.
-
-4. Read the
+2. Read the
    [Frozen Experimental Protocol](records/predictive_action_projection_experimental_protocol.md)
    before launching or interpreting final training and evaluation.
 
-5. Use the focused Markdown contracts for exact subsystem interfaces, persisted
-   schemas, metric meanings, and failure semantics.
+3. Inspect the machine-readable protocols and executable validators.
 
-The guides are pedagogical and do not supersede the implementation design,
-focused contracts, machine-readable protocols, executable validators, or
-source code.
+4. Read the [final study record](records/final_study_record.md), then use the
+   [release verification guide](validation/release_verification.md) for the
+   completed repository.
+
+The three software manuals are maintained in separate Overleaf projects.
+Compile them there and copy the PDFs to the guide/design paths below. Current
+contracts and executable code define exact behavior; historical records retain
+their original revision-specific meaning.
 
 ## Active documents
 
 ### Guides
 
-- [Orientation Guide to Predictive Action Projection with PPO](guides/orientation_guide_to_predictive_action_projection_with_ppo.pdf)
-- [Predictive Action Projection Software and Artifact Companion](guides/predictive_action_projection_software_companion.pdf)
+- [Orientation Guide to Predictive Action Projection with PPO](guides/Orientation_Guide_to_Predictive_Action_Projection_with_PPO.pdf)
+- [Predictive Action Projection Software and Artifact Companion](guides/Predictive_Action_Projection_Software_Companion.pdf)
 
 The orientation guide provides the shortest conceptual entry into the study,
 its motivation, and its main architecture.
@@ -62,14 +55,12 @@ evidence, validation workflows, aggregation, and common interpretation errors.
 
 - [Predictive Action Projection Implementation Design](design/predictive_action_projection_implementation_design.pdf)
 
-The implementation design is the authoritative consolidated specification for
-the implemented predictive action-projection system. It defines the
-mathematical model, component ownership, software architecture, algorithms,
-artifact contracts, failure semantics, validation structure, and
-change-control boundaries.
-
-The editable source is maintained in Overleaf. The repository contains the
-compiled PDF as the authoritative implementation-design artifact.
+The design and both guides describe the completed five-run study,
+transition-consistent reward indexing, and read-only release verification.
+The repository contains the compiled PDFs. Compile the Orientation Guide from
+its Overleaf `main.tex`; the Implementation Design project has separate main
+files for the design and companion, sharing its preamble, diagrams, and
+bibliography.
 
 ### Frozen experimental protocol
 
@@ -96,7 +87,8 @@ change.
 
 ### Validation
 
-- [Runtime validation](validation/runtime_validation.md)
+- [Release verification without new experiments](validation/release_verification.md)
+- [Development and historical runtime validation](validation/runtime_validation.md)
 
 The Python validators and tests are the executable source of truth for
 validation behavior. The validation guide identifies the supported entry
@@ -121,12 +113,18 @@ explicit amendment.
 
 The calibration evidence directory contains the compact family table, the
 layout-level paired comparison, and the representative trajectory figure. The
-complete raw calibration bundle remains outside normal Git under `runs/`.
+raw calibration CSV/NPZ files and acceptance audit are preserved in the local `runs/` archive, excluded from Git.
+
+### Completed study
+
+- [Final findings and evidence mapping](records/final_study_record.md)
+- [Repository release audit](records/repository_release_audit.md)
 
 ### Visual references
 
 - [Original training layout](assets/layouts/original_training_layout.pdf)
 - [Frozen core layout suite](assets/layouts/core_navigation_layouts_visual_reference.pdf)
+- [Four-page core layout atlas](assets/layouts/Predictive_Action_Projection_Core_Layout_Atlas.pdf)
 
 These PDFs document benchmark geometry. They are not final paper-result
 figures.
@@ -155,17 +153,17 @@ because the implementation later changes.
 ```text
 runs/      Raw checkpoints, TensorBoard events, CSV files, NPZ trajectories,
            validation logs, calibration outputs, benchmark outputs, and other
-           generated evidence.
+           generated evidence, all excluded from Git and preserved locally.
 
 results/   Curated tables and figures selected for repository-facing analysis
-           and publication artifacts.
+           and scientific diagnostics.
 
 docs/      Implementation design, conceptual and operational guides, focused
            contracts, validation guidance, research records, and compact
            visual references.
 ```
 
-Raw generated evidence is intentionally not copied into this directory.
+All `runs/` files remain local and ignored, including final raw evidence. The release inventory under `verification/` lists repository files separately from optional local-archive checksums. The default release checks work without `runs/`; `--archive-root` enables additional checks of the preserved archive.
 Records identify the relevant paths, hashes, configurations, and summaries so
 that the evidence remains traceable without treating generated runtime output
 as ordinary documentation source.

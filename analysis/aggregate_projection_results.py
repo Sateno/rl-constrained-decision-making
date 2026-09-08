@@ -30,8 +30,12 @@ REQUIRED_COLUMNS = {
     "episode",
     "episode_return",
     "episode_length",
+    "max_episode_steps",
     "success",
     "collision",
+    "terminated",
+    "truncated",
+    "final_distance_to_goal",
     "min_obstacle_clearance",
     "action_bound_clipping_count",
     "action_bound_clipping_rate",
@@ -41,6 +45,7 @@ REQUIRED_COLUMNS = {
     "turn_rate_action_bound_clipping_rate",
     "mean_action_bound_clipping_norm",
     "max_action_bound_clipping_norm",
+    "projection_intervention_count",
     "projection_intervention_rate",
     "mean_projection_correction_norm",
     "max_projection_correction_norm",
@@ -225,12 +230,14 @@ def discover_episodes(protocol: dict[str, object], evaluation_dir: str | Path) -
         raise ValueError("No evaluation CSVs matched the protocol and layout suite.")
 
     episodes = pd.concat(frames, ignore_index=True, sort=False)
-    episodes["success"] = as_bool(episodes["success"], "success")
-    episodes["collision"] = as_bool(episodes["collision"], "collision")
-    episodes["projection_enabled"] = as_bool(
-        episodes["projection_enabled"],
+    for column in (
+        "success",
+        "collision",
+        "terminated",
+        "truncated",
         "projection_enabled",
-    )
+    ):
+        episodes[column] = as_bool(episodes[column], column)
     episodes["result_build_schema_version"] = TABLE_SCHEMA
 
     audit = {
@@ -285,16 +292,58 @@ def validate_episodes(protocol: dict[str, object], episodes: pd.DataFrame) -> No
 
     episode_returns = pd.to_numeric(episodes["episode_return"], errors="coerce").to_numpy(float)
     episode_lengths = pd.to_numeric(episodes["episode_length"], errors="coerce").to_numpy(float)
+    max_episode_steps = pd.to_numeric(
+        episodes["max_episode_steps"],
+        errors="coerce",
+    ).to_numpy(float)
 
     if not np.all(np.isfinite(episode_returns)):
         raise ValueError("episode_return must be finite for every selected episode.")
-    if not np.all(np.isfinite(episode_lengths)) or np.any(episode_lengths <= 0.0):
-        raise ValueError("episode_length must be finite and positive for every selected episode.")
+    if (
+        not np.all(np.isfinite(episode_lengths))
+        or not np.allclose(episode_lengths, np.round(episode_lengths), atol=0.0, rtol=0.0)
+        or np.any(episode_lengths <= 0.0)
+    ):
+        raise ValueError("episode_length must contain positive finite integers.")
+    if (
+        not np.all(np.isfinite(max_episode_steps))
+        or not np.allclose(max_episode_steps, np.round(max_episode_steps), atol=0.0, rtol=0.0)
+        or np.any(max_episode_steps <= 0.0)
+    ):
+        raise ValueError("max_episode_steps must contain positive finite integers.")
+    if np.any(episode_lengths > max_episode_steps):
+        raise ValueError("episode_length must not exceed max_episode_steps.")
+
+    final_distances = pd.to_numeric(
+        episodes["final_distance_to_goal"],
+        errors="coerce",
+    ).to_numpy(float)
+    if not np.all(np.isfinite(final_distances)) or np.any(final_distances < 0.0):
+        raise ValueError("final_distance_to_goal must be finite and nonnegative.")
+
+    success = episodes["success"].to_numpy(bool)
+    collision = episodes["collision"].to_numpy(bool)
+    terminated = episodes["terminated"].to_numpy(bool)
+    truncated = episodes["truncated"].to_numpy(bool)
+    terminal_count = success.astype(int) + collision.astype(int) + truncated.astype(int)
+
+    if np.any(terminal_count != 1):
+        raise ValueError(
+            "success, collision, and truncated timeout must form one exclusive, "
+            "exhaustive terminal outcome."
+        )
+    if np.any(terminated != (success | collision)):
+        raise ValueError("terminated must equal success or collision.")
+    if np.any(truncated != ~(success | collision)):
+        raise ValueError("truncated must identify the timeout outcome.")
+    if np.any(truncated & (episode_lengths != max_episode_steps)):
+        raise ValueError("Timeout rows must end at max_episode_steps.")
 
     action_count_columns = (
         "action_bound_clipping_count",
         "speed_action_bound_clipping_count",
         "turn_rate_action_bound_clipping_count",
+        "projection_intervention_count",
     )
 
     for column in action_count_columns:
@@ -334,6 +383,7 @@ def validate_episodes(protocol: dict[str, object], episodes: pd.DataFrame) -> No
         ("action_bound_clipping_count", "action_bound_clipping_rate"),
         ("speed_action_bound_clipping_count", "speed_action_bound_clipping_rate"),
         ("turn_rate_action_bound_clipping_count", "turn_rate_action_bound_clipping_rate"),
+        ("projection_intervention_count", "projection_intervention_rate"),
     )
 
     for count_column, rate_column in count_rate_pairs:
@@ -406,6 +456,23 @@ def validate_episodes(protocol: dict[str, object], episodes: pd.DataFrame) -> No
     expected_enabled = episodes["projection_mode"].eq("enabled")
     if not bool((episodes["projection_enabled"] == expected_enabled).all()):
         raise ValueError("projection_enabled disagrees with projection_mode.")
+
+    disabled = ~expected_enabled.to_numpy(bool)
+    disabled_zero_columns = (
+        "projection_intervention_count",
+        "projection_intervention_rate",
+        "mean_projection_correction_norm",
+        "max_projection_correction_norm",
+        "mean_projection_slack_sum",
+        "max_projection_slack",
+        "projection_solver_failure_count",
+    )
+    for column in disabled_zero_columns:
+        values = pd.to_numeric(episodes[column], errors="coerce").to_numpy(float)
+        if np.any(np.abs(values[disabled]) > 1.0e-12):
+            raise ValueError(
+                f"{column} must be structural zero when projection is disabled."
+            )
 
     duplicate_columns = [
         "method",
@@ -683,99 +750,6 @@ def paired_summary(paired: pd.DataFrame) -> pd.DataFrame:
 #################################################################################
 # region Output
 
-# Escape one short text value for LaTeX.
-def latex_escape(value: object) -> str:
-#{
-    text = str(value)
-
-    for old, new in [
-        ("\\", r"\textbackslash{}"),
-        ("&", r"\&"),
-        ("%", r"\%"),
-        ("$", r"\$"),
-        ("#", r"\#"),
-        ("_", r"\_"),
-    ]:
-        text = text.replace(old, new)
-
-    return text
-
-#} End function latex_escape
-
-
-# Format a mean and standard deviation for LaTeX.
-def mean_std(mean_value: object, std_value: object, digits: int = 3) -> str:
-#{
-    mean_value = float(mean_value)
-    std_value = float(std_value)
-
-    if not np.isfinite(mean_value):
-        return "--"
-    if not np.isfinite(std_value):
-        return f"{mean_value:.{digits}f}"
-    return f"{mean_value:.{digits}f} $\\pm$ {std_value:.{digits}f}"
-
-#} End function mean_std
-
-
-# Write compact include-ready LaTeX tables.
-def write_latex_tables(methods: pd.DataFrame, paired_methods: pd.DataFrame, output_dir: Path) -> tuple[Path, Path]:
-#{
-    method_path = output_dir / "generated_method_summary.tex"
-    paired_path = output_dir / "generated_paired_projection_deltas.tex"
-    method_lines = [
-        "\\begin{tabular}{llrrrrrrr}",
-        "\\toprule",
-        "Method & Projection & Return & Success & Collision & Clearance & Intervention & Correction & Slack \\\\",
-        "\\midrule",
-    ]
-
-    for row in methods.itertuples(index=False):
-        values = [
-            latex_escape(row.display_name),
-            "On" if row.projection_mode == "enabled" else "Off",
-            mean_std(row.episode_return_mean, row.episode_return_std),
-            mean_std(row.success_rate_mean, row.success_rate_std),
-            mean_std(row.collision_rate_mean, row.collision_rate_std),
-            mean_std(row.min_obstacle_clearance_mean, row.min_obstacle_clearance_std),
-            mean_std(row.projection_intervention_rate_mean, row.projection_intervention_rate_std),
-            mean_std(row.projection_correction_norm_mean, row.projection_correction_norm_std),
-            mean_std(row.projection_slack_sum_mean, row.projection_slack_sum_std, 6),
-        ]
-        method_lines.append(" & ".join(values) + " \\\\")
-
-    method_lines.extend(["\\bottomrule", "\\end{tabular}"])
-    method_path.write_text("\n".join(method_lines) + "\n", encoding="utf-8")
-    paired_lines = [
-        "\\begin{tabular}{lrrrr}",
-        "\\toprule",
-        "Method & Return $\\Delta$ & Success $\\Delta$ & Collision $\\Delta$ & Clearance $\\Delta$ \\\\",
-        "\\midrule",
-    ]
-
-    for row in paired_methods.itertuples(index=False):
-        values = []
-
-        for metric in ("episode_return", "success", "collision", "min_obstacle_clearance"):
-            column = f"{metric}_delta_enabled_minus_disabled"
-            values.append(
-                mean_std(
-                    getattr(row, f"{column}_mean"),
-                    getattr(row, f"{column}_std"),
-                )
-            )
-
-        paired_lines.append(
-            f"{latex_escape(row.display_name)} & " + " & ".join(values) + " " + '\\\\'
-        )
-
-    paired_lines.extend(["\\bottomrule", "\\end{tabular}"])
-    paired_path.write_text("\n".join(paired_lines) + "\n", encoding="utf-8")
-    return method_path, paired_path
-
-#} End function write_latex_tables
-
-
 # Build all canonical tables from discovered common-layout episode CSVs.
 def build_result_tables(protocol_path: str | Path, evaluation_dir: str | Path, output_dir: str | Path) -> dict[str, Path]:
 #{
@@ -807,9 +781,6 @@ def build_result_tables(protocol_path: str | Path, evaluation_dir: str | Path, o
     methods.to_csv(paths["methods"], index=False)
     paired.to_csv(paths["paired"], index=False)
     paired_methods.to_csv(paths["paired_summary"], index=False)
-    method_latex, paired_latex = write_latex_tables(methods, paired_methods, output)
-    paths["method_latex"] = method_latex
-    paths["paired_latex"] = paired_latex
     suite = protocol["_layout_suite"]
     audit = {
         "status": "PASS",
