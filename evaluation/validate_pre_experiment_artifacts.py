@@ -84,8 +84,6 @@ EXPECTED_RESULT_TABLES = {
     "method_summary.csv",
     "paired_projection_deltas.csv",
     "paired_projection_summary.csv",
-    "generated_method_summary.tex",
-    "generated_paired_projection_deltas.tex",
 }
 
 

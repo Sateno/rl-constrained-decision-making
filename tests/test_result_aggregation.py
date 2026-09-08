@@ -107,6 +107,8 @@ def episode_row(
 ) -> dict[str, object]:
 #{
     enabled = projection_mode == "enabled"
+    episode_length = 40 + episode
+    intervention_count = 4 if enabled else 0
     return {
         "method": "ppo_baseline",
         "train_seed": train_seed,
@@ -123,9 +125,13 @@ def episode_row(
         "projection_enabled": enabled,
         "episode": episode,
         "episode_return": episode_return,
-        "episode_length": 40 + episode,
+        "episode_length": episode_length,
+        "max_episode_steps": 50,
         "success": success,
         "collision": collision,
+        "terminated": success or collision,
+        "truncated": not (success or collision),
+        "final_distance_to_goal": 0.0 if success else 1.0,
         "min_obstacle_clearance": np.nan if layout_id == "layout_a" else 0.2,
         "action_bound_clipping_count": 0,
         "action_bound_clipping_rate": 0.0,
@@ -135,7 +141,8 @@ def episode_row(
         "turn_rate_action_bound_clipping_rate": 0.0,
         "mean_action_bound_clipping_norm": 0.0,
         "max_action_bound_clipping_norm": 0.0,
-        "projection_intervention_rate": 0.1 if enabled else 0.0,
+        "projection_intervention_count": intervention_count,
+        "projection_intervention_rate": intervention_count / episode_length,
         "mean_projection_correction_norm": 0.02 if enabled else 0.0,
         "max_projection_correction_norm": 0.05 if enabled else 0.0,
         "mean_projection_slack_sum": 0.001 if enabled else 0.0,
@@ -202,7 +209,7 @@ def write_complete_evaluations(root: Path, layout_suite_path: Path) -> list[Path
 #################################################################################
 # region Tests
 
-# Layouts are averaged within checkpoints before independent training seeds are aggregated.
+# Layouts are averaged within each run's final checkpoint before run summaries are aggregated.
 def test_result_build_aggregates_layouts_before_seeds_and_preserves_pairs(tmp_path: Path):
 #{
     layout_suite_path = write_layout_suite(tmp_path)
@@ -236,17 +243,11 @@ def test_result_build_aggregates_layouts_before_seeds_and_preserves_pairs(tmp_pa
     assert paired_summary.iloc[0][
         "episode_return_delta_enabled_minus_disabled_mean"
     ] == pytest.approx(1.75)
-    assert outputs["method_latex"].read_text(encoding="utf-8").strip()
-    paired_latex = outputs["paired_latex"].read_text(encoding="utf-8")
-    assert paired_latex.strip()
-    assert "PPO baseline & " in paired_latex
-    assert any(
-        line.startswith("PPO baseline & ") and line.endswith('\\\\')
-        for line in paired_latex.splitlines()
-    )
+    assert not list(output_dir.glob("*.tex"))
     assert audit["selected_csv_count"] == 4
     assert audit["discovered_csv_count"] == 5
     assert audit["projection_solver_failure_count"] == 0
+
 
 #} End function test_result_build_aggregates_layouts_before_seeds_and_preserves_pairs
 
@@ -330,6 +331,77 @@ def test_result_build_rejects_nonfinite_evidence(
     with pytest.raises(ValueError, match=message):
         build_result_tables(protocol_path, tmp_path / "evaluation", tmp_path / "tables")
 #} End function test_result_build_rejects_nonfinite_evidence
+
+
+@pytest.mark.parametrize(
+    ("file_index", "updates", "message"),
+    [
+        (
+            1,
+            {"projection_intervention_count": 1.5},
+            "projection_intervention_count must contain finite integers",
+        ),
+        (
+            1,
+            {
+                "projection_intervention_count": 1,
+                "projection_intervention_rate": 0.5,
+            },
+            "projection_intervention_rate does not match",
+        ),
+        (
+            0,
+            {"collision": True},
+            "must form one exclusive, exhaustive terminal outcome",
+        ),
+        (
+            0,
+            {"terminated": False},
+            "terminated must equal success or collision",
+        ),
+        (
+            0,
+            {
+                "success": False,
+                "collision": False,
+                "terminated": False,
+                "truncated": True,
+            },
+            "Timeout rows must end at max_episode_steps",
+        ),
+        (
+            0,
+            {"mean_projection_correction_norm": 0.01},
+            "must be structural zero when projection is disabled",
+        ),
+        (
+            0,
+            {"final_distance_to_goal": np.nan},
+            "final_distance_to_goal must be finite and nonnegative",
+        ),
+    ],
+)
+# The producer rejects internally inconsistent endpoint and projector evidence.
+def test_result_build_rejects_internal_evidence_inconsistency(
+    tmp_path: Path,
+    file_index: int,
+    updates: dict[str, object],
+    message: str,
+):
+#{
+    layout_suite_path = write_layout_suite(tmp_path)
+    protocol_path = write_protocol(tmp_path, layout_suite_path)
+    paths = write_complete_evaluations(tmp_path, layout_suite_path)
+    frame = pd.read_csv(paths[file_index])
+    for column, value in updates.items():
+        if isinstance(value, float) and not value.is_integer():
+            frame[column] = frame[column].astype(float)
+        frame.loc[0, column] = value
+    frame.to_csv(paths[file_index], index=False)
+
+    with pytest.raises(ValueError, match=message):
+        build_result_tables(protocol_path, tmp_path / "evaluation", tmp_path / "tables")
+#} End function test_result_build_rejects_internal_evidence_inconsistency
 
 
 # A completed result-table directory is never overwritten silently.

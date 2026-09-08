@@ -36,7 +36,7 @@ replicate.
 
 ## Raw evidence
 
-The complete generated evidence remains outside normal Git at:
+The raw calibration CSV/NPZ files and acceptance audit are preserved locally, outside Git, at the recorded paths:
 
 ```text
 runs/calibration/core_navigation_layouts_v1/

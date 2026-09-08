@@ -237,29 +237,30 @@ Matched episode or layout outcomes are classified as:
 collision, success, or timeout
 ```
 
-and paired transition counts are reported descriptively. These transition
-tables are deterministic transformations of the frozen raw episode rows; they
+and matched correspondence counts are reported descriptively. These
+correspondence tables are deterministic transformations of the frozen raw episode rows; they
 do not require changes to training, environment, projection, or evaluation
 semantics.
 
 ## Aggregation and statistical interpretation
 
-The independently trained checkpoint is the empirical replicate.
+The independently initialized training run is the empirical replicate. One
+final checkpoint is retained from each run as the evaluated model artifact.
 
 Primary evaluation:
 
 ```text
-100 complete episodes within checkpoint
--> one checkpoint summary
--> aggregate five checkpoint summaries across training seeds
+100 complete episodes within each run's final checkpoint
+-> one run-level final-checkpoint summary
+-> aggregate five run-level summaries across training seeds
 ```
 
 Secondary evaluation:
 
 ```text
-24 layouts within checkpoint
--> one checkpoint summary
--> aggregate five checkpoint summaries across training seeds
+24 layouts within each run's final checkpoint
+-> one run-level final-checkpoint summary
+-> aggregate five run-level summaries across training seeds
 ```
 
 Report all seed-level values, mean, standard deviation, paired seed-level
@@ -351,3 +352,30 @@ secondary evaluation=24 deterministic transfer layouts
 all trained methods evaluated projection off and on
 final outcomes inspected before freeze=false
 ```
+
+## Terminology clarification recorded 4 September 2026
+
+The frozen design and numerical evidence are unchanged. For all current and
+future reporting, the independently initialized training run is the empirical
+replicate, with five runs per training condition. One final checkpoint is
+retained from each run and identifies the model artifact used for evaluation.
+Projector-off and projector-on evaluations are paired within that same run
+through its retained final checkpoint.
+
+Earlier uses of "independently trained checkpoint" in this historical protocol
+should therefore be read as "independently initialized training run represented
+by its retained final checkpoint." Likewise, matched projector-off/projector-on
+terminal outcomes are descriptive correspondences between separate executions,
+not temporal transitions within one trajectory.
+
+## Secondary-protocol identity amendment recorded 4 September 2026
+
+The historical declaration above records
+`dfc0e1e3de29c0f63eb6152a3f063ad1d17c4461430855f33222f93e827c6e90`
+for the secondary analysis protocol. The committed protocol actually executed
+by the frozen result builders has canonical identity
+`f0f853fb53b910cdd9227e1562fc227201b08a6926d8895d430e507944b659d1`.
+The historical value is reproduced when the operationally unused
+`validated_implementation_base_commit` field is added to that protocol. This
+amendment preserves both provenance facts. It does not change the executed
+configuration, evidence, result, or conclusion.

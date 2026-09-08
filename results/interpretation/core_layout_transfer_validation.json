@@ -1,0 +1,249 @@
+{
+  "build_audit_checks": {
+    "counts_exact": true,
+    "hashes_exact": true,
+    "status": "PASS"
+  },
+  "cross_table_checkpoint_comparisons": [],
+  "design": {
+    "expected_checkpoint_rows": 30,
+    "expected_episode_rows": 720,
+    "expected_method_rows": 6,
+    "expected_paired_checkpoint_rows": 15,
+    "expected_paired_method_rows": 3,
+    "expected_train_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "layout_count": 24,
+    "layout_ids": [
+      "control_open_route",
+      "control_upper_clearance",
+      "control_lower_clearance",
+      "control_symmetric_clearance",
+      "single_near_early_upper",
+      "single_near_early_lower",
+      "single_near_late_upper",
+      "single_near_late_lower",
+      "single_blocked_central_upper",
+      "single_blocked_central_lower",
+      "double_near_staggered_upper_first",
+      "double_near_staggered_lower_first",
+      "double_near_same_side_upper",
+      "double_near_same_side_lower",
+      "double_blocked_staggered_upper_first",
+      "double_blocked_staggered_lower_first",
+      "double_blocked_same_side_upper",
+      "double_blocked_same_side_lower",
+      "triple_mild_slalom_upper_first",
+      "triple_mild_slalom_lower_first",
+      "triple_narrowing_slalom_upper_first",
+      "triple_narrowing_slalom_lower_first",
+      "triple_shifted_slalom_upper_first",
+      "triple_shifted_slalom_lower_first"
+    ],
+    "methods": [
+      "ppo_baseline",
+      "ppo_high_penalty",
+      "ppo_train_projection"
+    ],
+    "projection_modes_by_method": {
+      "ppo_baseline": [
+        "disabled",
+        "enabled"
+      ],
+      "ppo_high_penalty": [
+        "disabled",
+        "enabled"
+      ],
+      "ppo_train_projection": [
+        "disabled",
+        "enabled"
+      ]
+    },
+    "repeats_per_layout": 1
+  },
+  "episode_checks": {
+    "checkpoint_identity_count": 15,
+    "clearance_nan_pattern_exact": true,
+    "evaluation_mapping_exact": true,
+    "outcome_partition_exact": true,
+    "pairing_keys_exact": true,
+    "rate_formula_max_abs_errors": {
+      "action_bound_clipping_rate": 0.0,
+      "projection_intervention_rate": 1.1102230246251565e-16,
+      "speed_action_bound_clipping_rate": 0.0,
+      "turn_rate_action_bound_clipping_rate": 0.0
+    },
+    "result_build_schema_version": "projection_result_tables_v1",
+    "seed_identity_exact": true,
+    "structural_zero_counts_when_projection_disabled": {
+      "max_projection_correction_norm": 360,
+      "max_projection_slack": 360,
+      "mean_projection_correction_norm": 360,
+      "mean_projection_slack_sum": 360,
+      "projection_intervention_count": 360,
+      "projection_intervention_rate": 360,
+      "projection_solver_failure_count": 360
+    }
+  },
+  "implementation": {
+    "entrypoint": "validate_evaluation_tables.py",
+    "entrypoint_sha256": "97aa4f0c6bfebb3dd71069eebb191239359292267bf873af7c554a695ac54fbe",
+    "evidence_module": "_evaluation_evidence.py",
+    "evidence_module_sha256": "250789508fba8850e07bc19d1aef0b93ea8348b6b14eb09594469a6c62b53d5f"
+  },
+  "inputs": {
+    "build_audit": {
+      "path": "results/tables/core_layout_transfer/result_build_audit.json",
+      "sha256": "92f30b23d079c0ed11d7aada08f9f30be910fc45b4fc5194e00077be6a6b35e9"
+    },
+    "checkpoint_summary": {
+      "path": "results/tables/core_layout_transfer/checkpoint_summary.csv",
+      "sha256": "44387c817135904fd50c8df0fb30c300ad5c07b995a51bff2c6115a6d085e372"
+    },
+    "episodes": {
+      "path": "results/tables/core_layout_transfer/evaluation_episode_results.csv",
+      "sha256": "d79d8dad6f828263c12e648bfd1ffb7788a01dbfb4e5a0b7272f2cc5f09ee702"
+    },
+    "layout_suite": {
+      "path": "evaluation/layouts/core_navigation_layouts.json",
+      "sha256": "10f599e80a30b37042ab1b6ed4b5f4a8a22ed3ae6a28ab1455740745a15d8c01"
+    },
+    "method_summary": {
+      "path": "results/tables/core_layout_transfer/method_summary.csv",
+      "sha256": "ec3e134ebc735b36886b320a0dbdb76eb65daf923014980085b71aa9ac7cbb73"
+    },
+    "paired_deltas": {
+      "path": "results/tables/core_layout_transfer/paired_projection_deltas.csv",
+      "sha256": "f575dd4874f45e28677b0470d9161e0d16f6dcd85e3960d21e4a09b0268abc7a"
+    },
+    "paired_summary": {
+      "path": "results/tables/core_layout_transfer/paired_projection_summary.csv",
+      "sha256": "a3f89e5f1cdd33ab7aee33278b850253436ff29118241f4fe25458124fcc08f0"
+    },
+    "protocol": {
+      "path": "experiments/projection_analysis_protocol.json",
+      "sha256": "eded13a5b9a6d485550c4693e43e633c4bc7c57db79add69010c47fd3a387aa2"
+    }
+  },
+  "output_schema": "interpretation_analysis_output_v1",
+  "reconciliation": {
+    "checkpoint_max_abs_errors": {
+      "action_bound_clipping_norm": 9.172350379227368e-17,
+      "action_bound_clipping_norm_max": 0.0,
+      "action_bound_clipping_rate": 5.551115123125783e-17,
+      "collision_rate": 6.245004513516506e-17,
+      "episode_count": 0.0,
+      "episode_length": 2.842170943040401e-14,
+      "episode_return": 4.440892098500626e-16,
+      "layout_count": 0.0,
+      "min_obstacle_clearance": 1.1102230246251565e-16,
+      "projection_correction_norm": 5.551115123125783e-17,
+      "projection_correction_norm_max": 0.0,
+      "projection_intervention_rate": 6.765421556309548e-17,
+      "projection_slack_max": 0.0,
+      "projection_slack_sum": 6.052558627900329e-17,
+      "speed_action_bound_clipping_rate": 5.551115123125783e-17,
+      "success_rate": 0.0,
+      "training_collision_penalty": 0.0,
+      "turn_rate_action_bound_clipping_rate": 0.0
+    },
+    "method_max_abs_errors": {
+      "action_bound_clipping_norm_max_mean": 6.071532165918825e-17,
+      "action_bound_clipping_norm_max_std": 6.938893903907228e-17,
+      "action_bound_clipping_norm_mean": 7.632783294297951e-17,
+      "action_bound_clipping_norm_std": 9.643978324258562e-17,
+      "action_bound_clipping_rate_mean": 3.469446951953614e-18,
+      "action_bound_clipping_rate_std": 6.245004513516506e-17,
+      "collision_rate_mean": 6.591949208711867e-17,
+      "collision_rate_std": 9.71445146547012e-17,
+      "episode_length_mean": 0.0,
+      "episode_length_std": 3.552713678800501e-15,
+      "episode_return_mean": 0.0,
+      "episode_return_std": 4.440892098500626e-16,
+      "min_obstacle_clearance_mean": 7.632783294297951e-17,
+      "min_obstacle_clearance_std": 6.938893903907228e-17,
+      "projection_correction_norm_max_mean": 7.632783294297951e-17,
+      "projection_correction_norm_max_std": 8.326672684688674e-17,
+      "projection_correction_norm_mean": 5.724587470723463e-17,
+      "projection_correction_norm_std": 5.898059818321144e-17,
+      "projection_intervention_rate_mean": 3.2959746043559335e-17,
+      "projection_intervention_rate_std": 8.066464163292153e-17,
+      "projection_slack_max_mean": 9.974659986866641e-17,
+      "projection_slack_max_std": 7.291259609965017e-17,
+      "projection_slack_sum_mean": 3.122502256758253e-17,
+      "projection_slack_sum_std": 6.776263578034403e-21,
+      "seed_count": 0.0,
+      "speed_action_bound_clipping_rate_mean": 3.469446951953614e-18,
+      "speed_action_bound_clipping_rate_std": 6.245004513516506e-17,
+      "success_rate_mean": 5.551115123125783e-17,
+      "success_rate_std": 9.020562075079397e-17,
+      "turn_rate_action_bound_clipping_rate_mean": 0.0,
+      "turn_rate_action_bound_clipping_rate_std": 0.0
+    },
+    "paired_delta_max_abs_errors": {
+      "action_bound_clipping_rate_delta_enabled_minus_disabled": 1.3877787807814457e-17,
+      "collision_delta_enabled_minus_disabled": 6.245004513516506e-17,
+      "episode_length_delta_enabled_minus_disabled": 1.4210854715202004e-14,
+      "episode_return_delta_enabled_minus_disabled": 9.020562075079397e-17,
+      "max_action_bound_clipping_norm_delta_enabled_minus_disabled": 6.657001339060997e-17,
+      "mean_action_bound_clipping_norm_delta_enabled_minus_disabled": 1.235990476633475e-17,
+      "min_obstacle_clearance_delta_enabled_minus_disabled": 9.8879238130678e-17,
+      "paired_layout_count": 0.0,
+      "speed_action_bound_clipping_rate_delta_enabled_minus_disabled": 1.3877787807814457e-17,
+      "success_delta_enabled_minus_disabled": 6.245004513516506e-17,
+      "turn_rate_action_bound_clipping_rate_delta_enabled_minus_disabled": 0.0
+    },
+    "paired_summary_max_abs_errors": {
+      "action_bound_clipping_rate_delta_enabled_minus_disabled_mean": 3.469446951953614e-18,
+      "action_bound_clipping_rate_delta_enabled_minus_disabled_std": 6.245004513516506e-17,
+      "collision_delta_enabled_minus_disabled_mean": 6.591949208711867e-17,
+      "collision_delta_enabled_minus_disabled_std": 9.71445146547012e-17,
+      "episode_length_delta_enabled_minus_disabled_mean": 0.0,
+      "episode_length_delta_enabled_minus_disabled_std": 0.0,
+      "episode_return_delta_enabled_minus_disabled_mean": 8.326672684688674e-17,
+      "episode_return_delta_enabled_minus_disabled_std": 8.326672684688674e-17,
+      "max_action_bound_clipping_norm_delta_enabled_minus_disabled_mean": 9.334980705100193e-17,
+      "max_action_bound_clipping_norm_delta_enabled_minus_disabled_std": 4.629543276513104e-17,
+      "mean_action_bound_clipping_norm_delta_enabled_minus_disabled_mean": 2.4665599424045226e-18,
+      "mean_action_bound_clipping_norm_delta_enabled_minus_disabled_std": 9.643978324258562e-17,
+      "min_obstacle_clearance_delta_enabled_minus_disabled_mean": 3.426078865054194e-17,
+      "min_obstacle_clearance_delta_enabled_minus_disabled_std": 7.979727989493313e-17,
+      "seed_count": 0.0,
+      "speed_action_bound_clipping_rate_delta_enabled_minus_disabled_mean": 3.469446951953614e-18,
+      "speed_action_bound_clipping_rate_delta_enabled_minus_disabled_std": 6.245004513516506e-17,
+      "success_delta_enabled_minus_disabled_mean": 2.7755575615628914e-17,
+      "success_delta_enabled_minus_disabled_std": 2.0816681711721685e-17,
+      "turn_rate_action_bound_clipping_rate_delta_enabled_minus_disabled_mean": 0.0,
+      "turn_rate_action_bound_clipping_rate_delta_enabled_minus_disabled_std": 0.0
+    }
+  },
+  "script": "validate_evaluation_tables",
+  "status": "PASS",
+  "table_shapes": {
+    "checkpoint_summary": [
+      30,
+      26
+    ],
+    "episodes": [
+      720,
+      53
+    ],
+    "method_summary": [
+      6,
+      35
+    ],
+    "paired_deltas": [
+      15,
+      16
+    ],
+    "paired_summary": [
+      3,
+      24
+    ]
+  }
+}

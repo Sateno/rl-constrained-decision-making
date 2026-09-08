@@ -1,0 +1,1699 @@
+{
+  "columns": [
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 3
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 3
+        }
+      },
+      "column": "method",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "ppo_baseline",
+        "ppo_high_penalty",
+        "ppo_train_projection"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 3
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 5.0,
+          "minimum": 1.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 5.0,
+          "minimum": 1.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "train_seed",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 5.0,
+        "minimum": 1.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 5
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 50.0,
+          "minimum": 10.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 50.0,
+          "minimum": 10.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "training_collision_penalty",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 50.0,
+        "minimum": 10.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 2
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "false_count": 240,
+          "true_count": 120
+        },
+        "enabled": {
+          "false_count": 240,
+          "true_count": 120
+        }
+      },
+      "column": "training_projection_enabled",
+      "dtype_after_strict_parsing": "bool",
+      "kind": "boolean",
+      "overall": {
+        "false_count": 480,
+        "true_count": 240
+      },
+      "rows": 720,
+      "unique_nonmissing": 2
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 15
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 15
+        }
+      },
+      "column": "checkpoint_sha256",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "152c446a47682b6accaa1d5d54a6c547bcf0772aac856079d10c709b5dea791d",
+        "3c5949efe582518ed18dd33bd0066b919e2240bf8d1a1675995de14bf291227d",
+        "45d8ccefb072cbd8badc1551770d69a5c5a31c61b936add71224ea5172ff83d4",
+        "48e6b29f11086f82bb7f139dd80c052e298b8823ceb40af4967097c4f8743b97",
+        "8a5e7c0edb9e277062afa2433ca3ef1568bb909b75bf3bdb82e42469e8e81171",
+        "8dd06c30b16fafd91d3e679f5262588e83f69345442e3f605e40213d266208ef",
+        "94a7e01271b6c4fdc2c40ab4df16731f351c85303fbfdd4a66df84cf7df61528",
+        "a3f683d8d1172d90a5f45a00f31759384b305350c48b5c24f09595e607c90545"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 15
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        }
+      },
+      "column": "layout_suite_schema_version",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "navigation_layout_suite_v1"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        }
+      },
+      "column": "layout_suite_id",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "core_navigation_layouts_v1"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        }
+      },
+      "column": "layout_suite_sha256",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "1027141797052240e83b941398e5a32031e9ca67d001e4a0cf1e19b0f96dd466"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        }
+      },
+      "column": "layout_suite_path",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "evaluation\\layouts\\core_navigation_layouts.json"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 24
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 24
+        }
+      },
+      "column": "layout_id",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "control_lower_clearance",
+        "control_open_route",
+        "control_symmetric_clearance",
+        "control_upper_clearance",
+        "double_blocked_same_side_lower",
+        "double_blocked_same_side_upper",
+        "double_blocked_staggered_lower_first",
+        "double_blocked_staggered_upper_first"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 24
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        }
+      },
+      "column": "layout_repeat",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 720
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 1023.0,
+          "minimum": 1000.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 1023.0,
+          "minimum": 1000.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "evaluation_seed",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 1023.0,
+        "minimum": 1000.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 24
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 10.0,
+          "minimum": 10.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 10.0,
+          "minimum": 10.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "evaluation_collision_penalty",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 10.0,
+        "minimum": 10.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        }
+      },
+      "column": "evaluation_policy_mode",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "deterministic"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 200.0,
+          "minimum": 200.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 200.0,
+          "minimum": 200.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "max_episode_steps",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 200.0,
+        "minimum": 200.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 3.0,
+          "minimum": 3.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 3.0,
+          "minimum": 3.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "layout_max_obstacles",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 3.0,
+        "minimum": 3.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.1,
+          "minimum": 0.1,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.1,
+          "minimum": 0.1,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "layout_agent_radius",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.1,
+        "minimum": 0.1,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.25,
+          "minimum": 0.25,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.25,
+          "minimum": 0.25,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "layout_goal_radius",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.25,
+        "minimum": 0.25,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        }
+      },
+      "column": "projection_mode",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "disabled",
+        "enabled"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 2
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 3
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 3
+        }
+      },
+      "column": "policy",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "ppo_baseline",
+        "ppo_high_penalty",
+        "ppo_train_projection"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 3
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 15
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 15
+        }
+      },
+      "column": "checkpoint",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "runs\\checkpoints\\final\\ppo_baseline_51200_seed1.pt",
+        "runs\\checkpoints\\final\\ppo_baseline_51200_seed2.pt",
+        "runs\\checkpoints\\final\\ppo_baseline_51200_seed3.pt",
+        "runs\\checkpoints\\final\\ppo_baseline_51200_seed4.pt",
+        "runs\\checkpoints\\final\\ppo_baseline_51200_seed5.pt",
+        "runs\\checkpoints\\final\\ppo_high_penalty_51200_seed1.pt",
+        "runs\\checkpoints\\final\\ppo_high_penalty_51200_seed2.pt",
+        "runs\\checkpoints\\final\\ppo_high_penalty_51200_seed3.pt"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 15
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 23.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 15
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 23.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 15
+        }
+      },
+      "column": "episode",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 30
+      },
+      "rows": 720,
+      "unique_nonmissing": 24
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 1023.0,
+          "minimum": 1000.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 1023.0,
+          "minimum": 1000.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "seed",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 1023.0,
+        "minimum": 1000.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 24
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 12.998163920991413,
+          "minimum": -16.103504601909027,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 12.987001068190509,
+          "minimum": -16.103504601909027,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "episode_return",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 12.998163920991413,
+        "minimum": -16.103504601909027,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 466
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 200.0,
+          "minimum": 8.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 200.0,
+          "minimum": 38.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "episode_length",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 200.0,
+        "minimum": 8.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 67
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "false_count": 318,
+          "true_count": 42
+        },
+        "enabled": {
+          "false_count": 311,
+          "true_count": 49
+        }
+      },
+      "column": "success",
+      "dtype_after_strict_parsing": "bool",
+      "kind": "boolean",
+      "overall": {
+        "false_count": 629,
+        "true_count": 91
+      },
+      "rows": 720,
+      "unique_nonmissing": 2
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "false_count": 276,
+          "true_count": 84
+        },
+        "enabled": {
+          "false_count": 341,
+          "true_count": 19
+        }
+      },
+      "column": "collision",
+      "dtype_after_strict_parsing": "bool",
+      "kind": "boolean",
+      "overall": {
+        "false_count": 617,
+        "true_count": 103
+      },
+      "rows": 720,
+      "unique_nonmissing": 2
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "false_count": 234,
+          "true_count": 126
+        },
+        "enabled": {
+          "false_count": 292,
+          "true_count": 68
+        }
+      },
+      "column": "terminated",
+      "dtype_after_strict_parsing": "bool",
+      "kind": "boolean",
+      "overall": {
+        "false_count": 526,
+        "true_count": 194
+      },
+      "rows": 720,
+      "unique_nonmissing": 2
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "false_count": 126,
+          "true_count": 234
+        },
+        "enabled": {
+          "false_count": 68,
+          "true_count": 292
+        }
+      },
+      "column": "truncated",
+      "dtype_after_strict_parsing": "bool",
+      "kind": "boolean",
+      "overall": {
+        "false_count": 194,
+        "true_count": 526
+      },
+      "rows": 720,
+      "unique_nonmissing": 2
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 8.492470041450474,
+          "minimum": 0.1993652557358603,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 8.492470041450474,
+          "minimum": 0.1991937916542867,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "final_distance_to_goal",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 8.492470041450474,
+        "minimum": 0.1991937916542867,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 428
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 345,
+          "maximum": 2.4635642126552706,
+          "minimum": -0.0887935398400339,
+          "missing_count": 15,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 345,
+          "maximum": 2.4635642126552706,
+          "minimum": -0.0072803657944355,
+          "missing_count": 15,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "min_obstacle_clearance",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 690,
+        "maximum": 2.4635642126552706,
+        "minimum": -0.0887935398400339,
+        "missing_count": 30,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 425
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 200.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 251
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 200.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 248
+        }
+      },
+      "column": "action_bound_clipping_count",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 200.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 499
+      },
+      "rows": 720,
+      "unique_nonmissing": 65
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 251
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 248
+        }
+      },
+      "column": "action_bound_clipping_rate",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 499
+      },
+      "rows": 720,
+      "unique_nonmissing": 65
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 200.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 251
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 200.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 248
+        }
+      },
+      "column": "speed_action_bound_clipping_count",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 200.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 499
+      },
+      "rows": 720,
+      "unique_nonmissing": 65
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 251
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 248
+        }
+      },
+      "column": "speed_action_bound_clipping_rate",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 499
+      },
+      "rows": 720,
+      "unique_nonmissing": 65
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        }
+      },
+      "column": "turn_rate_action_bound_clipping_count",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 720
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        }
+      },
+      "column": "turn_rate_action_bound_clipping_rate",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 720
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.702719042301178,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 251
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.702719042301178,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 248
+        }
+      },
+      "column": "mean_action_bound_clipping_norm",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.702719042301178,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 499
+      },
+      "rows": 720,
+      "unique_nonmissing": 113
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.7183635234832764,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 251
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.7183635234832764,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 248
+        }
+      },
+      "column": "max_action_bound_clipping_norm",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.7183635234832764,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 499
+      },
+      "rows": 720,
+      "unique_nonmissing": 113
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "false_count": 360,
+          "true_count": 0
+        },
+        "enabled": {
+          "false_count": 0,
+          "true_count": 360
+        }
+      },
+      "column": "projection_enabled",
+      "dtype_after_strict_parsing": "bool",
+      "kind": "boolean",
+      "overall": {
+        "false_count": 360,
+        "true_count": 360
+      },
+      "rows": 720,
+      "unique_nonmissing": 2
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 200.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 254
+        }
+      },
+      "column": "projection_intervention_count",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 200.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 614
+      },
+      "rows": 720,
+      "unique_nonmissing": 58
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 254
+        }
+      },
+      "column": "projection_intervention_rate",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 614
+      },
+      "rows": 720,
+      "unique_nonmissing": 72
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.9406103701787518,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 22
+        }
+      },
+      "column": "mean_projection_correction_norm",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.9406103701787518,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 382
+      },
+      "rows": 720,
+      "unique_nonmissing": 319
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 1.021754372778822,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 22
+        }
+      },
+      "column": "max_projection_correction_norm",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 1.021754372778822,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 382
+      },
+      "rows": 720,
+      "unique_nonmissing": 126
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.0017494662274584,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 254
+        }
+      },
+      "column": "mean_projection_slack_sum",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.0017494662274584,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 614
+      },
+      "rows": 720,
+      "unique_nonmissing": 107
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.004298735710872,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 254
+        }
+      },
+      "column": "max_projection_slack",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.004298735710872,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 614
+      },
+      "rows": 720,
+      "unique_nonmissing": 107
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        }
+      },
+      "column": "projection_solver_failure_count",
+      "dtype_after_strict_parsing": "int64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 720
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.25,
+          "minimum": 0.25,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.25,
+          "minimum": 0.25,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "projection_lookahead_distance",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.25,
+        "minimum": 0.25,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 2.0,
+          "minimum": 2.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 2.0,
+          "minimum": 2.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "projection_alpha",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 2.0,
+        "minimum": 2.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 1000.0,
+          "minimum": 1000.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 1000.0,
+          "minimum": 1000.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 0
+        }
+      },
+      "column": "projection_slack_penalty",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 1000.0,
+        "minimum": 1000.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 0
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        },
+        "enabled": {
+          "finite_count": 360,
+          "maximum": 0.0,
+          "minimum": 0.0,
+          "missing_count": 0,
+          "negative_infinity_count": 0,
+          "positive_infinity_count": 0,
+          "zero_count": 360
+        }
+      },
+      "column": "projection_extra_clearance",
+      "dtype_after_strict_parsing": "float64",
+      "kind": "numeric",
+      "overall": {
+        "finite_count": 720,
+        "maximum": 0.0,
+        "minimum": 0.0,
+        "missing_count": 0,
+        "negative_infinity_count": 0,
+        "positive_infinity_count": 0,
+        "zero_count": 720
+      },
+      "rows": 720,
+      "unique_nonmissing": 1
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 15
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 15
+        }
+      },
+      "column": "source_csv",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\runs\\evaluation\\final\\core_layout_transfer\\ppo_baseline\\seed1\\projection_disabled.csv",
+        "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\runs\\evaluation\\final\\core_layout_transfer\\ppo_baseline\\seed1\\projection_enabled.csv",
+        "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\runs\\evaluation\\final\\core_layout_transfer\\ppo_baseline\\seed2\\projection_disabled.csv",
+        "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\runs\\evaluation\\final\\core_layout_transfer\\ppo_baseline\\seed2\\projection_enabled.csv",
+        "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\runs\\evaluation\\final\\core_layout_transfer\\ppo_baseline\\seed3\\projection_disabled.csv",
+        "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\runs\\evaluation\\final\\core_layout_transfer\\ppo_baseline\\seed3\\projection_enabled.csv",
+        "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\runs\\evaluation\\final\\core_layout_transfer\\ppo_baseline\\seed4\\projection_disabled.csv",
+        "C:\\rl_projects\\src\\repos\\rl-constrained-decision-making\\runs\\evaluation\\final\\core_layout_transfer\\ppo_baseline\\seed4\\projection_enabled.csv"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 30
+    },
+    {
+      "by_projection_mode": {
+        "disabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        },
+        "enabled": {
+          "missing_count": 0,
+          "rows": 360,
+          "unique_nonmissing": 1
+        }
+      },
+      "column": "result_build_schema_version",
+      "dtype_after_strict_parsing": "object",
+      "examples": [
+        "projection_result_tables_v1"
+      ],
+      "kind": "text_or_categorical",
+      "missing_count": 0,
+      "rows": 720,
+      "unique_nonmissing": 1
+    }
+  ],
+  "implementation": {
+    "entrypoint": "inventory_evaluation_table.py",
+    "entrypoint_sha256": "c1cb771abb96a2dfe7c02eeb780e65c546b7e546b1044d9e60add784876c5cd9",
+    "evidence_module": "_evaluation_evidence.py",
+    "evidence_module_sha256": "250789508fba8850e07bc19d1aef0b93ea8348b6b14eb09594469a6c62b53d5f"
+  },
+  "input": {
+    "path": "results/tables/core_layout_transfer/evaluation_episode_results.csv",
+    "sha256": "d79d8dad6f828263c12e648bfd1ffb7788a01dbfb4e5a0b7272f2cc5f09ee702"
+  },
+  "output_schema": "interpretation_analysis_output_v1",
+  "row_count": 720,
+  "script": "inventory_evaluation_table"
+}

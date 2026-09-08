@@ -33,3 +33,12 @@ Thumbs.db
 *.synctex.gz
 *.toc
 /.github
+
+# Raw runs remain local archives; no completed-study exceptions.
+# Paper and manual source projects are maintained separately.
+/analysis/publication/
+/results/publication_assets/
+/results/tables/*/generated_*.tex
+/docs/source/
+/tmp/
+/build/

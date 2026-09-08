@@ -100,15 +100,19 @@ y_{t+1}&=y_t+v_t\sin\theta_t\Delta t,\\
 
 Default `dt=0.1`.
 
-Reward:
+Writing \(r_{t+1}\) for the reward emitted after executing \(u_t=[v_t,\omega_t]^\top\)
+from state \(t\), the reward is:
 
 \[
-r_t=c_p(d_{t-1}-d_t)-c_u(v_t^2+\omega_t^2)-c_{\mathrm{time}}
-+r_{\mathrm{goal}}\mathbf1_{\mathrm{success}}
--c_{\mathrm{collision}}\mathbf1_{\mathrm{collision}},
+r_{t+1}=c_p(d_t-d_{t+1})-c_u(v_t^2+\omega_t^2)-c_{\mathrm{time}}
++r_{\mathrm{goal}}\mathbf1_{\mathrm{success},t+1}
+-c_{\mathrm{collision}}\mathbf1_{\mathrm{collision},t+1},
 \]
 
-plus a distance-weighted timeout penalty on truncation.
+with the additional term
+\(-c_{\mathrm{timeout}}d_{t+1}\mathbf1_{\mathrm{truncated},t+1}\)
+on a timeout transition. Success, collision, and timeout indicators refer to
+the post-transition state.
 
 | Parameter | Default |
 |---|---:|

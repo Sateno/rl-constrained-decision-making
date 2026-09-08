@@ -1,0 +1,1544 @@
+{
+  "schema_version": "pap_repository_release_v3",
+  "audit_date": "2026-09-08",
+  "base_commit": "5a5cc2041ad5b6194a86aff9e61460873ce185c9",
+  "frozen_protocol_commit": "ba64926aed98b08b7b285266cf85989d466f9f1c",
+  "protected_against_main": [
+    "algorithms/ppo/__init__.py",
+    "algorithms/ppo/action_bound_diagnostics.py",
+    "algorithms/ppo/agent.py",
+    "algorithms/ppo/ppo_continuous_action.py",
+    "algorithms/ppo/projection_training.py",
+    "environment.yml",
+    "environments/__init__.py",
+    "environments/action_wrappers.py",
+    "environments/constrained_navigation.py",
+    "environments/factory.py",
+    "evaluation/__init__.py",
+    "evaluation/evaluate_layout_suite.py",
+    "evaluation/evaluate_policy.py",
+    "evaluation/evaluate_projection_pair.py",
+    "evaluation/inspect_pre_experiment_validation.py",
+    "evaluation/layout_suite.py",
+    "evaluation/layouts/core_navigation_layouts.json",
+    "evaluation/layouts/development_navigation_layouts.json",
+    "evaluation/layouts/fixed_training_geometry.json",
+    "evaluation/trajectory_recording.py",
+    "evaluation/validate_evaluation_time_projection.py",
+    "evaluation/validate_pre_experiment_codebase.py",
+    "experiments/__init__.py",
+    "experiments/benchmark_training_devices.py",
+    "experiments/calibrate_core_layouts.py",
+    "experiments/development_projection_analysis_protocol.json",
+    "experiments/fixed_training_geometry_analysis_protocol.json",
+    "experiments/projection_analysis_protocol.json",
+    "experiments/run_clean_ppo_baseline.py",
+    "experiments/train_ppo_variant.py",
+    "projection/__init__.py",
+    "projection/cbf_qp_projection.py",
+    "projection/cbf_qp_wrapper.py"
+  ],
+  "excluded_paths": [
+    "analysis/publication/README.md",
+    "analysis/publication/__init__.py",
+    "analysis/publication/build_publication_assets.py",
+    "analysis/publication/geometry.py",
+    "analysis/publication/latex/Figure_1_Controller_Boundary.tex",
+    "analysis/publication/latex/Figure_2_Fixed_Training_Geometry.tex",
+    "analysis/publication/latex/Figure_3_Paired_Run_Outcomes.tex",
+    "analysis/publication/latex/Figure_4_Matched_Outcome_Correspondence.tex",
+    "analysis/publication/render_transfer_layout_atlas.py",
+    "results/publication_assets/figures/Figure_1_Controller_Boundary.tex",
+    "results/publication_assets/figures/Figure_2_Fixed_Training_Geometry.tex",
+    "results/publication_assets/figures/Figure_3_Paired_Run_Outcomes.tex",
+    "results/publication_assets/figures/Figure_4_Matched_Outcome_Correspondence.tex",
+    "results/publication_assets/figures/data/Figure_2_Fixed_Training_Geometry_data.tex",
+    "results/publication_assets/figures/data/Figure_3_Paired_Run_Outcomes_Data.csv",
+    "results/publication_assets/figures/data/Figure_4_Matched_Outcome_Correspondence_data.csv",
+    "results/publication_assets/figures/data/Figure_4_Matched_Outcome_Correspondence_data.tex",
+    "results/tables/core_layout_transfer/generated_method_summary.tex",
+    "results/tables/core_layout_transfer/generated_paired_projection_deltas.tex",
+    "results/tables/fixed_training_geometry/generated_method_summary.tex",
+    "results/tables/fixed_training_geometry/generated_paired_projection_deltas.tex",
+    "tests/test_publication_assets.py"
+  ],
+  "paper_evidence_map": {
+    "data/fixed_episode_results.csv": "results/tables/fixed_training_geometry/evaluation_episode_results.csv",
+    "data/transfer_episode_results.csv": "results/tables/core_layout_transfer/evaluation_episode_results.csv",
+    "data/fixed_checkpoint_summary.csv": "results/tables/fixed_training_geometry/checkpoint_summary.csv",
+    "data/transfer_checkpoint_summary.csv": "results/tables/core_layout_transfer/checkpoint_summary.csv",
+    "data/fixed_training_geometry.json": "evaluation/layouts/fixed_training_geometry.json",
+    "data/core_navigation_layouts.json": "evaluation/layouts/core_navigation_layouts.json"
+  },
+  "active_markdown": [
+    "README.md",
+    "THIRD_PARTY_NOTICES.md",
+    "algorithms/README.md",
+    "analysis/interpretation/README.md",
+    "docs/README.md",
+    "docs/contracts/environment_and_projection.md",
+    "docs/contracts/evaluation_and_artifacts.md",
+    "docs/contracts/trajectory_archive.md",
+    "docs/validation/release_verification.md",
+    "docs/validation/runtime_validation.md",
+    "results/calibration/core_navigation_layouts_v1/README.md",
+    "results/interpretation/README.md",
+    "verification/README.md",
+    "docs/records/final_study_record.md",
+    "docs/records/repository_release_audit.md"
+  ],
+  "files": {
+    ".gitattributes": {
+      "sha256": "64ee0c4ddc98c2c708692ee0c5ac9e41324b96207a788e84bfcf73f077f04785",
+      "text": true
+    },
+    ".gitignore": {
+      "sha256": "b8c55a382d8e6c51138d6c776c1deb8df200d12bf8b692dd3fc4780d6c73a2b0",
+      "text": true
+    },
+    "LICENSE": {
+      "sha256": "af614245ae8c205a3bcf3a952266db32e4699926066fe015aa8be245b0c54308",
+      "text": true
+    },
+    "README.md": {
+      "sha256": "cef00eb4448e1ba57c56cd507e5f8d1762f46c0552e52a0f0024493b7e7eccd5",
+      "text": true
+    },
+    "THIRD_PARTY_NOTICES.md": {
+      "sha256": "f67e8f627b8409efa2d186438928af7a53aa6cce30919e3818835b1025d9f725",
+      "text": true
+    },
+    "algorithms/README.md": {
+      "sha256": "a022f673d5e135aba4aa61234eb30f1d3bb4a85b1b5a724e8c2773a056dc9e81",
+      "text": true
+    },
+    "algorithms/ppo/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": true
+    },
+    "algorithms/ppo/action_bound_diagnostics.py": {
+      "sha256": "7063511483713e5c03fc781d1adb03a04cfbbca814f903445b34a0f64cbcc3f6",
+      "text": true
+    },
+    "algorithms/ppo/agent.py": {
+      "sha256": "c7c565a8362efb915ef4aa91a9306d512085100c237931abc97ef3cf904d6696",
+      "text": true
+    },
+    "algorithms/ppo/ppo_continuous_action.py": {
+      "sha256": "59c1666b898341c633820cdec21be924d028919e9157787478c2daf84902c5c6",
+      "text": true
+    },
+    "algorithms/ppo/projection_training.py": {
+      "sha256": "d3815e33bbc3acdf3f1bdb443837fa0593a34d2a3604f9a929d737c1001aca3c",
+      "text": true
+    },
+    "analysis/aggregate_projection_results.py": {
+      "sha256": "0dd32fb5a2c957c5329d031b9e55156707fc30d025309eb8b158e1da505ffa56",
+      "text": true
+    },
+    "analysis/build_projection_results.py": {
+      "sha256": "8dd5c01368b7dd8f0fda4d0c295df4388f53c52d9ccb1e9452a65663075ba68d",
+      "text": true
+    },
+    "analysis/interpretation/README.md": {
+      "sha256": "164f4704c3bd74e561ecbac00ed39c8d451099f71c283661305d5041bcc53029",
+      "text": true
+    },
+    "analysis/interpretation/__init__.py": {
+      "sha256": "0250b02846dd538736cb3f34bcf6279fc5b9aafb7f134f20f96f5247617006d5",
+      "text": true
+    },
+    "analysis/interpretation/_evaluation_evidence.py": {
+      "sha256": "250789508fba8850e07bc19d1aef0b93ea8348b6b14eb09594469a6c62b53d5f",
+      "text": true
+    },
+    "analysis/interpretation/inventory_evaluation_table.py": {
+      "sha256": "c1cb771abb96a2dfe7c02eeb780e65c546b7e546b1044d9e60add784876c5cd9",
+      "text": true
+    },
+    "analysis/interpretation/summarize_absolute_evaluation_performance.py": {
+      "sha256": "9beea199b9d0761da8bf0659ed4cf2142f5a8717073dccd3aedd9966310a0e93",
+      "text": true
+    },
+    "analysis/interpretation/summarize_layout_transfer_performance.py": {
+      "sha256": "a9ea8a3d1fba6a9be562d47bc10720a042a28d77966ade2d13033f8d41678158",
+      "text": true
+    },
+    "analysis/interpretation/summarize_paired_projection_effects.py": {
+      "sha256": "2ba7ec86acdca94e5370d44b3353fc961a0be74c93c0be98da77e1c81ef33745",
+      "text": true
+    },
+    "analysis/interpretation/summarize_paired_terminal_outcome_correspondences.py": {
+      "sha256": "7d049c8c9c8f04c25908b4ff398688b5631745391340f921ad058298e5399089",
+      "text": true
+    },
+    "analysis/interpretation/summarize_paired_terminal_outcome_transitions.py": {
+      "sha256": "751d3336863f772c0b700f1ec52c60ff34e9b6989abacd68cdd604c035c64825",
+      "text": true
+    },
+    "analysis/interpretation/validate_evaluation_tables.py": {
+      "sha256": "97aa4f0c6bfebb3dd71069eebb191239359292267bf873af7c554a695ac54fbe",
+      "text": true
+    },
+    "analysis/layout_geometry.py": {
+      "sha256": "5129d6a68ae51c28d5b391d3540c18f926174f7e701e15e7761e8c8c1cb802c4",
+      "text": true
+    },
+    "analysis/plot_projection_results.py": {
+      "sha256": "c4fe306df6578f4ea6d1a6e0e61f1327eaa68d091c50134c23f66dd71a753cb0",
+      "text": true
+    },
+    "analysis/render_transfer_layout_atlas.py": {
+      "sha256": "2dc6aeb71da1aeed64a09e011e2fcdf25de68ef7fd72f516fbab250559cbc70a",
+      "text": true
+    },
+    "analysis/training_diagnostics.py": {
+      "sha256": "430eebbf01b3fa5c14bae893a4a861ec293bd1f5b1ed29ad48139b8f7d4bd83a",
+      "text": true
+    },
+    "docs/README.md": {
+      "sha256": "b1049a1a9f9b9336de51b43b4c50f61ea375d13ee97bca2c230d9aa2dafc6b29",
+      "text": true
+    },
+    "docs/assets/layouts/Predictive_Action_Projection_Core_Layout_Atlas.pdf": {
+      "sha256": "fba1b2f143761b417e130fda2e90c2dc0ae9eb2f86f0839fff18a96685b92235",
+      "text": false
+    },
+    "docs/assets/layouts/core_navigation_layouts_visual_reference.pdf": {
+      "sha256": "5e177c14100e4f60ce5018812be64a7f0ee697d18427aea5141a702522c513ae",
+      "text": false
+    },
+    "docs/assets/layouts/original_training_layout.pdf": {
+      "sha256": "5204d80ef52e2335cc36cde7c8bbb8378d8610fc08c0b4fbfc13220216a88cf2",
+      "text": false
+    },
+    "docs/contracts/environment_and_projection.md": {
+      "sha256": "10b0d420bdba2b881f28774c537569ad05a64ca7720d100c3fce3ca410b31068",
+      "text": true
+    },
+    "docs/contracts/evaluation_and_artifacts.md": {
+      "sha256": "918788683ea6c9abf1c33ab19fce0318a339e4ff17ce53ea42af22575e7a76d4",
+      "text": true
+    },
+    "docs/contracts/trajectory_archive.md": {
+      "sha256": "8dc4a3a89f6205a9f255745e7d5d17a93d5c33cd57b68ffc7d92e371ef7e59a6",
+      "text": true
+    },
+    "docs/records/Predictive_Action_Projection_Analysis_Command_Record.md": {
+      "sha256": "dea2a381b1582e5966daad135ea530f6c8bd5649c6047e4286ee194513e894df",
+      "text": true
+    },
+    "docs/records/Predictive_Action_Projection_Analysis_Record.md": {
+      "sha256": "2a3eb2e9fbed1c809f8ed28af1a0ff1590d5dcf05accae0e6390fecded09acff",
+      "text": true
+    },
+    "docs/records/baseline_regression_record.md": {
+      "sha256": "dcc3d1ad346101e42f980e8b00b867737589c286cb7a75cc4cffb116951f631c",
+      "text": true
+    },
+    "docs/records/core_layout_calibration_record.md": {
+      "sha256": "0eb9db5aee6d8b7deacfa8827f2b2f235e6bc2f7808c7cd5fa7c838cff8e0e04",
+      "text": true
+    },
+    "docs/records/evaluation_time_projection_regression_record.md": {
+      "sha256": "7a9b16c7e6b474f6a60adaa9870c7183d472a51cdbe76a2d44cc0fa94d7ede42",
+      "text": true
+    },
+    "docs/records/final_study_record.md": {
+      "sha256": "24e90ea1160468cf310997f65baf59cc0d2896464585d7ce2a5fd068091c9e25",
+      "text": true
+    },
+    "docs/records/predictive_action_projection_experimental_protocol.md": {
+      "sha256": "618fded005c55458fd5bc992ae8ec9f6273586b2566d79b76eac8a52cd097d66",
+      "text": true
+    },
+    "docs/records/repository_release_audit.md": {
+      "sha256": "3b94a5f2f58d1bb2586459b088d38c5cf5eb3779d0f61e1e7c922cafd9167079",
+      "text": true
+    },
+    "docs/validation/release_verification.md": {
+      "sha256": "a3e68a570d8687821272c8d58165a1c2aedb01b60fe711326c62920cf32dbae6",
+      "text": true
+    },
+    "docs/validation/runtime_validation.md": {
+      "sha256": "a0bfa8c13f545379b06c33880b6c82e24a1fbef4045b1c79264ab13a3d3b28c0",
+      "text": true
+    },
+    "environment.yml": {
+      "sha256": "4aa1242a8cfaebad289bcac153949db81a75e1d18608092b069eeeb49dcfd77d",
+      "text": true
+    },
+    "environments/__init__.py": {
+      "sha256": "4f1840d5051629bce44da24d1b52d667facdfe52bf19e58d1eb9b0f26fde2d74",
+      "text": true
+    },
+    "environments/action_wrappers.py": {
+      "sha256": "12667ed8d6ed796431b9b5049bf73f49da798a7e6dc53681ff4089bfa96d8b77",
+      "text": true
+    },
+    "environments/constrained_navigation.py": {
+      "sha256": "ee1b815bf9b90927875baa98bda7aa019911cf33eada6870bcd35f95ebe1a129",
+      "text": true
+    },
+    "environments/factory.py": {
+      "sha256": "9140277d5d6fa2eb692397bbc2850440f841617314c4346b529d72befd08df89",
+      "text": true
+    },
+    "evaluation/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": true
+    },
+    "evaluation/evaluate_layout_suite.py": {
+      "sha256": "13b12c96884e1b798535a128c6c7f7861f5825a7d502ef73a62438015c2a7d89",
+      "text": true
+    },
+    "evaluation/evaluate_policy.py": {
+      "sha256": "994d0e3c9b03ef8d7c8b588110ca87f41507448d93c052b863dcbd5a4cbd6f22",
+      "text": true
+    },
+    "evaluation/evaluate_projection_pair.py": {
+      "sha256": "fecffc4586f37f528bf735f2e8681e037bcba300d5ab5c9eb8db25769b3b9802",
+      "text": true
+    },
+    "evaluation/inspect_pre_experiment_validation.py": {
+      "sha256": "e6539a380d3e9b566a96b525b746b687ac5de7e2bd3fb97094183e721582a5b2",
+      "text": true
+    },
+    "evaluation/layout_suite.py": {
+      "sha256": "3d7bc0864e6d433ac4b0f0a23569f138f066d745a94367e37cefd852f68120ee",
+      "text": true
+    },
+    "evaluation/layouts/core_navigation_layouts.json": {
+      "sha256": "b4dfaf5589a57510735d6ce3ffae60118852145194b250c756ed604ecf72c385",
+      "text": true
+    },
+    "evaluation/layouts/development_navigation_layouts.json": {
+      "sha256": "b9720827823d4ee3ab529220741909798a3aefa1601b2889c8f250a12949fb93",
+      "text": true
+    },
+    "evaluation/layouts/fixed_training_geometry.json": {
+      "sha256": "ce0f52bcdbe77259d5e0c5ad38ab42fc6010590e17faf2487efa692ac2e64f7e",
+      "text": true
+    },
+    "evaluation/trajectory_recording.py": {
+      "sha256": "3e9bec1818ea07c21d3981882af16f7d99b0a1b497a32560fcd14b9ae84ba60d",
+      "text": true
+    },
+    "evaluation/validate_evaluation_time_projection.py": {
+      "sha256": "b26953977349168fbab4f059b3f5492b6ebac824f5a56adc11593fed91df70c0",
+      "text": true
+    },
+    "evaluation/validate_pre_experiment_artifacts.py": {
+      "sha256": "283de85023affbde09ea0c209f787870722e0407a14bd0f7a3d23477cf7b4daf",
+      "text": true
+    },
+    "evaluation/validate_pre_experiment_codebase.py": {
+      "sha256": "f2dcea099cf723f88deeb376a537e591c341b19a8ee98d7b82370bdb3f42f189",
+      "text": true
+    },
+    "evaluation/verify_repository_release.py": {
+      "sha256": "4d61455d41ac40bfd22c2f738888bdfb8669d6a402cbeb2182c982ef44a3591d",
+      "text": true
+    },
+    "experiments/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": true
+    },
+    "experiments/benchmark_training_devices.py": {
+      "sha256": "f0a465fcc3a3791cfe4bac4e2b74e15a3ba6ac4765d7255077ce84b248434e2d",
+      "text": true
+    },
+    "experiments/calibrate_core_layouts.py": {
+      "sha256": "4cfe310c58d424ad8dc291a8c652ff050817b1f3160f07964c6fba6ca4ca0c37",
+      "text": true
+    },
+    "experiments/development_projection_analysis_protocol.json": {
+      "sha256": "204766e7f3798b540e94a3ddc8c3a66acb7c294f8284e8150e9745795ef9664f",
+      "text": true
+    },
+    "experiments/fixed_training_geometry_analysis_protocol.json": {
+      "sha256": "1730f793b7a8b7eaa985cfe2850578c62096610851eb492f926bee45f29184bc",
+      "text": true
+    },
+    "experiments/projection_analysis_protocol.json": {
+      "sha256": "8ba2cced1feb13207ca4f594ee4dfdf1930ae5da486e376d040c54491c586d28",
+      "text": true
+    },
+    "experiments/run_clean_ppo_baseline.py": {
+      "sha256": "e65f7affdedc0bf576542d8442bbbf5aaadf76df2abe5607aa17fe2741e6c44c",
+      "text": true
+    },
+    "experiments/train_ppo_variant.py": {
+      "sha256": "c5c7a498a508a8aa5ecd5a4565a8363cf81ff542a53eb85c84e567dd4c0f346e",
+      "text": true
+    },
+    "projection/__init__.py": {
+      "sha256": "b98e5436ebb7e4840155c47870a96057288672b1b47ccef4d2868ee1e2fe872a",
+      "text": true
+    },
+    "projection/cbf_qp_projection.py": {
+      "sha256": "82458e7b5a616464150ba106895243217556bff92dde0211afe8809b72cdfa79",
+      "text": true
+    },
+    "projection/cbf_qp_wrapper.py": {
+      "sha256": "5b85b0be5d580f1d420182440aa7a8cad82745587123eb584e041619eeeee085",
+      "text": true
+    },
+    "pytest.ini": {
+      "sha256": "93dac66233bc9d8aa6991af78d5c2051885dce0dc20a895a5597fc59a7b0ba80",
+      "text": true
+    },
+    "results/calibration/core_navigation_layouts_v1/README.md": {
+      "sha256": "48b566887ec4cba8d468860b81895752cbeab6fdb69887d91fe58724f49a3b3a",
+      "text": true
+    },
+    "results/calibration/core_navigation_layouts_v1/calibration_by_family.csv": {
+      "sha256": "af9ca518f36f900a0b8e9c821950e21fbbd00557a5a616cff786f76a410d9b74",
+      "text": true
+    },
+    "results/calibration/core_navigation_layouts_v1/calibration_layout_comparison.csv": {
+      "sha256": "19c1b3f3bb9dfdd5f5a8509b963a2565751a9ae79889490851470c7768fd9a02",
+      "text": true
+    },
+    "results/calibration/core_navigation_layouts_v1/calibration_representative_trajectories.pdf": {
+      "sha256": "e478e77e2cb046b2d44c68ac74bfed986356d58f29fcd9b7a6b871e5692b3785",
+      "text": false
+    },
+    "results/figures/.gitkeep": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_action_bound_clipping.pdf": {
+      "sha256": "e625b0e3fdcc490bcc9470cf2059b7f28ed3da9fec0d9a42913dd9bbc1e9ecc7",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_action_bound_clipping_norm.pdf": {
+      "sha256": "ce1b4d40303eaeb3692b3cdaff9a6ae8ebefc57b343cd7e9f6977811459f951e",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_collision_rate.pdf": {
+      "sha256": "a9487dd6924e627469210625446080bdb634fcee6b047b24d7958106a1768619",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_min_obstacle_clearance.pdf": {
+      "sha256": "0c6acfff9deee1d3a5c9de6100e86e1566bef83ae7f4ca0d46c93f28aff955ad",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_projection_correction.pdf": {
+      "sha256": "7a556aedbcbe1e44c2dd5a50bf7240f65d8cdb0157a4dfe3adce6e2114527334",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_projection_correction_max.pdf": {
+      "sha256": "eab1bf8d0d0d6c40be23d78bb83413ca6d5979c15c7349e7d8782cfdedd69f0f",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_projection_intervention.pdf": {
+      "sha256": "3b6c7c0054db4bbd422222ad24c98af7f32dd5fad0e2d8d29b31a996b38e2510",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_projection_slack.pdf": {
+      "sha256": "3be735e0cc03c9677c84da567d29df3c933e6947a2e4bfdc34b3fec681c81e7e",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_projection_slack_max.pdf": {
+      "sha256": "be2d1433bc065ec9708827f404fc059dd93f323bf401a605c6f8473c32065db7",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_return.pdf": {
+      "sha256": "969431f7a2124cd1ab35bb0cbce64c67229a75953e4bd2d2c0fafa874f74d648",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_success_rate.pdf": {
+      "sha256": "af992e6ee26f574920b9a86aca02b3085fde6ff9947602229fc58a16a57d1e8a",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/evaluation_timeout_rate.pdf": {
+      "sha256": "610e3405eef520df3d20328f28efef9b54cabf868078ae0c7234cb595f0cfe3a",
+      "text": false
+    },
+    "results/figures/core_layout_transfer/figure_build_audit.json": {
+      "sha256": "a937028c074c5a3ca01e9df854f6813129e97b6d3557540df59e52c11172b8dd",
+      "text": true
+    },
+    "results/figures/core_layout_transfer/representative_trajectories.pdf": {
+      "sha256": "4325e0a0a322653651527ca6d60e06a06a5a73000751bc55cee30fb22e8fd633",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_action_bound_clipping.pdf": {
+      "sha256": "e3f00c4d8677d467ab244f462738a5d769d0f60902e66d18556c8d74c86d41f5",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_action_bound_clipping_norm.pdf": {
+      "sha256": "f8089a32b273af5b0a0ff707ade7a986a6fa6f6e3240008b516e0e292a9ead6b",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_collision_rate.pdf": {
+      "sha256": "37a241a351d32fab35ec42db6762e8abc4663db3836bf8f64d3a17ccbc888597",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_min_obstacle_clearance.pdf": {
+      "sha256": "3015dce49d3495e0fd28ef2a81fdfcfc4939a9459095fb4bcbdb7aec5aed4c6f",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_projection_correction.pdf": {
+      "sha256": "91c87383233280c6ee57e9a6b0b1d5853f07f1d211cd68aa7b3fde3ff8541a34",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_projection_correction_max.pdf": {
+      "sha256": "7f5136d9a96bed28577e4ee4b8b62f7ec3c790ae58922f35b4dca6a4217a3018",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_projection_intervention.pdf": {
+      "sha256": "1d620e57d6e87012abd43b68d50c15d10c2e5db3039fdc1f6b35432e069348fc",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_projection_slack.pdf": {
+      "sha256": "137be5a769dcb2fb6cdcf936e0414584965541c968a6ffef75dae668b3a5599d",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_projection_slack_max.pdf": {
+      "sha256": "8eb64678e2edd95180afcefc8c5e43ebd60311521f15a9e573ec7645914117fe",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_return.pdf": {
+      "sha256": "0b5cfb3ac043705ff3518034f53a60feb10e4bf9d6665a3c9a94a2c6d53467d6",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_success_rate.pdf": {
+      "sha256": "27cf20ba13bda1f5d473aec795ac4a01abf1e9b9635390c204cec588165bd5d9",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/evaluation_timeout_rate.pdf": {
+      "sha256": "50a78201a10d3e894221e38ca2449882536c506a87f3ebb36532dce28b3494d3",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/figure_build_audit.json": {
+      "sha256": "e027812e92577aa8b682cb3895d447c8c48858e3b8ca3b9db4ee812480ca5cbd",
+      "text": true
+    },
+    "results/figures/fixed_training_geometry/representative_trajectories.pdf": {
+      "sha256": "3fbdb0969dbc7220a2d98dcce7d2af74909f474fbddff75d8ec3301727082919",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/training_action_bound_clipping.pdf": {
+      "sha256": "bd573ce09b1695149763a3cbece622c78a4e9900e6707b4047aa84e1679f3f87",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/training_cumulative_collisions.pdf": {
+      "sha256": "5428d882a1fbac7683d8a2015b0a7af1d3307d08639743d0a38b5b7f71baeff7",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/training_projection_correction.pdf": {
+      "sha256": "799dbd10c35b71b0cd4309aa88505d475d6b14660a40b55a1c5ac3a10c6eea01",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/training_projection_correction_max.pdf": {
+      "sha256": "cdd3f1924d027ee17241c93b1459ff984656507c19a8dbd00b62de02ddd03eec",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/training_projection_intervention.pdf": {
+      "sha256": "3941d5a63c7c6dedc14b7d6abafbc1a8cb1b8936cdb7aafda08bde1336dafec3",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/training_projection_slack.pdf": {
+      "sha256": "aa1f9531c2cf44941d149c2eb89a598e6e4ee0be2e787912f4fc4041579841bb",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/training_projection_slack_max.pdf": {
+      "sha256": "1e933c10ab8b5cd7c00d6d93c390a20ae79eb696661a895f6edb8ed622483833",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/training_return.pdf": {
+      "sha256": "9a9f52dcade611945e8efd8ad44dcf88d588a400bc0de9f8f6f3197b6ef91c30",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/training_rolling_collision_rate.pdf": {
+      "sha256": "97d48f50028154e4e9d2b36ad593824a21b2349c9c1a963846a9e18f457de450",
+      "text": false
+    },
+    "results/figures/fixed_training_geometry/training_rolling_success_rate.pdf": {
+      "sha256": "5176dfbc8e5a5c488372ae5099d0c80ea4ebe9886249e4c36b4fbeb6ca1090db",
+      "text": false
+    },
+    "results/interpretation/README.md": {
+      "sha256": "077a246ca5fb3ffb7460b5a4ba98c802a5282a1f3d3a3d76d46e985216d40bf5",
+      "text": true
+    },
+    "results/interpretation/core_layout_transfer_absolute.json": {
+      "sha256": "31d02817357a547bc5d3dbc2a0fbfdd13f668a0a2f68719c1af04891787f0692",
+      "text": true
+    },
+    "results/interpretation/core_layout_transfer_correspondences.json": {
+      "sha256": "12ac1b58b956f966408200a476f67fbd8b84fb73923de8ca956f69d300650d44",
+      "text": true
+    },
+    "results/interpretation/core_layout_transfer_inventory.json": {
+      "sha256": "9910d5455cc0cbde8bd91dbaf04a87b51d41d344da88ba128ed823c72ee0f066",
+      "text": true
+    },
+    "results/interpretation/core_layout_transfer_layouts.json": {
+      "sha256": "7bff4c253b6413c4053b2141f5a1c5f3f4f778eeeab6567aa6815a12627fad46",
+      "text": true
+    },
+    "results/interpretation/core_layout_transfer_paired.json": {
+      "sha256": "c45a9029e05aade7619ab7c91ff8cabda428a2cc0747da59e6fee459782bdbdd",
+      "text": true
+    },
+    "results/interpretation/core_layout_transfer_validation.json": {
+      "sha256": "693c4905a8a044b401c5f7bd1f56698ad13b84f1dbcd48be7739a55d46d008f3",
+      "text": true
+    },
+    "results/interpretation/fixed_training_geometry_absolute.json": {
+      "sha256": "09031da3ff240bf42d83f2db8b1a4e512990942a8aa130d43c2057fab31b0185",
+      "text": true
+    },
+    "results/interpretation/fixed_training_geometry_correspondences.json": {
+      "sha256": "d1ee91fe1658f7778d53c73189c7c0c5c24d2b6a4502bbec1df35054347ce414",
+      "text": true
+    },
+    "results/interpretation/fixed_training_geometry_inventory.json": {
+      "sha256": "848a12c21cdd7ed1ec6b58f24f2c73a33b4b834d53df8c8c84ab57399fd53a4b",
+      "text": true
+    },
+    "results/interpretation/fixed_training_geometry_paired.json": {
+      "sha256": "47f7e286603d26acdec27620088595013070869ed3d984e25c17d01c3a702dc8",
+      "text": true
+    },
+    "results/interpretation/fixed_training_geometry_validation.json": {
+      "sha256": "860dea29990089503c2d79d83bd612e6323f63cc746ac6c5dbfeb76acef639bf",
+      "text": true
+    },
+    "results/interpretation/reconstruction_commands.json": {
+      "sha256": "06d238fbecbb0bee5dd534c7e9bb038d3b6cde48b7c57fcb48d4868413aa6288",
+      "text": true
+    },
+    "results/tables/.gitkeep": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": false
+    },
+    "results/tables/core_layout_transfer/checkpoint_summary.csv": {
+      "sha256": "8f7697c658089fe80145c0c996450070980a8ce615e549a7f5266203aa8c49df",
+      "text": true
+    },
+    "results/tables/core_layout_transfer/evaluation_episode_results.csv": {
+      "sha256": "8091681f988009657e2951089fcc520e3960143f48ef8dbda5c2fcfce6e7f4ae",
+      "text": true
+    },
+    "results/tables/core_layout_transfer/method_summary.csv": {
+      "sha256": "bfa713faaf170c7585fac4bdcdb5ee592db68d15b3124800ee299f2a204733cd",
+      "text": true
+    },
+    "results/tables/core_layout_transfer/paired_projection_deltas.csv": {
+      "sha256": "75d4a7c778d9ff5412603d6e4a0b27872120d38e10c0f763b9126f3c06ab8848",
+      "text": true
+    },
+    "results/tables/core_layout_transfer/paired_projection_summary.csv": {
+      "sha256": "9408e896a270965b6e4dbf69df955786c4ae4421880413b47c6aa423bea89159",
+      "text": true
+    },
+    "results/tables/core_layout_transfer/representative_trajectory_selection.csv": {
+      "sha256": "761a91ac83505a03b3dfbf2f99f7672a4c4f8e0013147102b9fccdecb57d85b0",
+      "text": true
+    },
+    "results/tables/core_layout_transfer/result_build_audit.json": {
+      "sha256": "acb1fa12ff5d24491719def11f049f542828f05f85e3e259f6edbbb390c4d82d",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/checkpoint_summary.csv": {
+      "sha256": "f00c16e40f590fe00d8266d729b57260a11562d8b7384234145d66288ae4dd53",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/evaluation_episode_results.csv": {
+      "sha256": "4eafae0edfc0ff75e78a884cec2dbcd5cbec4408c772bb4c9f305d183645d750",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/method_summary.csv": {
+      "sha256": "d3ac057c51a6908bc6693d9710bb594611e6043fb0d4310fca2b7ba1c3902e62",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/paired_projection_deltas.csv": {
+      "sha256": "39f99acc31189315cfc66fb51526f56ac4dce00b765644eab3573614fe93e0e6",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/paired_projection_summary.csv": {
+      "sha256": "73e8edba2834ea7db7ef9e7f984d86e17779b01c81c725d25fa0ff4cd735ee51",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/representative_trajectory_selection.csv": {
+      "sha256": "53c64d862ae08bf391c919f24b196d4671f429b6ec4d2d5c20cdc2c0068e1446",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/result_build_audit.json": {
+      "sha256": "e0fa01617c4581ea172f18f8a08c4a1733acbbf8fee435e62e39b6e56ced14fc",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/training_curve_points.csv": {
+      "sha256": "c67f129df92ec1b17991d956ad9d6adc5a8bb2bce3753b989106a1e3b4ba7f83",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/training_episode_diagnostics.csv": {
+      "sha256": "4c3433be7b17e9640caadc932c1261e349f59d8a8594c23426f88671b123aa3d",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/training_rollout_diagnostics.csv": {
+      "sha256": "687ca3318e9aa3fdd7e4f6e891b1f07f6932998b091c0c745bb968530d55d2c0",
+      "text": true
+    },
+    "results/tables/fixed_training_geometry/training_scalar_events.csv": {
+      "sha256": "17cba92be1e501afb28ee838515569b7afcadd7d295dd0280a6f2d11fdedac1f",
+      "text": true
+    },
+    "scripts/benchmark_training_devices.bat": {
+      "sha256": "0a2390fc58898b1ca6eaf5e6638937997d7484599940c50ef4569622559ddda4",
+      "text": true
+    },
+    "scripts/calibrate_core_layouts.bat": {
+      "sha256": "6650d4e805797eea73f17862c33c46f4753e8f48f9c0f57d00a9210ef98db3c7",
+      "text": true
+    },
+    "scripts/evaluate_policy.bat": {
+      "sha256": "71ff422e5320d3aecbe9f94cbba30ba9686f16e16e3e23b425c622639b361aff",
+      "text": true
+    },
+    "scripts/evaluate_projection_pair.bat": {
+      "sha256": "0bf986a442a898521544da9fc69d83804281f4b0d8680c61a1f5c04888fb4c86",
+      "text": true
+    },
+    "scripts/inspect_pre_experiment_validation.bat": {
+      "sha256": "4447363cc6e6483c7a45e47d23a543c8918b374742f923ff7f5740b404e2e8c1",
+      "text": true
+    },
+    "scripts/plot_projection_results.bat": {
+      "sha256": "43cf9e464fce14a9087a65931716b47fd4980f0d0bc9bb3ef207b39bdb9ec3c0",
+      "text": true
+    },
+    "scripts/run_ppo_baseline_clean.bat": {
+      "sha256": "708be051688fc279ce279d4919273f9153a79f574023291e955a6367b224719f",
+      "text": true
+    },
+    "scripts/train_ppo_baseline.bat": {
+      "sha256": "28fcd8356167e7a8ddd9a6d2336fd646a7de3943eac21e687d4bc6f09b4d6310",
+      "text": true
+    },
+    "scripts/train_ppo_high_penalty.bat": {
+      "sha256": "d8f9de02c4e9b5a313b42a1ff3814f07b15eb19b5dfd75c271bbabe0d7bfef11",
+      "text": true
+    },
+    "scripts/train_ppo_projection.bat": {
+      "sha256": "436cda0b579668311624d9236845f0e24c9d49a2fd6db2639c35c148a601a8df",
+      "text": true
+    },
+    "scripts/validate_evaluation_time_projection.bat": {
+      "sha256": "e95d664d6d722a50f2f9679b71d7b4845ec166387f624d13aa5006f45dcae6f7",
+      "text": true
+    },
+    "scripts/validate_pre_experiment_codebase.bat": {
+      "sha256": "e993a63552036ca15bdc4a5be16628cf47cd331711a3d90888c5ba1c7143c315",
+      "text": true
+    },
+    "tests/test_action_bound_diagnostics.py": {
+      "sha256": "b61166284606ecd0758f8914b0eacac3c966736d8a8d3d8edcf4b1f5734db15b",
+      "text": true
+    },
+    "tests/test_cbf_qp_projection.py": {
+      "sha256": "52bc179f040a79d9fff1162d1d1522b17135ede85f7e4f73a85d4ce1bb0a6e00",
+      "text": true
+    },
+    "tests/test_cbf_qp_wrapper.py": {
+      "sha256": "0b2428d996794ec256c8ed9bfd5384f73dd823e5c6e31e1216c87efdd9c93318",
+      "text": true
+    },
+    "tests/test_constrained_navigation.py": {
+      "sha256": "a456a6d605a452becc786691e191487be4a0b12c5cab1975c1b2b7737a8c906f",
+      "text": true
+    },
+    "tests/test_evaluate_policy.py": {
+      "sha256": "07eba56761f2a58ee3575903753961e5b4ac363e8223562d4635b64c41b9b59a",
+      "text": true
+    },
+    "tests/test_evaluate_projection_pair.py": {
+      "sha256": "7ac27dbb67f0942ba881b02fd100802324bfc6ec8049c261b7881afa14ff214d",
+      "text": true
+    },
+    "tests/test_interpretation_analysis.py": {
+      "sha256": "8a0e2099e684e6e84b2d892300127ddd7f2e715416832291fb44264cfdc698c9",
+      "text": true
+    },
+    "tests/test_layout_atlas.py": {
+      "sha256": "e583fe0b759473cdbd379fd3db6e0f7bcb01440ccdde48e4ad7bc540107d1593",
+      "text": true
+    },
+    "tests/test_layout_suite.py": {
+      "sha256": "265570117662a96ba198ed52a4232366647be775ff0238346b7425d10a524ff7",
+      "text": true
+    },
+    "tests/test_ppo_rollout_semantics.py": {
+      "sha256": "95f5321618cfd50bedd47c0f7103524903ae9e67740bd9f52c8ce3c49a087afa",
+      "text": true
+    },
+    "tests/test_repository_release.py": {
+      "sha256": "45fdb7e22c4ac62dc2cb41e18bd12fa75e025b9674bd8c3f41b5d5490c073da2",
+      "text": true
+    },
+    "tests/test_result_aggregation.py": {
+      "sha256": "6454977b3299dc61c93631789333979afd3371b83291d0667fede64f3610d84b",
+      "text": true
+    },
+    "tests/test_script_orchestration.py": {
+      "sha256": "7f0c4e1b0354cc965223c82d2b9887089ebe8949a47a62c9631ddb3b425cc2f6",
+      "text": true
+    },
+    "tests/test_training_diagnostics.py": {
+      "sha256": "f83086bb1ac7e1e6acc05a737f02bd3350779f51f4cefe5abb8d06e8f4be6749",
+      "text": true
+    },
+    "verification/README.md": {
+      "sha256": "493656680493fd906978d456e6aacd4ba6705c0053d7c29671c400b84adbdd0d",
+      "text": true
+    },
+    "verification/audit_environment.json": {
+      "sha256": "68eebd21c9dba96c1cf9a1b44af9c482fd11dbae008bfab0b3e1f26538dae529",
+      "text": true
+    }
+  },
+  "input_archives": {
+    "rl-constrained-decision-making(20260907-183013).zip": "a43e3279eae66e174a10ed5dc263d092234362f71764d9442baf790f0afde619",
+    "Runtime_Attribution_in_PPO_with_Predictive_Action_Projection.zip": "fa8773c3c8420f2027c286a92928f22114839d97b85f8ff0d8c34a1e5837fa24"
+  },
+  "externally_compiled_manuals": [
+    "docs/design/predictive_action_projection_implementation_design.pdf",
+    "docs/guides/Orientation_Guide_to_Predictive_Action_Projection_with_PPO.pdf",
+    "docs/guides/Predictive_Action_Projection_Software_Companion.pdf"
+  ],
+  "excluded_trees": [
+    "docs/source",
+    "analysis/publication",
+    "results/publication_assets"
+  ],
+  "local_archive_files": {
+    "runs/ConstrainedNavigation-v0__ppo_baseline_51200_seed1__1__1786675596/events.out.tfevents.1786675596.Sal-Legion.59880.0": {
+      "sha256": "8282ddd43dbaa2c7f78bc387987fda1accd51b501aa8bdafa77c486fb1c0dc62",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_baseline_51200_seed2__2__1786765127/events.out.tfevents.1786765127.Sal-Legion.67536.0": {
+      "sha256": "96e49b5d50c822511692a5f102a2b826b1733163c7c086bd2054fda018829144",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_baseline_51200_seed3__3__1786766518/events.out.tfevents.1786766518.Sal-Legion.70228.0": {
+      "sha256": "ffc273c39b5f2a60d716e064a291ed6d98ce3c86844fde34228917f7734422cd",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_baseline_51200_seed4__4__1786827666/events.out.tfevents.1786827666.Sal-Legion.42192.0": {
+      "sha256": "bb81ba5d9c5e065b0e71fda7d57195ec0fea35ceb9ec29938464cb3563cd1a64",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_baseline_51200_seed5__5__1786828518/events.out.tfevents.1786828518.Sal-Legion.25872.0": {
+      "sha256": "c0300a088d5fd1d2fc561ec66657d98d48035d576a79202f187c5486f3d04743",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_high_penalty_51200_seed1__1__1786675688/events.out.tfevents.1786675688.Sal-Legion.54332.0": {
+      "sha256": "99b41983437ea30613d2cfe70bc2544599a70ccb2eea90c606ae3ca15d419910",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_high_penalty_51200_seed2__2__1786765159/events.out.tfevents.1786765159.Sal-Legion.12772.0": {
+      "sha256": "1076675aab67f816d8e1de91459549c771619dcec9f7e4a1655937a8d8ec5e32",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_high_penalty_51200_seed3__3__1786766558/events.out.tfevents.1786766558.Sal-Legion.51444.0": {
+      "sha256": "652b2755d576237ccd3fdfb9948203a5a8ec729a5bacb490a071c490ab346753",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_high_penalty_51200_seed4__4__1786827702/events.out.tfevents.1786827702.Sal-Legion.30880.0": {
+      "sha256": "09a17aa2eeb261e936ad211f7c5e4cc1fd77580eed0c2cc5105826fdd4a893ef",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_high_penalty_51200_seed5__5__1786828536/events.out.tfevents.1786828536.Sal-Legion.34296.0": {
+      "sha256": "717fe7e47c77b72115cdcb904cc697ce6b6599ee2c193af6d671669d09f6cfa4",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_train_projection_51200_seed1__1__1786675727/events.out.tfevents.1786675727.Sal-Legion.3452.0": {
+      "sha256": "90f437411de2aa3656b3e38a909838b74025c6df13de5cdb56857a83082e38a7",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_train_projection_51200_seed2__2__1786765181/events.out.tfevents.1786765181.Sal-Legion.33712.0": {
+      "sha256": "c745b8b4e95646325933e351422f983a6f436c4eeddd8ce5064d708831bda4dc",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_train_projection_51200_seed3__3__1786766584/events.out.tfevents.1786766584.Sal-Legion.43476.0": {
+      "sha256": "40110d60e9ed506b14eadcb8dc2c7f7ec3d643c9174fc33d1e76411644076f51",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_train_projection_51200_seed4__4__1786827722/events.out.tfevents.1786827722.Sal-Legion.47248.0": {
+      "sha256": "cb15446cd0415ef90c3d719cab7aa86c1ead7b9dc22def521def0e5de4d92b9e",
+      "text": false
+    },
+    "runs/ConstrainedNavigation-v0__ppo_train_projection_51200_seed5__5__1786828554/events.out.tfevents.1786828554.Sal-Legion.48412.0": {
+      "sha256": "4b9412e226ae67b535ce9a553ef83da183753784216639d064a647be14d71c3b",
+      "text": false
+    },
+    "runs/calibration/core_navigation_layouts_v1/baseline_projection_disabled.csv": {
+      "sha256": "50ab1944b80f48109a9d8f1a18c8dc7e5af842542a2894c5815805a7f8bc906d",
+      "text": true
+    },
+    "runs/calibration/core_navigation_layouts_v1/baseline_projection_disabled_trajectories.npz": {
+      "sha256": "6a6c5e6156717ddd4bb813d5b7bf118cf29607fcdd28660dcbd67642e73ed1aa",
+      "text": false
+    },
+    "runs/calibration/core_navigation_layouts_v1/baseline_projection_enabled.csv": {
+      "sha256": "8c119258be7f0518fcf7a370ed23a204cc8c985c75610e544be48ada360bd30d",
+      "text": true
+    },
+    "runs/calibration/core_navigation_layouts_v1/baseline_projection_enabled_trajectories.npz": {
+      "sha256": "979708b08119d4d69605d38063b6ebde24f674eb9fdb3f571951e17e1e1d108c",
+      "text": false
+    },
+    "runs/calibration/core_navigation_layouts_v1/calibration_audit.json": {
+      "sha256": "501b981f1c7c841782cbc6ad4537ceb3ffc2d4e49f0d0b41d774c0923bd77262",
+      "text": true
+    },
+    "runs/calibration/core_navigation_layouts_v1/calibration_by_family.csv": {
+      "sha256": "af9ca518f36f900a0b8e9c821950e21fbbd00557a5a616cff786f76a410d9b74",
+      "text": true
+    },
+    "runs/calibration/core_navigation_layouts_v1/calibration_layout_comparison.csv": {
+      "sha256": "19c1b3f3bb9dfdd5f5a8509b963a2565751a9ae79889490851470c7768fd9a02",
+      "text": true
+    },
+    "runs/calibration/core_navigation_layouts_v1/calibration_summary.md": {
+      "sha256": "4d3c0e9a862af0a80bd5ccfa9871d6bacad4c0afd6d3595756b056b63f2bb166",
+      "text": true
+    },
+    "runs/calibration/core_navigation_layouts_v1/calibration_summary.txt": {
+      "sha256": "3c5d4e88ad1ab49e4530030410a430287fb8584d7dba8d33e4d269677f2eccc2",
+      "text": true
+    },
+    "runs/checkpoints/final/ppo_baseline_51200_seed1.pt": {
+      "sha256": "ac9747daee76239c878cc1339dfbe72a8ed020eaae9d3f5013a7ce78b8a07836",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_baseline_51200_seed2.pt": {
+      "sha256": "b739ee92df7f8c5ecbcf3078764cb694532485a0a8395cabcc5b5e283ae77f58",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_baseline_51200_seed3.pt": {
+      "sha256": "8a5e7c0edb9e277062afa2433ca3ef1568bb909b75bf3bdb82e42469e8e81171",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_baseline_51200_seed4.pt": {
+      "sha256": "d0cdbe0eae3327affadf64e343d3519ee3e91fd82a805e833c9068c467b1af7c",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_baseline_51200_seed5.pt": {
+      "sha256": "c7238f982b6e88a89665a3aced8c737fb05966ff76f926fe7592d6e0924664e1",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_high_penalty_51200_seed1.pt": {
+      "sha256": "f946099fe7e2006e7a6b1a59938504d3e9d7e397fcb8eed0c86e6acc71637c88",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_high_penalty_51200_seed2.pt": {
+      "sha256": "a3f683d8d1172d90a5f45a00f31759384b305350c48b5c24f09595e607c90545",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_high_penalty_51200_seed3.pt": {
+      "sha256": "48e6b29f11086f82bb7f139dd80c052e298b8823ceb40af4967097c4f8743b97",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_high_penalty_51200_seed4.pt": {
+      "sha256": "c57feec3843b8e3e585dc713ff618665322279b1975ee8277d305a134b7bbb80",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_high_penalty_51200_seed5.pt": {
+      "sha256": "45d8ccefb072cbd8badc1551770d69a5c5a31c61b936add71224ea5172ff83d4",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_train_projection_51200_seed1.pt": {
+      "sha256": "3c5949efe582518ed18dd33bd0066b919e2240bf8d1a1675995de14bf291227d",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_train_projection_51200_seed2.pt": {
+      "sha256": "94a7e01271b6c4fdc2c40ab4df16731f351c85303fbfdd4a66df84cf7df61528",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_train_projection_51200_seed3.pt": {
+      "sha256": "8dd06c30b16fafd91d3e679f5262588e83f69345442e3f605e40213d266208ef",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_train_projection_51200_seed4.pt": {
+      "sha256": "fe5cf72639d7b42227099dba859c4bc05d33760b1ab46464c8237636967b6f16",
+      "text": false
+    },
+    "runs/checkpoints/final/ppo_train_projection_51200_seed5.pt": {
+      "sha256": "152c446a47682b6accaa1d5d54a6c547bcf0772aac856079d10c709b5dea791d",
+      "text": false
+    },
+    "runs/checkpoints/ppo_baseline_51200_seed1.pt": {
+      "sha256": "3c06bd19ee42914aef49f049de88c165190f745ca1c4cdbb3ac23bb7497da1c3",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed1/projection_disabled.csv": {
+      "sha256": "e9fe1fa665e5e7520bf57ea4cbe76b6d3f3c041b124986eba35eb0e0a75e985a",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "06ebdd75d3a785d4a9b2f273a23e624ec57945fd50ed76445824b012d0a62c9b",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed1/projection_enabled.csv": {
+      "sha256": "5627a7abdc8dbfc1285e1919cb3ce161eb0ed0a2f02144636100a8de4512821b",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "6af8e513977840fc9ca53a81142bb45416fe4bfcafdcb55e45a19bd78b253917",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed2/projection_disabled.csv": {
+      "sha256": "a2185b999682627741656d889781a55802d970ee11728e66b3c3764162425a4c",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "eb346df0bb972bb178065f1c7d459a2779fbddfe5a951a7425afd488f5beb5a2",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed2/projection_enabled.csv": {
+      "sha256": "406b69a674780ede07f8775b5091ede64d7c497712facb97ff05ff608c08c0f5",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "bbb9b3c45c6c6497240a0657e8420d47b082d379a42410db0744656cc9c85a77",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed3/projection_disabled.csv": {
+      "sha256": "0256db98c9e4632503ac0fe29a2e14c69677e4f185b99668e820f4ae1fc8909e",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "1f6a642ac78079b6deab3737ac0edb40e33376914ff4ab93f267d610adde96d3",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed3/projection_enabled.csv": {
+      "sha256": "55deb6142e0c80b6e1dee5f6953eaf42553323c09ff5317bc337430a436c1cc1",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "5c840402ab90521e68c203de8ab8814e3d84939de88c7dd7dc21b3018a4fe8d5",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed4/projection_disabled.csv": {
+      "sha256": "df78784860c498bfdb32f1b755b171540cb30b1879d353b7470792d9d307774c",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "a5e71f029bd4e34f59add16031791f5ff3d56bfd53b9684f61a30754eef9b3eb",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed4/projection_enabled.csv": {
+      "sha256": "832ff3e717a2ac3fdf12a7ee7d2f7c9a4af215cc3cc35c5df099833e70ba7162",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "f62d7ea8f3b282ddb2a5f9aa2bfb647f31b6f350b1c3c7069694f376f1b26f4f",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed5/projection_disabled.csv": {
+      "sha256": "e5a5003e92e98d774590ec42d1d3080249dddbff391b2ef80bd13ca0ed94c2a8",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "e68b60c17b0b5e280520b1346b5eb8eb5694e6f8c4271c8bf6ed60bf95b5d0ef",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed5/projection_enabled.csv": {
+      "sha256": "6cec3cf5151d86ac0018fe00e90d5145c5c1746938a2b3d5347d4a0b07ef89e8",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "1298bdd4782fd5e25d23f176c3ee0b3fc583aaa5d6b7806de385039f897cedaa",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed1/projection_disabled.csv": {
+      "sha256": "be00f9ab16a0b666d0afcf47f2c4d65d123f95e64a49e722069ca9014820391a",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "59f6a6a4b24532750fe4d4e42319779533220e811d8449db54830234fe16a713",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed1/projection_enabled.csv": {
+      "sha256": "116e69ea96e320b878e2da040844ee47a1ce1aa13348daca374bbb54abba49dc",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "bbe9bbe2fbf97ea1f1f64ee53636d2861ee62c5b8c08e4671f3305d622273dd4",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed2/projection_disabled.csv": {
+      "sha256": "c7c5bb6d67612ba1300d1b544001fecf7e61bc611aa49ae48201d1091379466a",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "6041966413e75397f1008554beac353ba5207d993e5f041d0bb4c8eb830184f2",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed2/projection_enabled.csv": {
+      "sha256": "93fd67c5e0a9ff7807fccbb018f68c0e14c84778c8648224ffd8a7f3fb73ae7d",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "04f82b39737cb7c18e7c8fb31cb36744d910ff9dc0a909fa3b39335e9ae30013",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed3/projection_disabled.csv": {
+      "sha256": "84399864c51cdcda043b847e1404a4b7b6e246852312686924c8b1563b8a0252",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "350a30755f79e80e9a9404b37e44f46c3937977cb37134c5f17a1fea91718b99",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed3/projection_enabled.csv": {
+      "sha256": "96122c3b19f513c5e9c09e7f8e7b1220dede8ee66b1ebe06686e705523a5f1e6",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "f369c1ed5193a9d669beeb37bda849cea7e57ac2089a21bfc1be1a1fb0fe2904",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed4/projection_disabled.csv": {
+      "sha256": "9baec5ecf67fc954c333cfd7b21c2104a36f07fc80c325eff58e0826a4367c3f",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "08770fc56964c3ac5e93e30b2ef8802a96a31cb692d3e6424f27617eaef339a7",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed4/projection_enabled.csv": {
+      "sha256": "f7eb0c2afbd2c716ec37f236cb27b1059867527c21d58e4cd51be07575501792",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "b78c119787d8017d40676443b7e7ea77b48b6365eb37847c2ae7b74aa0c5ed76",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed5/projection_disabled.csv": {
+      "sha256": "8c1924d7ca4c1ed87d8ba34da6132e67d43dd608b5c8a3ed04c6c77e075ad392",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "ce2bbae821a17c56820e7a683f57082428013fe8a0e875c3528d2d2459158d95",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed5/projection_enabled.csv": {
+      "sha256": "fa04a05d45f6cebafe1055ca47bfb02ca0d6ecebd81c5e36bdba534da775af72",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "c82a7d3562220f91ebd43938872dd9221c2243beae5f0edb68ee79fa6391391f",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed1/projection_disabled.csv": {
+      "sha256": "a9652c692ee23819f139a7830c7e4d20483519d0d347a8a85772e9339d3ddbe2",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "5ca745e900636550087d648cc65a25bf28570e43ff6440e1d881275c91d4985c",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed1/projection_enabled.csv": {
+      "sha256": "cf42106a84e9112fb231c7ff92d0f3a775f3b06e8ab5801cd627a1d5b6d77baa",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "e21adcf80e2670ec15a1db5ae8b6bab63a3d458754e612abdefff726f50cf44e",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed2/projection_disabled.csv": {
+      "sha256": "1a20e6a0ffc33094d77a00cec6fc8ec36e0b5034f126d0b092a6436f42862013",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "b594c06b11cc0f43cf8d8b88c0737b16f3aa5bd06201a51eaabe36b4351c6a3c",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed2/projection_enabled.csv": {
+      "sha256": "b23e735fe59b1c796ce2dff54d79b7b0cfbdb1150ace239ff42a24d9be4b884f",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "251488bcbbdb3cc6394792ff2fb3ae4ee355aa4efee97a8d7e77e76bf8125116",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed3/projection_disabled.csv": {
+      "sha256": "ad6afd1f36a5d02f692ff7bb123a6943fe426d97b0f5bfaf6c8d765e5bd11cc9",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "3bce93167f807f9d6d05e4f59aaa51e45698a87168243d58ea2abfc0bd657fbd",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed3/projection_enabled.csv": {
+      "sha256": "a5ff4b578ca77497ccde81e04d20c681064abbc9adac52d1db5ac04a7598c9d5",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "8bf48749242270c7bc636e4bdc579a0c24139ee77eb5823d10b1635460ea26e7",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed4/projection_disabled.csv": {
+      "sha256": "5524a6d840f2dc79777324b38734f5a8718c5d052e6ffc63b1d86b384af01fde",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "87d06f2b07fe6f73bc0d6006e603257a4d83254d34d14f399d53bedf561fdf71",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed4/projection_enabled.csv": {
+      "sha256": "d324a61ff60c6028ebfb265d2e4cb8d50e6070d8725548d09cf22bdf0f16e96d",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "ae1c85f3345c9b95493e70bbaedb979ad5e5dcdb0b3d0ae8380b6a15082d6b0d",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed5/projection_disabled.csv": {
+      "sha256": "cd2572855b6eef77ad8a2895729253407a84b31cf890887dc9891adae5e67283",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "088bffd0448333c70c2295f3714bf8c06723ad24927623741a3f1fda9fa88b6c",
+      "text": false
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed5/projection_enabled.csv": {
+      "sha256": "b80f13be8060a4f1f2d3f8c9d8a30238dab9071d666b6200ebbce426822e7892",
+      "text": true
+    },
+    "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "e84bd76602eeddd4c77296401f6a1bcd4a2c22644b84ca2c4d44bea27bcc0e0b",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed1/projection_disabled.csv": {
+      "sha256": "4f116be41d4c0bf1f0fda4206d394001561afe257b8ab4405c4ae1e80c97175b",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "8d2a1a3144cbf98e6a7db193710c714545f1c13fc79ff98cd196fdfc84b77566",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed1/projection_enabled.csv": {
+      "sha256": "af58d5301a85fcbee4ff40e53a6c43c974a874bc7121f8dbd466d331161bfeb5",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "3f618c87b5cfea8536d9741f1597e30091bbf27edc7c5fa0c703fa73f9e987b6",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed2/projection_disabled.csv": {
+      "sha256": "83d89f2fa3f26aca7542dc7711193f20d1b5c95c5765c12caaab060782a936d4",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "48f60ed04e9a837b4729cb78f437d28f0488c5106676caf1aa6bc0a14fefd558",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed2/projection_enabled.csv": {
+      "sha256": "51f887ad65377c4b1e32b5b2642584b75b4bc56ea2637707e94ebb0e1e1bca4d",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "9ea517ba5ddaded12dfb97acff383a73df31cfa46bdb704cc9c2e11abcc62b65",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed3/projection_disabled.csv": {
+      "sha256": "c43f1575fee0b90440e7becb84cb1e306b61f80ca95c1ed954f7ec38aef2bae1",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "f0f3dfcbdf214b8076fca2edfc3ce560d5b701387e5ac353bef740e0062af908",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed3/projection_enabled.csv": {
+      "sha256": "ab01323b808d03bdcd61a21dda6c77e325f74f954013febd589449284e6b1e64",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "d8d267680b21af3ea03fd37edad1313d87c8b27d5e607a8bc2b227f56fd674f2",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed4/projection_disabled.csv": {
+      "sha256": "cfe61c889110e8974d6d342106b971f73c03b39d61ce214ed77a4834bab5540e",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "871dd52345f769682b7934e2bffc748ce9d9624d2cb1d37aa20d7940133a4acf",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed4/projection_enabled.csv": {
+      "sha256": "d4d8c27b2fffb2b37249b3fa9d296860fbdeee1f04432f9eda319ae36cf139bf",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "666b2c4028c6619a97505670c69581591c4396b0af3a92af441e6cfa10970edf",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed5/projection_disabled.csv": {
+      "sha256": "e85ba0cb49d7239358f9727fc00bddcf1c1d5af6f4ce82f29c5887e6c41318b7",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "02e29ebaf82d7bf62c0d51db9a2393960b35053160e07c5af8f3319eb867d7f0",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed5/projection_enabled.csv": {
+      "sha256": "e64e84a9ee43268516d0f62327c8c7782affb5eb59c8a2ad22b1fdad5e9afc3f",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "e7a4ea12eaa76952446d71d55021247cd3bcf4aa015637f8dd5c5eb3bbdc3e4c",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed1/projection_disabled.csv": {
+      "sha256": "e6ed8c157bc075e26f5ff89a6bae852948c272dae0638d591da97fee6daafb9b",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "37dc62e2bc68bc4472d19100c88d0e7ce05897e98f680c2cd6731a30c590430b",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed1/projection_enabled.csv": {
+      "sha256": "0e842cf20af7bc01f5be6e7772814ca7cecfcfc7f338fe0c39a69d7e4bb17bc5",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "47e53932277dc856b31e3ca31ea0498fe678ed5af68dcbf3c1444997fe8cf7b5",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed2/projection_disabled.csv": {
+      "sha256": "62148a2217d5cfe08de9837592bee1d27c05c22c13d37134ede5a2be3e47ba78",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "5a15a4865b649bcdfe0c2e76fcdd7fb1e21fbd832d02fa69ef6deaa5b5c04eb9",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed2/projection_enabled.csv": {
+      "sha256": "5336ac7a7eb18ef378a43d9e0b3da8214addc5f58ab83eec05883db17fb52802",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "4f9ecf279755edf1b0b479e1e9f6fcc7cafe597324eb442d839b1418a2ef0838",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed3/projection_disabled.csv": {
+      "sha256": "9c298b9aac1918b88768f20dd0e4bfdbae59b9e2d8e528f50ffe6bd6a36255c9",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "652ff2f6c3747f0c380461ef8321384caebd7492c72f6b13c8418bebe066bbd1",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed3/projection_enabled.csv": {
+      "sha256": "49a966ccf542976a4d90a16c0b4a06a23a4c6f6a2819c05bf1aade31faa9671e",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "b715ecc237fa8b9b4d6b84929cc659a412777d0180145d79da26e7d19929552a",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed4/projection_disabled.csv": {
+      "sha256": "2d4315d83ee19bdcd0e0c074ad615ca1adefb2bba21dec45f150e1a743b8f098",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "c0765cfc31da416cd77e7b3b2881fd56910ba35eb96fcce74ae25f646240c8c0",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed4/projection_enabled.csv": {
+      "sha256": "67a5e33c3980195a6741f52ab774533e3629fa2c7b28fa92e5e1e698fe62dbba",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "205b9ba00dc57ca44dd2cbfb9427072600fca9904164c80516758be8681b76b4",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed5/projection_disabled.csv": {
+      "sha256": "65362c53a636ed7036954026059fc2429666f0596643cda2e9da8afc5074aa3d",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "3ac4c0e8f127b77fc480c9fccd1b9995c63eacff424299332bc1e9dee20db70a",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed5/projection_enabled.csv": {
+      "sha256": "b99490b1fbf36d58eb7d85d083ee0d7fdb1e4b9c6014e64ae3713953d79a98e5",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "a1d727ee518e55e2852caadd991d9f158ac0fb469b1cd11cb68dc7f2b53ffc55",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed1/projection_disabled.csv": {
+      "sha256": "c77ecbc9b2eacf9b4993f1a7b3f1944a74c61e7c1649027eec8d2c3adf65f0cd",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "94eb03b7c3e7363c0c8bcd6e6e97bcf3742f67047184542e95eb5009f0ec6ff7",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed1/projection_enabled.csv": {
+      "sha256": "e0e16aba1a38fefb347d510f01f881248c5c0dffd472462e3dcdf1dfa0f4ae45",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "e7a0591fd1978ee91be4bfe36f98c350e16a82e1978b80cbe6728eff2630d9a4",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed2/projection_disabled.csv": {
+      "sha256": "0b02057dab8a515395d611044914878c220d069cff489c5f4773a49cffb7c46c",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "3293fa2f0bae8c0bb7749598c64a2a65758058dd48ac2b5eb79db319d98c460f",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed2/projection_enabled.csv": {
+      "sha256": "6e48d1fb767d7d057b46d400ba699e58c717345b3f8e5b05c1b6b233f063b522",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "da159d061ec1c6d6cfceda70a19d17872bfaafa3010a8690e501d2eae7c46888",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed3/projection_disabled.csv": {
+      "sha256": "c1821a35bfe27ec30c924a94bf335b7d02c63868549b84d7f9fda0babb5f149b",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "f01563ce862809c065d6e9cd39093378bf160e220d4b87ff9e2fd8385adfddd3",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed3/projection_enabled.csv": {
+      "sha256": "c85f2c388cca0888cb1ab004687cbcbe80bf983a8ee1b98c4d321b49e8ccd329",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "4788979b6615df129b60e9544b0ca680e3c5c65b854aa10cee26f7b93eeb7009",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed4/projection_disabled.csv": {
+      "sha256": "f3be64d7971db3e695282b6dc6e5c85fd9c8c9f7842e807fbfe58ed977ef6bb7",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "7506b70ddaed5e4dfd6904799e586d1d77fab1df4728fe6473665c208d006189",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed4/projection_enabled.csv": {
+      "sha256": "2bce31422660d76bfbe0eb9629c6b801eda426f2174997c6620d2333b3e77da1",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "b03e9ea66d3797890f4e8430c01540aed3f2bcf678ebd91fc46dff572b2c3f3e",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed5/projection_disabled.csv": {
+      "sha256": "50e6f56ef86cb41ca64985a3bef5e5c6043ca803eac7e8bd70c93dcc32ca2078",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "5d528978ae161d23bfc143a34f25afcae426297ce6d266796490f8c5056779e2",
+      "text": false
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed5/projection_enabled.csv": {
+      "sha256": "ca2ee8e05db96a9fdce45c149bdd61a2ba4d5059e17d79e650fd3dabd1d90474",
+      "text": true
+    },
+    "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "38bcf0231e45e808329bfacc0f8edcce417e6498786f3c34e7dd9791428b625a",
+      "text": false
+    },
+    "runs/evaluation/final/logs/seed1_ppo_baseline_evaluation.txt": {
+      "sha256": "4d369d1b25207a107920d7941b49365e5db25193514d49c22dfb69934d9c7481",
+      "text": true
+    },
+    "runs/evaluation/final/logs/seed1_ppo_high_penalty_evaluation.txt": {
+      "sha256": "3b3b77c0c1af8d8ce3c3ec18284a2f29a2ffd88ce607e6954b481946150ea1e5",
+      "text": true
+    },
+    "runs/evaluation/final/logs/seed1_ppo_train_projection_evaluation.txt": {
+      "sha256": "1ead1af3c1c2beb7f3927b91e41d39a1221ce323c0f205f6dbeb084a32aabfe1",
+      "text": true
+    },
+    "runs/evaluation/final/logs/seed2_evaluation.txt": {
+      "sha256": "4690e5a511df590051f000cd8e06373658dda70c5a28a1cde9b219380f365aad",
+      "text": true
+    },
+    "runs/evaluation/final/logs/seed3_evaluation.txt": {
+      "sha256": "61546f3043243ecbd504e7e1cbd56b3299387e9157c4169ebcdc0ecb9820b70f",
+      "text": true
+    },
+    "runs/evaluation/final/logs/seed4_evaluation.txt": {
+      "sha256": "7de2a18e3869a239786a7617a96624d14ebf21428d5a1883f051c6ed5014b7e5",
+      "text": true
+    },
+    "runs/evaluation/final/logs/seed5_evaluation.txt": {
+      "sha256": "c965305b34affca41f386e30153288fa6d4fd04c8ebb51e7e789bdfb8469dbcf",
+      "text": true
+    },
+    "runs/validation/evaluation_time_projection_validation_summary.txt": {
+      "sha256": "53a1fdb9b3d4014b0518bf0a29c399702a4aa41b77a51c528878e575b7551d4d",
+      "text": true
+    },
+    "runs/validation/pre_experiment_codebase/layout_evaluation_audit.json": {
+      "sha256": "77647bfd779cd603c5ad8945098ca214f177ed69ce8dfc95af5660d37817eff4",
+      "text": true
+    },
+    "runs/validation/pre_experiment_codebase/manual_review.txt": {
+      "sha256": "37d4caf64fcf1b92864b6dd94e29570b65a96f7422ea76be942344ca9589d101",
+      "text": true
+    },
+    "runs/validation/pre_experiment_codebase/pre_experiment_validation_summary.txt": {
+      "sha256": "24faf0f2fa3c14bf9590600bce5c6198990dd933098dcf4b16c71f7cc1df7e93",
+      "text": true
+    },
+    "runs/validation/pre_experiment_codebase/result_build_audit.json": {
+      "sha256": "a1516f9b9eb525263a8f6aef82e37fb513589bd4f10504737b2448b78b1057a6",
+      "text": true
+    },
+    "runs/validation/pre_experiment_codebase/training_smoke_audit.json": {
+      "sha256": "303384445079187721dd6dd6bd05b4df7db9a916f6a044aa6eb3da83ffc6597f",
+      "text": true
+    },
+    "runs/validation/projection_conda_list.txt": {
+      "sha256": "2f5e7737c19943439fa28188103720556420c9f66320baab2c58dd77c6fd5647",
+      "text": true
+    },
+    "runs/validation/projection_environment.txt": {
+      "sha256": "70d075b66d59b523baf90110b3dd8fc7a3f9ad9f53b953767db22457745de775",
+      "text": true
+    },
+    "runs/validation/projection_pytest.txt": {
+      "sha256": "26a1367e878a7f009dcf33f672788f6cb13d7d67dea93aa0c89f69a2af41d7a2",
+      "text": true
+    },
+    "runs/validation/projection_runtime.txt": {
+      "sha256": "3e3b68f3dbf3f052adaf4d27c24e27eabf29476f4b2ae4989bd3628bd7714df3",
+      "text": true
+    },
+    "runs/validation/training_device_benchmark/benchmark_decision.json": {
+      "sha256": "d1657ab7cb11950956d521bc39ab6d90b410166281b79667dd5473fbaadd2b33",
+      "text": true
+    },
+    "runs/validation/training_device_benchmark/benchmark_environment.json": {
+      "sha256": "451d6d14af08986d7c71900acb0a674e4d6e635172d2517dd7f5fe2332eda0c4",
+      "text": true
+    },
+    "runs/validation/training_device_benchmark/benchmark_runs.csv": {
+      "sha256": "977e9576ce79c4e32d33e409bfff88f6078b489317c98fa7513386cff1660773",
+      "text": true
+    },
+    "runs/validation/training_device_benchmark/benchmark_summary.txt": {
+      "sha256": "c6f2d3086498152e9441873f1eed746d7fb3ad0244db7db878b7e52994350a67",
+      "text": true
+    }
+  }
+}

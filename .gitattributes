@@ -1,0 +1,17 @@
+# Canonical text avoids platform-only diffs. Evidence verification normalizes
+# CRLF to LF and otherwise compares every byte; binary artifacts remain exact.
+* text=auto
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.csv text eol=lf
+*.tex text eol=lf
+*.bib text eol=lf
+*.yml text eol=lf
+*.ini text eol=lf
+*.bat text eol=crlf
+*.pt -text
+*.npz -text
+*.pdf -text
+*.png -text
+events.out.tfevents.* -text

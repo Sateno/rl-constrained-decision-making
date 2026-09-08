@@ -1,5 +1,12 @@
 # Predictive Action Projection with PPO: Analysis Record
 
+> **Completed-study context, 7 September 2026:** This is a chronological record.
+> Statements about pending analysis, historical commands, temporary outputs, or
+> retired paper assets describe the stage at which they were written. Current
+> findings are in the [final study record](final_study_record.md), and the merge
+> checks are in the [release verification guide](../validation/release_verification.md).
+
+
 **Author:** Salvador Tenorio\
 **Status:** Living analysis record\
 **Study protocol:** Frozen protocol v1\
@@ -503,13 +510,13 @@ Verified implications:
 
 2. **The method-average baseline improvement is driven principally by seed 3.** Its 56.8% success in the final training decile is coherent with its exceptional 51% unprotected primary-evaluation success. This strengthens the interpretation that seed 3 learned genuinely useful behavior rather than benefiting from an evaluation anomaly.
 
-3. **A larger budget may help some baseline runs, but budget alone is not established as the remedy for failed seeds.** Seed 3 was still improving at the cutoff, yet seeds 1, 2, and 5 show no positive late success trend. The evidence supports a controlled budget-only follow-up, not a claim that longer training will remove seed variability.
+3. **A larger budget may help some baseline runs, but budget alone is not established as the remedy for failed seeds.** Seed 3 was still improving at the cutoff, yet seeds 1, 2, and 5 show no positive late success trend. A controlled budget study could test the idea, but this remains a private post-study note excluded from the report.
 
 4. **High-penalty PPO exhibits no late goal learning in any checkpoint.** Success is exactly zero in both late windows for all five seeds. Return changes are heterogeneous, including a large seed-4 decline, and cannot be interpreted as navigation progress. Together with the aggregate collision-to-timeout shift, this is more consistent with conservative reward optimization than with demonstrated budget insufficiency.
 
 5. **Projection-trained PPO is consistently competent and still improving in four checkpoints.** Seeds 1, 2, 3, and 5 gain both return and success; seed 4 is effectively at a ceiling near 97% success. The method is not universally plateaued, but the frozen budget was already sufficient for a strong composite controller.
 
-6. **Additional training targets differ by method.** For projection-trained PPO, more transitions may improve already-strong protected performance but do not directly address nominal-actor dependence or transfer. For baseline PPO, a budget-only experiment remains diagnostically meaningful. For high-penalty PPO, the frozen evidence gives no sign that budget alone will create goal completion.
+6. **Additional training targets differ by method.** For projection-trained PPO, more transitions might improve already-strong protected performance but would not directly address nominal-actor dependence or transfer. For baseline PPO, a budget-only experiment could be informative; for high-penalty PPO, the frozen evidence gives no sign that budget alone would create goal completion. These are private experiment-design observations, not report claims.
 
 7. **General training-convergence inspection is complete.** The remaining numerical training analysis is limited to the projector's intervention, correction, slack, and solver-failure burden; trajectory inspection then has greater explanatory value than further curve subdivision.
 
@@ -1120,7 +1127,1539 @@ A documentation-only release patch has therefore been prepared with:
 
 Every percentage and paired-difference value in the proposed README was independently reconciled against the committed fixed-geometry and transfer CSV summaries. The patch changes documentation and attribution only; it does not alter source behavior, tests, protocols, evidence, figures, tables, or scientific interpretation inputs.
 
+## Scientific interpretation phase
+
+### Phase I, Step 1: frozen interpretation workspace
+
+**Completed:** 2026-08-27\
+**Repository mode:** read-only\
+**Scientific judgment:** PASS. The audited evidence identity is identified and
+stable enough to begin reconstruction of the experimental design. This step
+establishes evidence identity only; it does not promote any preliminary result
+interpretation into a final study claim.
+
+#### Commit identities
+
+| Role | Full commit | Verification and meaning |
+|---|---|---|
+| Current public `main` revision | `5a5cc2041ad5b6194a86aff9e61460873ce185c9` | Resolved directly from `refs/heads/main` on 2026-08-27. The repository currently has one remote branch, `main`; this revision controls its default public view. |
+| Audited-results audit anchor | `b005123cb2c6c754a991d1e7fdc709437b90e915` | Commit titled `Add audited predictive action projection results`. It is a reachable ancestor of current `main` and identifies the provenance of the single audited evidence set. The relevant evidence paths are byte-identical at this anchor and the recorded current revision. |
+| Frozen protocol source commit | `ba64926aed98b08b7b285266cf85989d466f9f1c` | Tagged `predictive-action-projection-protocol-v1`; it is an ancestor of the audit anchor. It identifies the frozen protocol source, not a separate dataset or active branch. |
+| Public-release documentation commit | `97f375a5ecc22db16d1cfc641dbff0e7f7ac9eed` | Adds release documentation, licensing, attribution, and final public-release record entries. It does not change the evidence paths. |
+
+The evidence commit contains 64 changed files. Sixty are committed result-table
+and result-figure artifacts; the remainder are the reviewed analysis/plotting
+and record changes described by the release record. A path-restricted Git diff
+from the evidence commit to current `main` is empty for both protocols,
+`analysis/aggregate_projection_results.py`,
+`analysis/plot_projection_results.py`, both complete result-table trees, and
+both complete result-figure trees. The only later repository differences are
+`README.md`, `LICENSE`, `THIRD_PARTY_NOTICES.md`, and the two repository record
+files. Commit `5a5cc204...` changes only `README.md` relative to the public-release
+documentation commit.
+
+The following Git object identities are identical at the evidence commit,
+public-release documentation commit, and current `main`:
+
+| Frozen object | Git object ID |
+|---|---|
+| `results/tables/fixed_training_geometry/` | `5a974a12ff5e869b1a77b6ad25e53f7f25965040` |
+| `results/tables/core_layout_transfer/` | `b176b54f9f1afa1c110eda0d09fd2fce649cea9b` |
+| Fixed-geometry `figure_build_audit.json` | `29b3d5f4946a2b83b723403960647b12a0f166ec` |
+| Transfer `figure_build_audit.json` | `3f5731849cf583ace7c1c0907393738ed8ee39cf` |
+| `analysis/plot_projection_results.py` | `a599eaf2c400c1cce51cf8ccc3ca1d4b2346bd3e` |
+| Fixed-geometry protocol | `bdcf11c601b119f4c0a077ea9164d768d26fba43` |
+| Transfer protocol | `128de5af6352d6480d3074675ef8067bccf5c8df` |
+
+#### Evidence-count derivation
+
+The fixed-geometry protocol contains three methods, five expected training
+seeds, two required projection modes for every method, one audited layout, and
+100 repeats per layout:
+
+```text
+3 methods x 5 checkpoints x 2 modes x 1 layout x 100 repeats
+= 3 x 5 x 2 x 1 x 100
+= 3,000 episode rows.
+```
+
+Sources: `experiments/fixed_training_geometry_analysis_protocol.json`, fields
+`methods`, `expected_train_seeds`, each method's
+`required_projection_modes`, and `expected_repeats_per_layout`; and
+`results/tables/fixed_training_geometry/result_build_audit.json`, fields
+`layout_count = 1`, `episode_row_count = 3000`, and `status = PASS`.
+
+The transfer protocol contains the same three methods, five expected training
+seeds, and two projection modes, with 24 audited layouts and one repeat per
+layout:
+
+```text
+3 methods x 5 checkpoints x 2 modes x 24 layouts x 1 repeat
+= 3 x 5 x 2 x 24 x 1
+= 720 episode rows.
+```
+
+Sources: `experiments/projection_analysis_protocol.json`, the same named
+fields; and
+`results/tables/core_layout_transfer/result_build_audit.json`, fields
+`layout_count = 24`, `episode_row_count = 720`, and `status = PASS`.
+
+The complete frozen evidence count is therefore:
+
+```text
+3,000 fixed-geometry rows + 720 transfer rows = 3,720 episode rows.
+```
+
+Direct line counts independently give 3,001 and 721 lines in the two committed
+episode CSVs, respectively. Subtracting one header line from each gives 3,000
+and 720 data rows. The two suites remain separate estimands and must not be
+pooled into a headline performance rate merely because their inventory counts
+sum to 3,720.
+
+#### Audit status recovered from the frozen sources
+
+| Gate | Verified frozen result |
+|---|---|
+| Fixed result-table build | `PASS`; 3,000 episode rows, 30 checkpoint rows, six method-mode rows, 15 paired-checkpoint rows, three paired-method rows, zero recorded solver failures. |
+| Transfer result-table build | `PASS`; 720 episode rows, 30 checkpoint rows, six method-mode rows, 15 paired-checkpoint rows, three paired-method rows, zero recorded solver failures. |
+| Fixed figure build | `PASS`; evaluation-and-training scope, 23 PDFs, 28 generated pre-audit artifacts, zero skipped artifacts. |
+| Transfer figure build | `PASS`; evaluation-only scope, 13 PDFs, 14 generated pre-audit artifacts, zero skipped artifacts; shared training diagnostics intentionally omitted. |
+| Source regression gates | 25 targeted tests and 71 complete-repository tests passed before the final figure builds. |
+| Direct visual/numerical gate | All 36 PDFs were rendered and inspected; the 3,720 episode rows and derived table layers reconciled. |
+| Public-release history gate | The full-history public-release audit is recorded as `PASS` in commit `97f375a...`. |
+
+The committed episode tables also recover the evaluation exposure for the
+zero-failure statement. Projection was enabled for 1,500 fixed-geometry
+episodes totaling 236,084 executed steps and 360 transfer episodes totaling
+62,900 executed steps:
+
+```text
+enabled episodes = 1,500 + 360 = 1,860
+enabled steps    = 236,084 + 62,900 = 298,984
+failure count    = 0 + 0 = 0
+```
+
+These are enabled-step exposure counts from the fields `projection_mode`,
+`episode_length`, and `projection_solver_failure_count` in the two committed
+`evaluation_episode_results.csv` files. They are not labeled solver-call
+counts here; that label requires the separate implementation check that one
+solve occurs per enabled step. Training-time exposure remains separate.
+
+#### Frozen source map
+
+| Evidence role | Frozen source location |
+|---|---|
+| Intended design and estimands | `experiments/fixed_training_geometry_analysis_protocol.json`; `experiments/projection_analysis_protocol.json`; referenced layout suites. |
+| Numerical episode evidence | `results/tables/fixed_training_geometry/evaluation_episode_results.csv`; `results/tables/core_layout_transfer/evaluation_episode_results.csv`. |
+| Checkpoint, method, and paired summaries | The remaining CSV and generated-LaTeX files in both result-table directories. |
+| Validation, pairing, and aggregation semantics | `analysis/aggregate_projection_results.py`, especially `REQUIRED_COLUMNS`, `validate_episodes`, `checkpoint_summary`, `method_summary`, `paired_deltas`, and `paired_summary`. |
+| Plot-field mapping and presentation derivations | `analysis/plot_projection_results.py`, especially `EVALUATION_PLOTS`, `plot_evaluation_checkpoints`, the derived timeout definition, and the projection-only plotting boundary. |
+| Build completeness and scope | Both `result_build_audit.json` files and both `figure_build_audit.json` files. |
+| Frozen provenance and executed release procedures | The repository copies of this Analysis Record and the Analysis Command Record at the relevant commit. |
+| Orientation only | Current-public-`main` `README.md`; it is not a numerical or interpretive authority. |
+| Interpretation method | The continuation prompt, regeneration blueprint, and printable scientific-interpretation guide from the verified handoff package. |
+
+#### Metric-dictionary location
+
+The explanatory working dictionary is Section 4 of the printable guide and
+Section 9 of the Markdown blueprint. The authoritative field and reduction
+definitions to be used when the formal metric dictionary is built in Phase I,
+Step 5 are located in:
+
+1. the exact headers of both committed episode and summary CSV layers;
+2. `analysis/aggregate_projection_results.py`, including the required columns,
+   validation equations, episode-to-checkpoint reductions, checkpoint-to-method
+   reductions, and paired enabled-minus-disabled construction; and
+3. `analysis/plot_projection_results.py`, including plotted field names,
+   projection-only structural handling, and
+   `timeout_rate = 1 - success_rate - collision_rate`.
+
+No plausible field definition will be inferred from a figure title. Step 5
+will reconcile the working dictionary against these frozen sources before any
+ambiguous metric is interpreted.
+
+#### Living-record and sidecar procedure
+
+- The committed repository copies remain frozen and unchanged during
+  interpretation unless Salvador Tenorio later authorizes a repository update.
+- Verified milestones replace the existing Library identities of the Analysis
+  Record, Analysis Command Record, and continuation prompt; they do not create
+  duplicate copies.
+- Exact new commands and calculation procedures are recorded in the command
+  record. Verified reasoning, decisions, evidence boundaries, and caveats are
+  recorded here.
+- `Predictive_Action_Projection_Interpretation_Workbook.md` stores the active
+  source map, decisions, teach-back notes, and analysis queue.
+- `Predictive_Action_Projection_Claim_Evidence_Matrix.csv` stores only
+  traceable candidate claims and preserves rejected interpretations.
+- `Predictive_Action_Projection_Report_Ready_Sentences.md` stores scoped
+  sentences that have already passed their applicable gate; result conclusions
+  will not be added before the interpretation gate.
+- The continuation prompt is updated whenever the current numbered step
+  changes materially.
+
+#### Missing sources, discrepancies, and operational boundary
+
+No numerical or protocol conflict was found among the authoritative Step 1
+sources. Raw checkpoints, raw evaluation shards, NPZ trajectory archives, and
+TensorBoard logs are intentionally outside ordinary public source control; this
+is a scope limitation of the public curated layer, not an unresolved Step 1
+discrepancy, because the committed audits and records identify their role and
+the present step does not require regeneration.
+
+The printable guide's Step 1 checklist suggests creating a dedicated
+analysis/report branch. The controlling continuation prompt makes the
+interpretation phase read-only by default and does not authorize repository
+mutation. The higher-authority operational rule therefore controls: no branch,
+checkout, edit, stage, commit, merge, or push was performed. The interpretation
+workspace is frozen by reference to the audit anchor and the versioned Library
+working records. A repository report branch can be created
+later only after explicit authorization.
+
+#### Step gate
+
+Phase I, Step 1 is complete. The next analytical action is Phase I, Step 2:
+reconstruct methods, checkpoints, projection modes, episodes, layouts, seeds,
+and totals from the frozen sources. No scientific outcome claim was promoted
+during Step 1.
+
+### Phase I, Step 2: reconstructed frozen experimental design
+
+**Completed:** 2026-08-27\
+**Repository mode:** read-only\
+**Scientific judgment:** PASS, qualified by one explained and bounded
+provenance-hash discrepancy.
+The frozen design, the 15 executed checkpoint identities, both execution-time
+projection modes, both evaluation-suite grids, and all row totals reconcile.
+This step establishes the experimental structure only. It does not establish
+an outcome effect, inferential independence, cross-method seed blocking, or a
+causal learning mechanism.
+
+#### Purpose and scientific importance
+
+Step 2 reconstructs what was varied, what was held fixed, and how every
+evaluation row enters the design. This prevents three common errors:
+
+1. confusing the training intervention with the evaluation-time projector;
+2. counting repeated episodes or layouts as additional trained policies; and
+3. pooling the stochastic familiar-geometry suite with the deterministic
+   transfer suite merely because both contain episode rows.
+
+The governing design sources are:
+
+- `docs/records/predictive_action_projection_experimental_protocol.md`;
+- `experiments/fixed_training_geometry_analysis_protocol.json`;
+- `experiments/projection_analysis_protocol.json`;
+- `evaluation/layouts/fixed_training_geometry.json`;
+- `evaluation/layouts/core_navigation_layouts.json`;
+- both committed `evaluation_episode_results.csv` files;
+- both committed `checkpoint_summary.csv` files; and
+- both `result_build_audit.json` files.
+
+All paths and calculations below refer to the audited evidence set identified
+by audit-anchor commit
+`b005123cb2c6c754a991d1e7fdc709437b90e915`; the two protocol JSON blobs are
+unchanged from protocol commit
+`ba64926aed98b08b7b285266cf85989d466f9f1c` through the recorded public
+`main` tip.
+
+#### Explained and bounded transfer-protocol identity discrepancy
+
+Step 2 found and resolved a narrow discrepancy that the Step 1 commit-tree
+comparison did not expose:
+
+| Source | Transfer-protocol canonical SHA-256 |
+|---|---|
+| Human-readable frozen protocol record | `dfc0e1e3de29c0f63eb6152a3f063ad1d17c4461430855f33222f93e827c6e90` |
+| Actual committed `experiments/projection_analysis_protocol.json` | `f0f853fb53b910cdd9227e1562fc227201b08a6926d8895d430e507944b659d1` |
+| Transfer `result_build_audit.json`, field `protocol_sha256` | `f0f853fb53b910cdd9227e1562fc227201b08a6926d8895d430e507944b659d1` |
+
+The canonicalization function is
+`evaluation/layout_suite.py::canonical_json_sha256`: UTF-8 JSON with sorted
+keys, separators `(',', ':')`, `ensure_ascii=False`, and `allow_nan=False`.
+Applying it to the committed transfer protocol gives `f0f853...`.
+
+The declared `dfc0e1...` value was reproduced exactly by adding this one field
+to the committed JSON object before canonicalization:
+
+```text
+validated_implementation_base_commit = d0548b3e6729571113675b6f4ccad6401f27f167
+```
+
+That provenance field is present in the fixed-geometry protocol and in the
+freeze-status clause of the human-readable protocol record, but is absent from
+the committed transfer JSON. Repository-wide inspection found no runtime or
+analysis use of that key. No method, penalty, projection mode, training seed,
+training budget, layout, repeat count, evaluation seed, policy mode, device,
+episode limit, or projection parameter differs. The executed result build
+records the actual committed identity `f0f853...`.
+
+**Analytical treatment:** use `f0f853...` as the executed transfer-protocol
+identity; retain `dfc0e1...` in the discrepancy register as the hash of an
+otherwise identical object containing one additional, operationally unused
+provenance field. This construction explains the two hash values exactly but
+does not prove the historical cause of the difference. The discrepancy is a
+documentation and machine-readable-provenance defect, not evidence of a
+different experiment. The repository was not edited. If a documentation
+correction is later authorized, it should explain the discrepancy rather than
+silently altering the committed JSON.
+
+This finding corrects the broad Step 1 statement that no protocol discrepancy
+had been found. It does not invalidate the Step 1 commit boundary or episode
+inventory.
+
+#### Training-condition map
+
+The `methods` array in both protocol JSON files is identical:
+
+| Method key | Display name | Training collision penalty | Projection during training | Training seeds | Required evaluation modes |
+|---|---|---:|---:|---|---|
+| `ppo_baseline` | PPO baseline | 10.0 | disabled | 1, 2, 3, 4, 5 | disabled, enabled |
+| `ppo_high_penalty` | PPO high penalty | 50.0 | disabled | 1, 2, 3, 4, 5 | disabled, enabled |
+| `ppo_train_projection` | PPO trained with projection | 10.0 | enabled | 1, 2, 3, 4, 5 | disabled, enabled |
+
+The first axis is the **training condition**. The second is the
+**execution-time projection mode applied to a frozen checkpoint**. Therefore,
+`ppo_train_projection` with evaluation projection disabled is a policy trained
+with projection but executed nominally; `ppo_baseline` with evaluation
+projection enabled is a baseline-trained policy executed as a policy-plus-
+projector composite controller.
+
+The common final training budget is `expected_training_timesteps = 51200` per
+run. The protocol record also fixes `num_envs = 4`, `num_steps = 256`,
+`num_minibatches = 8`, and `update_epochs = 4`. The derived training geometry
+is:
+
+```text
+transitions per rollout
+  = 4 environments x 256 steps/environment
+  = 1,024 transitions/rollout
+
+rollouts per run
+  = 51,200 transitions/run / 1,024 transitions/rollout
+  = 50 rollouts/run
+
+minibatch optimizer steps per run
+  = 50 rollouts/run x 8 minibatches/rollout x 4 epochs/minibatch
+  = 1,600 optimizer steps/run
+
+runs per method
+  = 5 training seeds
+
+transitions per method
+  = 5 runs/method x 51,200 transitions/run
+  = 256,000 transitions/method
+
+all final training transitions
+  = 3 methods x 5 runs/method x 51,200 transitions/run
+  = 768,000 transitions
+
+all PPO rollout/update iterations
+  = 15 runs x 50 rollouts/run
+  = 750 iterations
+
+all minibatch optimizer steps
+  = 15 runs x 1,600 optimizer steps/run
+  = 24,000 optimizer steps
+```
+
+These totals describe computational exposure. They are not independent-policy
+sample sizes and do not make reward levels comparable across the penalty-10
+and penalty-50 training conditions.
+
+#### Frozen checkpoint identity map
+
+The `method`, `train_seed`, `checkpoint`, and `checkpoint_sha256` columns in
+both `checkpoint_summary.csv` files produce the same 15-row mapping. Each
+identity is also invariant across disabled and enabled episode rows within
+both suites.
+
+| Method | Training seed | Frozen checkpoint path | SHA-256 |
+|---|---:|---|---|
+| `ppo_baseline` | 1 | `runs\checkpoints\final\ppo_baseline_51200_seed1.pt` | `ac9747daee76239c878cc1339dfbe72a8ed020eaae9d3f5013a7ce78b8a07836` |
+| `ppo_baseline` | 2 | `runs\checkpoints\final\ppo_baseline_51200_seed2.pt` | `b739ee92df7f8c5ecbcf3078764cb694532485a0a8395cabcc5b5e283ae77f58` |
+| `ppo_baseline` | 3 | `runs\checkpoints\final\ppo_baseline_51200_seed3.pt` | `8a5e7c0edb9e277062afa2433ca3ef1568bb909b75bf3bdb82e42469e8e81171` |
+| `ppo_baseline` | 4 | `runs\checkpoints\final\ppo_baseline_51200_seed4.pt` | `d0cdbe0eae3327affadf64e343d3519ee3e91fd82a805e833c9068c467b1af7c` |
+| `ppo_baseline` | 5 | `runs\checkpoints\final\ppo_baseline_51200_seed5.pt` | `c7238f982b6e88a89665a3aced8c737fb05966ff76f926fe7592d6e0924664e1` |
+| `ppo_high_penalty` | 1 | `runs\checkpoints\final\ppo_high_penalty_51200_seed1.pt` | `f946099fe7e2006e7a6b1a59938504d3e9d7e397fcb8eed0c86e6acc71637c88` |
+| `ppo_high_penalty` | 2 | `runs\checkpoints\final\ppo_high_penalty_51200_seed2.pt` | `a3f683d8d1172d90a5f45a00f31759384b305350c48b5c24f09595e607c90545` |
+| `ppo_high_penalty` | 3 | `runs\checkpoints\final\ppo_high_penalty_51200_seed3.pt` | `48e6b29f11086f82bb7f139dd80c052e298b8823ceb40af4967097c4f8743b97` |
+| `ppo_high_penalty` | 4 | `runs\checkpoints\final\ppo_high_penalty_51200_seed4.pt` | `c57feec3843b8e3e585dc713ff618665322279b1975ee8277d305a134b7bbb80` |
+| `ppo_high_penalty` | 5 | `runs\checkpoints\final\ppo_high_penalty_51200_seed5.pt` | `45d8ccefb072cbd8badc1551770d69a5c5a31c61b936add71224ea5172ff83d4` |
+| `ppo_train_projection` | 1 | `runs\checkpoints\final\ppo_train_projection_51200_seed1.pt` | `3c5949efe582518ed18dd33bd0066b919e2240bf8d1a1675995de14bf291227d` |
+| `ppo_train_projection` | 2 | `runs\checkpoints\final\ppo_train_projection_51200_seed2.pt` | `94a7e01271b6c4fdc2c40ab4df16731f351c85303fbfdd4a66df84cf7df61528` |
+| `ppo_train_projection` | 3 | `runs\checkpoints\final\ppo_train_projection_51200_seed3.pt` | `8dd06c30b16fafd91d3e679f5262588e83f69345442e3f605e40213d266208ef` |
+| `ppo_train_projection` | 4 | `runs\checkpoints\final\ppo_train_projection_51200_seed4.pt` | `fe5cf72639d7b42227099dba859c4bc05d33760b1ab46464c8237636967b6f16` |
+| `ppo_train_projection` | 5 | `runs\checkpoints\final\ppo_train_projection_51200_seed5.pt` | `152c446a47682b6accaa1d5d54a6c547bcf0772aac856079d10c709b5dea791d` |
+
+There are exactly three methods times five training seeds, or 15 frozen final
+checkpoints. A common numeric seed label across two methods does not by itself
+prove that those methods were intentionally blocked for cross-method
+inference. That question remains reserved for Step 4.
+
+#### Evaluation-suite reconstruction
+
+| Property | Fixed training geometry | Core-layout transfer |
+|---|---|---|
+| Protocol role | `primary_stochastic_fixed_training_geometry` | `secondary_deterministic_layout_transfer` |
+| Layout suite | `fixed_training_geometry_v1` | `core_navigation_layouts_v1` |
+| Layout count | 1 | 24 prespecified layouts |
+| Policy action | stochastic Gaussian sample | deterministic actor mean |
+| Repeats per layout/checkpoint/mode | 100 | 1 |
+| Evaluation seeds | 10000 through 10099 | 1000 through 1023 |
+| Projection modes | disabled and enabled | disabled and enabled |
+| Evaluation collision penalty | 10.0 | 10.0 |
+| Device | CPU | CPU |
+| Maximum episode length | 200 steps | 200 steps |
+| Method-seed-mode cells | 30 | 30 |
+| Rows per method-seed-mode cell | 100 | 24 |
+| Rows per checkpoint across both modes | 200 | 48 |
+| Rows per method | 1,000 | 240 |
+| Projection-disabled rows | 1,500 | 360 |
+| Projection-enabled rows | 1,500 | 360 |
+| Suite total | 3,000 | 720 |
+
+The exact primary mapping in every method-seed-mode cell is:
+
+```text
+layout_id       = fixed_training_geometry
+layout_repeat i = 0, ..., 99
+evaluation_seed = 10000 + i
+episode         = i
+seed            = evaluation_seed
+```
+
+The exact transfer mapping in every method-seed-mode cell follows the frozen
+layout-array order:
+
+| Episode index | Evaluation seed | Layout ID |
+|---:|---:|---|
+| 0 | 1000 | `control_open_route` |
+| 1 | 1001 | `control_upper_clearance` |
+| 2 | 1002 | `control_lower_clearance` |
+| 3 | 1003 | `control_symmetric_clearance` |
+| 4 | 1004 | `single_near_early_upper` |
+| 5 | 1005 | `single_near_early_lower` |
+| 6 | 1006 | `single_near_late_upper` |
+| 7 | 1007 | `single_near_late_lower` |
+| 8 | 1008 | `single_blocked_central_upper` |
+| 9 | 1009 | `single_blocked_central_lower` |
+| 10 | 1010 | `double_near_staggered_upper_first` |
+| 11 | 1011 | `double_near_staggered_lower_first` |
+| 12 | 1012 | `double_near_same_side_upper` |
+| 13 | 1013 | `double_near_same_side_lower` |
+| 14 | 1014 | `double_blocked_staggered_upper_first` |
+| 15 | 1015 | `double_blocked_staggered_lower_first` |
+| 16 | 1016 | `double_blocked_same_side_upper` |
+| 17 | 1017 | `double_blocked_same_side_lower` |
+| 18 | 1018 | `triple_mild_slalom_upper_first` |
+| 19 | 1019 | `triple_mild_slalom_lower_first` |
+| 20 | 1020 | `triple_narrowing_slalom_upper_first` |
+| 21 | 1021 | `triple_narrowing_slalom_lower_first` |
+| 22 | 1022 | `triple_shifted_slalom_upper_first` |
+| 23 | 1023 | `triple_shifted_slalom_lower_first` |
+
+For all transfer rows, `layout_repeat = 0`, `episode` is the zero-based layout
+index, and `seed = evaluation_seed`. These mappings were verified in all 30
+method-seed-mode cells, not inferred from only the first checkpoint.
+
+#### Complete episode derivation and independent cross-checks
+
+Primary suite:
+
+```text
+method-seed-mode cells
+  = 3 methods x 5 checkpoints/method x 2 modes/checkpoint
+  = 30 cells
+
+rows
+  = 30 cells x 1 layout/cell x 100 repeats/layout
+  = 3,000 episode rows
+```
+
+Transfer suite:
+
+```text
+method-seed-mode cells
+  = 3 x 5 x 2
+  = 30 cells
+
+rows
+  = 30 cells x 24 layouts/cell x 1 repeat/layout
+  = 720 episode rows
+```
+
+Alternative checkpoint-level reconstruction:
+
+```text
+fixed rows per checkpoint    = 2 modes x 100 episodes = 200
+transfer rows per checkpoint = 2 modes x 24 layouts   = 48
+combined rows per checkpoint = 200 + 48               = 248
+all rows                     = 15 checkpoints x 248   = 3,720
+```
+
+Alternative method-level reconstruction:
+
+```text
+fixed rows per method    = 5 checkpoints x 2 modes x 100 = 1,000
+transfer rows per method = 5 checkpoints x 2 modes x 24  =   240
+combined rows per method = 1,000 + 240                   = 1,240
+all rows                 = 3 methods x 1,240              = 3,720
+```
+
+The prescribed products, direct episode-table row counts, complete cell
+counts, checkpoint summaries, and result-audit `episode_row_count` values all
+agree without interpolation or rounding.
+
+#### Scientific classification
+
+- **Fact:** Three training conditions produced five final checkpoints each;
+  the same 15 SHA-identified checkpoints occur in both suites.
+- **Fact:** Every checkpoint was evaluated with execution-time projection both
+  disabled and enabled under a common evaluation collision penalty of 10.0.
+- **Calculation:** The training campaign consumed 768,000 environment
+  transitions across the 15 final runs.
+- **Calculation:** The evaluation inventory contains 3,000 fixed-geometry rows
+  and 720 transfer rows, totaling 3,720.
+- **Interpretation:** The design crosses a training-condition axis with an
+  execution-time intervention axis, allowing nominal-policy and composite-
+  controller questions to be separated later.
+- **Caveat:** One hundred stochastic episodes refine the within-checkpoint
+  estimate on one familiar geometry; they do not create 100 trained policies.
+- **Caveat:** Twenty-four prespecified layouts broaden deterministic geometric
+  coverage; they are not 24 independent training replicates or a random sample
+  of all navigation geometries.
+- **Caveat:** Numeric training-seed labels 1 through 5 recur across methods,
+  but Step 2 does not establish intentional cross-method blocking.
+- **Caveat:** The two suites differ in geometry, action-selection mode, and
+  repetition structure, so the 3,720-row inventory is not a pooled performance
+  estimand.
+- **Hypothesis:** None. Step 2 does not require or support a mechanism
+  hypothesis.
+
+#### Step gate
+
+Phase I, Step 2 is complete because:
+
+- [x] all three training conditions and their only designed differences were
+  recovered;
+- [x] all 15 final checkpoint paths and SHA-256 identities were reconciled
+  across both suites;
+- [x] disabled and enabled projection coverage is complete for every
+  checkpoint;
+- [x] the 100 fixed-geometry seed/repeat mappings were verified in every cell;
+- [x] the 24 transfer layout/seed mappings were verified in every cell;
+- [x] prescribed, observed, summarized, and audited totals agree;
+- [x] the transfer-protocol hash discrepancy was reproduced, classified, and
+  bounded without changing the repository; and
+- [x] no outcome claim or cross-method pairing assumption was introduced.
+
+The next action is Phase I, Step 3: explain and then, after Salvador's explicit
+authorization, lock the research questions before outcome interpretation
+begins.
+
+#### Independent continuity audit and terminology correction
+
+An independent read-only audit on 2026-08-28 reconfirmed the Step 2 design
+products and corrected three terminology issues:
+
+- the remote exposes one branch, `main`; `b005123...` is an audit-anchor commit
+  reachable from the recorded current revision, not a second active branch or
+  second dataset;
+- the training loop executes 750 PPO rollout/update iterations and 24,000
+  minibatch-level `optimizer.step()` calls across the 15 runs, so the latter is
+  reported as **minibatch optimizer steps**, not the ambiguous phrase
+  **optimizer updates**; and
+- adding the implementation-base provenance field reproduces the declared
+  transfer-protocol hash exactly, but this proves the mathematical relationship
+  between the objects rather than the historical cause of the discrepancy.
+
+The Step 2 design reconstruction remains PASS. Protocol-identity consistency
+remains qualified by the bounded transfer-protocol hash discrepancy. No
+outcome value was inspected or promoted during this continuity audit.
+
+### Phase I, Step 3: locked research questions and claim boundaries
+
+**Completed:** 2026-08-28\
+**Repository mode:** read-only\
+**Scientific judgment:** PASS after narrowing the collision-penalty question
+to the comparisons actually predeclared before the result commit. The gate was
+adjudicated exclusively from pre-result design and comparison sources; no
+outcome value was used to add, remove, or reword a question.
+
+#### Pre-result source verification
+
+The human-readable experimental protocol record at commit
+`ba64926aed98b08b7b285266cf85989d466f9f1c` predeclares the complete 3-by-2
+deployment matrix, outcome roles, six direct comparisons, transition-table
+analysis, checkpoint-level replicate rule, and separate primary/secondary suite
+roles. Git ancestry and path-restricted comparisons establish that:
+
+1. the protocol commit precedes audited-results commit `b005123...`;
+2. the human-readable protocol record did not change from the protocol commit
+   through the audited-results commit; and
+3. that record and both machine-readable protocol JSON files remain unchanged
+   through recorded current `main` revision `5a5cc204...`.
+
+The six frozen comparisons map to the locked questions as follows:
+
+| Frozen comparison | Locked use |
+|---|---|
+| Baseline off versus baseline on | RQ1 execution-time projection. |
+| Baseline off versus high-penalty off | RQ3 nominal penalty-training contrast. |
+| Baseline off versus projection-trained off | RQ2 nominal training-condition contrast. |
+| Projection-trained off versus projection-trained on | RQ1 execution-time projection and RQ5 filter-use support. |
+| Baseline on versus projection-trained on | RQ2 composite-controller contrast and RQ5 operational diagnostics. |
+| High-penalty off versus high-penalty on | RQ1 execution-time projection; supporting reward/filter-complementarity context for RQ3 and RQ5. |
+
+#### Locked research questions
+
+**RQ1 — primary fixed-geometry execution question**
+
+> For each training condition and evaluation suite, what paired
+> checkpoint-level changes in terminal outcomes and supporting behavioral
+> metrics are observed when execution-time projection is enabled rather than
+> disabled for the same checkpoint?
+
+For outcome (Y), method (m), checkpoint (s), and suite (q), the direct
+contrast is
+
+\[
+\Delta_{m,s}^{(q)}(Y)
+=
+\bar Y_{m,s,\mathrm{on}}^{(q)}
+-
+\bar Y_{m,s,\mathrm{off}}^{(q)}.
+\]
+
+This estimates the execution-time contribution of the projector under the
+tested protocol. It does not establish that the nominal policy learned safety,
+that projection guarantees safety, or that the result generalizes beyond the
+tested controller and environments.
+
+**RQ2 — primary fixed-geometry projection-training question**
+
+> Under collision penalty 10, how do projection-trained checkpoints and
+> baseline checkpoints differ when both are evaluated under the same execution
+> mode, considered separately for projection-off and projection-on and
+> separately by evaluation suite?
+
+The direct contrasts are
+
+\[
+C_{P,e}^{(q)}(Y)
+=
+\mu_{P,e}^{(q)}(Y)-\mu_{B,e}^{(q)}(Y),
+\qquad e\in\{\mathrm{off},\mathrm{on}\}.
+\]
+
+Projection-off compares nominal execution behavior. Projection-on compares
+policy-plus-projector composite controllers. Separately trained methods are not
+paired merely because they reuse numeric seed labels. The comparison does not
+identify a causal learning mechanism or prove policy--projector co-adaptation.
+
+**RQ3 — primary fixed-geometry reward-shaping question**
+
+> Under the frozen PPO configuration and training budget, how do nominal
+> checkpoints trained with collision penalty 50 differ from baseline nominal
+> checkpoints trained with collision penalty 10 when both are evaluated
+> without projection?
+
+The direct contrast is
+
+\[
+C_{H,\mathrm{off}}^{(q)}(Y)
+=
+\mu_{H,\mathrm{off}}^{(q)}(Y)
+-
+\mu_{B,\mathrm{off}}^{(q)}(Y).
+\]
+
+The high-penalty off/on comparison is already part of RQ1 and may provide
+supporting reward/filter-complementarity context. High-penalty on versus
+baseline on is not a predeclared direct comparison and is exploratory if later
+calculated. The study does not predeclare an equivalence margin and cannot
+establish that penalties and projection are interchangeable.
+
+**RQ4 — secondary prespecified transfer question**
+
+> Across the 24 prespecified deterministic transfer layouts, are the directions
+> and tradeoffs of the predeclared within-suite contrasts consistent with or
+> different from those observed in the stochastic fixed-geometry suite, with
+> the suites analyzed separately?
+
+This permits a statement that the same direction was observed in both suites.
+It does not permit pooling the suites, attributing cross-suite differences only
+to geometry, or generalizing to arbitrary environments. Geometry,
+action-selection mode, and repetition structure all differ between suites.
+
+**RQ5 — supporting filter-use question**
+
+> What filter-use profile---intervention frequency, correction magnitude,
+> slack, clipping, clearance, solver status, and joint terminal
+> outcomes---characterizes projection-enabled execution by training condition
+> and evaluation suite?
+
+RQ5 uses prespecified diagnostic metrics and descriptive matched terminal-
+outcome transitions. It does not introduce a new independent intervention
+contrast. It cannot establish latency, computational cost, real-time
+suitability, intervention-causes-success, formal constraint satisfaction, or a
+causal co-adaptation mechanism.
+
+#### Outcome hierarchy and exploratory boundary
+
+- Primary safety outcome: collision rate.
+- Principal task outcome: success rate.
+- Competing terminal outcome: timeout rate.
+- Supporting outcomes: common-reward return, episode length, and minimum signed
+  clearance.
+- Filter-use diagnostics: clipping, intervention, correction, slack, and
+  solver status.
+- Planned descriptive analysis: matched collision/success/timeout transitions.
+- Exploratory only: unlisted pairwise comparisons, formal
+  difference-in-differences interactions, pooled or formal cross-suite effect
+  differences, post hoc layout groups, intervention-outcome associations, and
+  substitution/equivalence assessments.
+
+No post hoc composite score is admitted. Collision, success, and timeout must
+be interpreted jointly.
+
+#### Step gate
+
+Phase I, Step 3 passes because every locked question maps to the frozen design,
+predeclared comparisons, prespecified metric families, or secondary-suite role;
+RQ3 has been narrowed to the declared nominal penalty contrast; RQ5 is
+supporting rather than an additional primary intervention question; and all
+causal, equivalence, formal-safety, arbitrary-generalization, runtime-cost, and
+pseudoreplication boundaries are explicit. Formal weighting, nesting, pairing,
+and uncertainty rules remain reserved for Step 4, and exact metric definitions
+remain reserved for Step 5.
+
+The next analytical action is Phase I, Step 4: explain and then, after
+Salvador's explicit authorization, establish the statistical units, nesting,
+pairing keys, and permitted uncertainty calculations.
+
+### Phase I, Step 4: verified units, pairing, aggregation, and uncertainty
+
+Step 4 was executed read-only against audited result commit
+`b005123cb2c6c754a991d1e7fdc709437b90e915`. The canonical protocols,
+aggregation implementation, and result tables are unchanged at recorded public
+`main` revision `5a5cc2041ad5b6194a86aff9e61460873ce185c9`.
+
+#### Raw-table identities
+
+The fixed table contains exactly 3,000 rows:
+
+\[
+3\text{ methods}\times5\text{ checkpoints}\times2\text{ modes}
+\times100\text{ stochastic episodes}=3{,}000.
+\]
+
+Every one of the 30 method--checkpoint--mode cells contains 100 rows, uses the
+single `fixed_training_geometry` layout, and covers evaluation seeds 10000
+through 10099. The transfer table contains exactly 720 rows:
+
+\[
+3\times5\times2\times24\text{ layouts}=720.
+\]
+
+Every transfer cell contains the same 24 layout identifiers exactly once and
+uses evaluation seeds 1000 through 1023. Both tables contain 15 distinct
+checkpoint SHA-256 identities, one for each method--training-seed run. There
+are no duplicate episode keys.
+
+The validated raw key in both suites is:
+
+```text
+method, train_seed, checkpoint_sha256, projection_mode,
+layout_id, layout_repeat, evaluation_seed
+```
+
+#### Pairing and nesting
+
+For each method and checkpoint, disabled and enabled rows have identical
+`layout_id`, `layout_repeat`, and `evaluation_seed` sets, and use the same
+checkpoint SHA-256. All 1,500 fixed-suite and 360 transfer-suite off/on merges
+are one-to-one. These matched evaluation cells support within-checkpoint
+effects and descriptive outcome transitions.
+
+Checkpoints are nested within training method. Projection mode is repeated
+within checkpoint. The fixed episodes are repeated stochastic evaluations;
+the 24 transfer layouts are fixed task conditions crossed with every
+checkpoint and mode. Neither source of repeated evaluation changes the number
+of independently trained policies.
+
+Cross-method seeds are not protocol-declared blocks. The aggregation code does
+not pair them. RQ2 and RQ3 therefore compare independent samples of five
+checkpoints per method rather than five index-matched seed differences.
+
+#### Verified aggregation implementation
+
+`analysis/aggregate_projection_results.py` implements the declared hierarchy.
+For ordinary checkpoint metrics:
+
+\[
+\bar Y^{F}_{m,s,e}
+=\frac1{100}\sum_{i=1}^{100}Y^{F}_{m,s,e,i},
+\qquad
+\bar Y^{T}_{m,s,e}
+=\frac1{24}\sum_{\ell=1}^{24}Y^{T}_{m,s,e,\ell}.
+\]
+
+Method means and sample standard deviations are then computed across the five
+checkpoint summaries:
+
+\[
+\bar Y^{(q)}_{m,e}=\frac1{5}\sum_{s=1}^{5}\bar Y^{(q)}_{m,s,e},
+\]
+
+\[
+s^{(q)}_{m,e}
+=\sqrt{\frac1{4}\sum_{s=1}^{5}
+\left(\bar Y^{(q)}_{m,s,e}-\bar Y^{(q)}_{m,e}\right)^2}.
+\]
+
+For each checkpoint, `paired_deltas()` merges disabled and enabled evaluation
+cells one-to-one and averages enabled-minus-disabled cell differences. The
+paired method summary then averages the five checkpoint effects and uses
+sample SD with `ddof=1`. Independent reconstruction matched every audited
+mean and SD to floating-point error below \(1.5\times10^{-14}\).
+
+Because both suites are balanced, pooling raw rows happens to reproduce the
+same point mean. It does not reproduce the correct independent replication.
+For example, baseline fixed-geometry disabled success is 0.152. The checkpoint
+SD is approximately 0.2121, giving checkpoint-based standard error
+
+\[
+0.2121/\sqrt5\approx0.0948.
+\]
+
+A naive binomial calculation using 500 episodes gives
+
+\[
+\sqrt{0.152(1-0.152)/500}\approx0.0161,
+\]
+
+almost six times smaller. The naive calculation falsely treats repeated
+evaluation of five policies as 500 independent trained policies.
+
+#### Locked uncertainty rules
+
+All five checkpoint values, their mean, sample SD, range, and effect magnitude
+will be primary. Within-method off/on effects additionally admit sign
+consistency and leave-one-checkpoint-out stability. Optional (t_4) intervals
+or sign-flip calculations are supplementary and must state their assumptions
+and low resolution; no formal significance test was predeclared.
+
+Cross-method contrasts are unpaired (5+5). A supplementary interval, if
+used, requires an independent-sample standard error and Welch degrees of
+freedom. Cross-method leave-one-out removes each of ten checkpoints singly.
+Five index-matched signs, paired (t_4) intervals, or same-numbered seed
+deletions are prohibited.
+
+#### Outcome and metric cautions exposed by Step 4
+
+All 3,720 rows are mutually exclusive and exhaustive success, collision, or
+timeout observations. Thus
+
+\[
+T=1-S-C,
+\qquad
+\Delta T=-(\Delta S+\Delta C).
+\]
+
+`paired_layout_count` is a generic output label. Its fixed-suite value 100
+means paired episode/repeat cells, not 100 layouts or independent replicates.
+The obstacle-free transfer layout `control_open_route` has structurally
+undefined clearance, so transfer clearance averages use 23 defined layouts.
+Projection-disabled filter fields are not applicable rather than observed
+zero burden. Episode/layout-averaged rates must not be silently replaced with
+pooled step rates, which weight long episodes and represent another estimand.
+Finally, the paired maximum-clipping delta averages matched cell-level maximum
+differences; it is not the difference between checkpoint-wide maxima.
+
+#### Training-budget hypothesis classification
+
+The conjecture that ten times more training would substantially improve
+success is scientifically plausible but not established by the frozen curves.
+Four projection-trained checkpoints still improve late, but protected
+fixed-geometry performance is already near ceiling. Baseline improvement is
+dominated by seed 3, several baseline checkpoints lack a positive late trend,
+and every high-penalty checkpoint has zero late success. The transfer layouts
+were never used during training, so more fixed-geometry optimization supplies
+no new geometric experience and may deepen specialization or filter use.
+
+The learning-rate schedule is also budget-dependent. With base rate
+\(3\times10^{-4}\), iteration 50 receives \(6\times10^{-6}\) in the frozen
+50-iteration campaign but \(2.706\times10^{-4}\) in a 500-iteration campaign.
+A 10x declared budget would change optimization from the beginning, not merely
+continue the frozen runs. Retain this only as a private post-study hypothesis;
+additional geometries or curriculum training would be a more directly targeted
+transfer intervention, but the outcome is unknown and excluded from the report.
+
+#### Step gate
+
+Phase I, Step 4 passes. Row identity, checkpoint nesting, permitted pairing,
+aggregation order, equal checkpoint weighting, sample-SD denominator,
+cross-method independence, suite separation, outcome accounting, and
+uncertainty boundaries are now verified. No repository file was modified.
+
+The next analytical action is Phase I, Step 5: construct the metric and
+evidence dictionary from exact source fields and reduction semantics.
+
+### Phase I, Step 5: verified metric and evidence dictionary
+
+Step 5 was executed read-only against audited result commit
+`b005123cb2c6c754a991d1e7fdc709437b90e915`. All metric-generating,
+aggregation, plotting, contract, and result-table paths inspected in this step
+are byte-unchanged at recorded public revision
+`5a5cc2041ad5b6194a86aff9e61460873ce185c9`.
+
+The lowest-level committed numerical evidence consists of the two canonical
+episode-row tables, with 3,000 fixed rows and 720 transfer rows. They share the
+same 53-column schema. All fields are complete except 30 structural clearance
+`NaN`s: the obstacle-free `control_open_route` layout for 15 checkpoints and
+two projection modes. The original evaluator shards and full per-step
+trajectory archives are intentionally absent from public source control.
+
+#### Outcome and reward definitions
+
+Success is final goal distance at most 0.25 environment-coordinate units.
+Collision is signed agent--obstacle boundary clearance at most zero. The
+environment terminates on success or collision and truncates at 200 steps only
+when neither occurs. All 3,720 rows independently satisfy the exact identity
+
+\[
+S+C+T=1,
+\qquad T=1-S-C.
+\]
+
+The common final-evaluation per-step reward is
+
+\[
+r_t=(d_{t-1}-d_t)-0.01(v_t^2+\omega_t^2)-0.01
+    +10S_t-10C_t-d_tT_t.
+\]
+
+`episode_return` is its undiscounted sum. It is a constructed reward score,
+not physical energy, distance, or a value estimate. All final evaluation rows
+use collision penalty 10, including the policy trained with penalty 50, so
+evaluation return is comparable across methods within each suite. Training
+returns remain incomparable across the penalty-10 and penalty-50 reward scales.
+
+Episode length is a transition count with ambiguous direction: a short success
+and a short collision have opposite meanings. Final distance is a verified raw
+field but is not carried into the checkpoint, method, paired, LaTeX, or plot
+layers. Any method-level use would require a new audited analysis. Minimum
+clearance is the trajectory minimum signed boundary margin, including the
+initial state. Transfer checkpoint clearance means use 23 obstacle-containing
+layouts; obstacle-free clearance is undefined rather than zero.
+
+No SI distance or time system is declared. Distances must be reported as
+environment-coordinate units and duration as transitions or simulated steps.
+
+#### Action clipping and projector order
+
+The audited execution order is:
+
+```text
+raw normalized action
+-> clipping to [-1,1]^2
+-> physical [v, omega] mapping
+-> optional CBF-QP projection
+-> environment execution
+```
+
+Clipping rate is the fraction of episode transitions on which either raw
+normalized component exceeds its bound. Mean clipping norm is the mean
+normalized-coordinate excess norm over all episode transitions, including
+zeros; the episode maximum is its largest value. Speed and turn clipping use
+the same episode-length denominator and may overlap on one transition.
+Clipping is applicable in both execution modes and is distinct from physical
+projector correction.
+
+For projection-enabled transitions,
+
+\[
+k_t=\lVert u_t^{exec}-u_t^{raw}\rVert_2,
+\qquad I_t=\mathbf1\{k_t>10^{-6}\}.
+\]
+
+The episode intervention rate is `sum(I_t)/L`; mean correction is
+`sum(k_t)/L`; maximum correction is `max(k_t)`. Correction is a numerical norm
+over physical `[v, omega]` coordinates with different component meanings and
+scales. It is not distance, energy, or commensurate with normalized clipping
+norm.
+
+Slack metrics derive from nonnegative CBF relaxation variables. Mean summed
+slack averages the per-step sum across active constraints over all episode
+steps; maximum slack is the largest individual constraint slack across the
+episode. Slack is not clearance, penetration, or collision probability, and
+depends on barrier scaling, parameters, geometry, and active-constraint count.
+
+Projection-disabled raw zeros are schema placeholders. Canonical checkpoint
+summaries convert intervention, correction, and slack to `NaN`/not applicable.
+Enabled zero correction/slack is a real observed zero. No-obstacle projection
+returns genuine zero with `no_active_constraints`. A failed solve increments
+the failure count and makes slack unknown/`NaN`; unknown slack is never zero.
+
+#### Reduction and weighting
+
+Ordinary checkpoint metrics are equal means over 100 fixed episodes or 24
+transfer layouts. Transfer clearance is the exception with 23 defined layouts.
+Rates are equal means of episode/layout rates, not pooled transition fractions:
+
+\[
+\frac1N\sum_i\frac{c_i}{L_i}
+\ne
+\frac{\sum_i c_i}{\sum_iL_i}
+\quad\text{in general}.
+\]
+
+For projection-trained transfer evaluation, the canonical mean layout-level
+intervention rate is 0.567, while the pooled transition fraction is 0.690.
+Both are valid for different estimands. Canonical report wording must say mean
+episode-level rate for fixed geometry and mean layout-level rate for transfer.
+
+Episode maximum clipping, correction, and slack values are first maximized
+within checkpoint. The method table reports the mean and sample SD of the five
+checkpoint maxima, not the study-wide maximum. The paired maximum-clipping
+quantity instead averages matched episode/layout maximum differences and is
+not the difference of two checkpoint maxima. Projector-only burdens have no
+off/on delta because projection-off burden is not applicable.
+
+#### Solver exposure
+
+| Context | Enabled transitions | Active-constraint QP attempts | Failures |
+|---|---:|---:|---:|
+| Projection-enabled training | 256,000 | 256,000 | 0 |
+| Fixed evaluation | 236,084 | 236,084 | 0 |
+| Transfer evaluation | 62,900 | 60,185 | 0 |
+| Combined accepted evidence | 554,984 | 552,269 | 0 |
+
+The 2,715 remaining transfer transitions are from the obstacle-free layout and
+bypass OSQP. `optimal_inaccurate` is accepted as success, but the committed
+episode layer does not retain the solver-status distribution. Zero failures
+therefore establishes empirical numerical reliability only for the frozen
+accepted simulations; it does not establish universal reliability, runtime,
+real-time suitability, invariance, or formal safety.
+
+#### Training diagnostics
+
+Training diagnostics are supporting learning histories. The structured
+training evidence contains 5,131 completed episodes, 750 rollout rows of 1,024
+transitions, and 14,811 aggregated curve points. Only completed episodes enter
+episode and rolling curves; episodes still active at the training-budget
+boundary are absent. Rolling outcomes use the latest 20 completed episodes,
+with early denominators 1 through 19. Direct curves linearly interpolate each
+seed onto a common overlapping step grid; derived outcome curves carry forward
+the most recent completed-episode state. Shading is mean plus/minus one sample
+SD across five seeds, not a confidence interval. Interpolated points are not
+new observations.
+
+Training final clearance is a final-state margin and is not evaluation minimum
+trajectory clearance. Training policies change during data collection; final
+evaluation freezes the checkpoint. Training observations never replace final
+evaluation evidence.
+
+#### Verification boundary and validation gaps
+
+Independent checks passed for outcome identities, count/rate formulas,
+component clipping relations, intervention formulas, mean/max ordering,
+success/final-distance and collision/clearance consistency, structural
+missingness, disabled placeholders, and failure totals. All committed table and
+plot mappings reconcile.
+
+Because full per-step archives are not public, every episode return and every
+mean/max norm cannot be recomputed from public per-step values. Their generating
+formulas and committed episode aggregates are verified; this is the exact
+public reproducibility boundary.
+
+Two nonblocking builder gaps were found. `projection_intervention_count` is not
+a declared required column and the builder does not check its rate against
+episode length. The builder also does not assert disabled raw placeholders are
+zero before converting burden summaries to `N/A`. The frozen rows independently
+pass both checks, so neither is a frozen-result defect.
+
+The compact generated LaTeX tables must not be reused unchanged: their outcome
+table omits timeout, and fixed three-decimal formatting can display small
+nonzero values as `0.000`. Final report tables will be rebuilt from CSV sources
+with all terminal outcomes and metric-appropriate precision.
+
+The larger-budget/two-additional-geometry/five-obstacle idea is retained only
+as a private post-study design note and is excluded from the report. The frozen
+capacity is three obstacles; five-obstacle capacity changes observation
+dimension and requires new training.
+
+#### Step gate
+
+Phase I, Step 5 passes. Definitions, units, denominators, reductions,
+applicability, structural missingness, directionality, verification limits, and
+caption/table rules are locked. Phase I is complete. No repository file was
+modified.
+
+The next analytical action is Phase II, Step 6: fixed-geometry absolute
+performance before paired effects.
+
+### Phase II, Step 6: fixed-geometry absolute performance
+
+Step 6 was executed read-only on 29 August 2026 against the 3,000 committed
+rows in `results/tables/fixed_training_geometry/evaluation_episode_results.csv`.
+Each method--seed--mode cell contained exactly 100 stochastic episodes. Timeout
+was reconstructed as `1 - success - collision` and matched `truncated` in every
+row.
+
+For each checkpoint and mode, the analysis calculated the arithmetic mean of
+the 100 episode observations. It then gave the five checkpoint summaries equal
+weight and calculated sample SD with `ddof=1`. The reconstruction matched all
+30 committed checkpoint rows and all six committed method-summary rows. The
+largest differences were \(1.78\times10^{-15}\) for checkpoint return,
+\(9.71\times10^{-17}\) for checkpoint clearance, and
+\(2.84\times10^{-14}\) for a method-level value.
+
+#### Absolute outcomes
+
+| Training condition | Projection | Success mean +/- SD | Collision mean +/- SD | Timeout mean +/- SD |
+|---|---|---:|---:|---:|
+| PPO baseline | Disabled | 15.2% +/- 21.2 pp | 14.0% +/- 7.2 pp | 70.8% +/- 23.7 pp |
+| PPO baseline | Enabled | 17.8% +/- 25.0 pp | 0.2% +/- 0.4 pp | 82.0% +/- 24.9 pp |
+| PPO high penalty | Disabled | 0.0% +/- 0.0 pp | 13.4% +/- 6.3 pp | 86.6% +/- 6.3 pp |
+| PPO high penalty | Enabled | 0.2% +/- 0.4 pp | 0.6% +/- 0.9 pp | 99.2% +/- 0.8 pp |
+| PPO trained with projection | Disabled | 17.4% +/- 8.0 pp | 81.8% +/- 7.6 pp | 0.8% +/- 0.8 pp |
+| PPO trained with projection | Enabled | 93.6% +/- 8.8 pp | 1.4% +/- 2.1 pp | 5.0% +/- 6.8 pp |
+
+The enabled projection-trained success calculation used checkpoint values
+`0.78, 0.96, 0.97, 0.99, 0.98`. Their sum is `4.68`, giving mean `0.936`.
+The squared deviations sum to `0.030920`; division by four gives sample
+variance `0.007730`, whose square root is `0.087920419`.
+
+The corresponding descriptive episode counts were baseline disabled
+`76/70/354`, baseline enabled `89/1/410`, high-penalty disabled `0/67/433`,
+high-penalty enabled `1/3/496`, projection-trained disabled `87/409/4`, and
+projection-trained enabled `468/7/25`, in success/collision/timeout order.
+These counts provide coverage and arithmetic reconciliation, not independent
+training replication.
+
+#### Supporting absolute metrics
+
+| Training condition | Projection | Return | Clearance | Length |
+|---|---|---:|---:|---:|
+| PPO baseline | Disabled | -5.0858 +/- 3.9965 | 0.3753 +/- 0.1310 | 176.37 +/- 25.54 |
+| PPO baseline | Enabled | -3.9123 +/- 4.5648 | 0.4144 +/- 0.1264 | 188.03 +/- 21.53 |
+| PPO high penalty | Disabled | -9.3636 +/- 0.4477 | 0.5432 +/- 0.1162 | 190.15 +/- 7.52 |
+| PPO high penalty | Enabled | -8.6595 +/- 0.6946 | 0.5822 +/- 0.1020 | 199.80 +/- 0.23 |
+| PPO trained with projection | Disabled | -5.3570 +/- 1.6443 | -0.0155 +/- 0.0090 | 41.69 +/- 6.36 |
+| PPO trained with projection | Enabled | 10.0042 +/- 1.5995 | 0.0674 +/- 0.0144 | 84.33 +/- 8.82 |
+
+The high-penalty controller demonstrates that high mean clearance and low
+collision are not synonymous with competence: its enabled configuration timed
+out in 99.2% of episodes. The projection-trained disabled controller shows that
+short duration is not automatically beneficial: its episodes were short
+because 81.8% ended in collision.
+
+#### Checkpoint structure and interpretation
+
+Baseline success ranged from 0--51% disabled and 0--60% enabled. Seed 3 was
+visibly influential; removing it only as a descriptive sensitivity check
+reduced disabled mean success from 15.2% to 6.25%. It remains in every primary
+summary and is not classified as a formal outlier.
+
+Every high-penalty disabled checkpoint had 0% success. Enabled high-penalty
+timeout ranged from 98--100%. Projection-trained disabled collision ranged from
+76--92%. Projection-trained enabled success ranged from 78--99%; seed 1 was
+weaker than seeds 2--5 but the dominant outcome remained success.
+
+The defensible absolute conclusion is that only the projection-trained,
+projection-enabled composite controller was success-dominated under the frozen
+fixed-geometry stochastic protocol. Baseline and high-penalty controllers were
+timeout-dominated, while the projection-trained nominal component was
+collision-dominated.
+
+This step describes controller endpoints. It does not yet calculate the paired
+within-checkpoint projector effect, prove that projection caused the complete
+cross-method result, establish policy--projector co-adaptation, or generalize
+beyond the single stochastic fixed geometry.
+
+#### Step gate
+
+Phase II, Step 6 passes. All absolute endpoints, five-checkpoint variability,
+outcome accounting, and supporting-metric cautions are verified. Phase II,
+Step 7 is recorded below.
+
+### Phase II, Step 7: fixed-geometry paired projection effects
+
+The fixed-geometry episode rows were paired within checkpoint by layout,
+repeat, and evaluation seed. Projection-enabled minus projection-disabled
+outcome rates were first computed separately for each of the five independently
+trained checkpoints, then summarized with the equal-checkpoint mean and sample
+SD.
+
+| Training condition | Success delta | Collision delta | Timeout delta |
+|---|---:|---:|---:|
+| PPO baseline | +2.6 +/- 3.8 pp | -13.8 +/- 7.3 pp | +11.2 +/- 7.5 pp |
+| PPO high penalty | +0.2 +/- 0.4 pp | -12.8 +/- 5.8 pp | +12.6 +/- 6.1 pp |
+| PPO trained with projection | +76.2 +/- 4.5 pp | -80.4 +/- 6.1 pp | +4.2 +/- 6.1 pp |
+
+For projection-trained PPO, success increased by 72 to 84 pp and collision
+decreased by 75 to 87 pp in all five checkpoints. Its leave-one-checkpoint-out
+success mean ranged from +74.25 to +77.25 pp. Baseline and high-penalty
+collision reductions were instead balanced primarily by additional timeout.
+
+The outcome identity was checked for every checkpoint:
+
+\[
+\Delta S+\Delta C+\Delta T=0.
+\]
+
+This permits net outcome accounting but does not identify the individual
+episode transitions. The paired fixed-geometry evidence supports substantial
+empirical filter dependence for projection-trained PPO, but not deliberate
+reliance, a causal co-adaptation mechanism, or formal safety.
+
+#### Step gate
+
+Phase II, Step 7 passes. All 15 same-checkpoint effects, sample SDs, ranges,
+signs, and leave-one-checkpoint-out summaries were reconciled. Phase II,
+Step 8 is recorded below.
+
+### Phase II, Step 8: transfer-suite performance
+
+Step 8 was executed read-only against the 720 committed rows in
+`results/tables/core_layout_transfer/evaluation_episode_results.csv`. The
+transfer suite contains three methods, five checkpoints per method, two
+projection modes, and 24 prespecified layouts. Each checkpoint-mode-layout
+cell contains one deterministic actor-mean episode.
+
+The checkpoint remains the independent training replicate, with \(n=5\) per
+method. The 24 layouts are fixed task conditions crossed with all checkpoints.
+A per-layout rate is therefore the fraction of the five observed checkpoints
+with an outcome in that named layout, not a stochastic episode probability or
+a new independent-policy sample.
+
+For terminal indicator \(Y_{m,s,q,\ell}\), checkpoint aggregation and the
+paired effect were reconstructed as
+
+\[
+\bar Y_{m,s,q}=\frac{1}{24}\sum_{\ell=1}^{24}Y_{m,s,q,\ell},
+\qquad
+\Delta_{m,s}=\bar Y_{m,s,\mathrm{enabled}}
+-\bar Y_{m,s,\mathrm{disabled}}.
+\]
+
+The five checkpoint effects were summarized by
+
+\[
+\bar\Delta_m=\frac{1}{5}\sum_{s=1}^{5}\Delta_{m,s},
+\qquad
+s_{\Delta,m}=\sqrt{\frac{1}{4}\sum_{s=1}^{5}
+(\Delta_{m,s}-\bar\Delta_m)^2}.
+\]
+
+The direct reconstruction was reconciled against:
+
+```text
+results/tables/core_layout_transfer/checkpoint_summary.csv
+results/tables/core_layout_transfer/method_summary.csv
+results/tables/core_layout_transfer/paired_projection_deltas.csv
+results/tables/core_layout_transfer/paired_projection_summary.csv
+results/tables/core_layout_transfer/result_build_audit.json
+experiments/projection_analysis_protocol.json
+evaluation/layouts/core_navigation_layouts.json
+```
+
+#### Absolute transfer outcomes
+
+| Training condition | Projection | Success mean +/- SD | Collision mean +/- SD | Timeout mean +/- SD |
+|---|---|---:|---:|---:|
+| PPO baseline | Disabled | 7.50% +/- 16.77 pp | 5.00% +/- 9.03 pp | 87.50% +/- 25.69 pp |
+| PPO baseline | Enabled | 7.50% +/- 16.77 pp | 3.33% +/- 7.45 pp | 89.17% +/- 24.22 pp |
+| PPO high penalty | Disabled | 0.00% +/- 0.00 pp | 1.67% +/- 3.73 pp | 98.33% +/- 3.73 pp |
+| PPO high penalty | Enabled | 0.00% +/- 0.00 pp | 0.00% +/- 0.00 pp | 100.00% +/- 0.00 pp |
+| PPO trained with projection | Disabled | 27.50% +/- 3.73 pp | 63.33% +/- 3.49 pp | 9.17% +/- 5.43 pp |
+| PPO trained with projection | Enabled | 33.33% +/- 4.17 pp | 12.50% +/- 6.59 pp | 54.17% +/- 7.80 pp |
+
+Baseline success was contributed entirely by seed 3, which succeeded in 9 of
+24 layouts in both modes; the other four checkpoints had zero success. No
+high-penalty checkpoint succeeded. Projection-trained enabled execution had
+the highest success and much lower collision than its disabled counterpart,
+but timeout was its dominant enabled terminal outcome.
+
+#### Paired transfer effects
+
+| Training condition | Success delta | Collision delta | Timeout delta |
+|---|---:|---:|---:|
+| PPO baseline | 0.00 +/- 0.00 pp | -1.67 +/- 2.28 pp | +1.67 +/- 2.28 pp |
+| PPO high penalty | 0.00 +/- 0.00 pp | -1.67 +/- 3.73 pp | +1.67 +/- 3.73 pp |
+| PPO trained with projection | +5.83 +/- 2.28 pp | -50.83 +/- 9.50 pp | +45.00 +/- 9.95 pp |
+
+Projection-trained checkpoint effects in seed order were:
+
+```text
+success:   +4.17,  +8.33,  +4.17,  +4.17,  +8.33 pp
+collision: -41.67, -41.67, -50.00, -62.50, -58.33 pp
+timeout:   +37.50, +33.33, +45.83, +58.33, +50.00 pp
+```
+
+Baseline checkpoint S/C/T effects in seed order were
+`0.00/-4.17/+4.17`, `0.00/0.00/0.00`, `0.00/-4.17/+4.17`,
+`0.00/0.00/0.00`, and `0.00/0.00/0.00` pp. High-penalty checkpoint effects
+were `0.00/-8.33/+8.33` for seed 1 and `0.00/0.00/0.00` for seeds 2 through
+5.
+
+All five checkpoints retained positive success, negative collision, and
+positive timeout effects. Leave-one-checkpoint-out mean ranges were +5.21 to
++6.25 pp for success, -53.13 to -47.92 pp for collision, and +41.67 to
++47.92 pp for timeout. For baseline, collision decreased in two checkpoints
+and was unchanged in three. For high-penalty PPO, it decreased in one and was
+unchanged in four. Success was unchanged in all five checkpoints for both
+nominally trained methods.
+
+Leave-one-checkpoint-out terminal-outcome mean ranges were:
+
+| Training condition | Success range | Collision range | Timeout range |
+|---|---:|---:|---:|
+| PPO baseline | 0.00 to 0.00 pp | -2.08 to -1.04 pp | +1.04 to +2.08 pp |
+| PPO high penalty | 0.00 to 0.00 pp | -2.08 to 0.00 pp | 0.00 to +2.08 pp |
+| PPO trained with projection | +5.21 to +6.25 pp | -53.13 to -47.92 pp | +41.67 to +47.92 pp |
+
+Projection-trained supporting effects were positive in all five checkpoints:
+
+```text
+evaluation return:          +3.4877 +/- 0.6047
+episode length:            +90.4333 +/- 14.0422 transitions
+minimum obstacle clearance: +0.0991 +/- 0.0180 coordinate units
+```
+
+The clearance summary excludes the obstacle-free `control_open_route` layout,
+where clearance is structurally undefined. Increased episode length is
+interpreted jointly with outcomes because many collision-avoiding runs
+continued until timeout.
+
+#### Layout breadth and exploratory observations
+
+The breadth of nonzero layout-mean effects was:
+
+| Training condition | Success positive / zero | Collision negative / zero | Timeout positive / zero |
+|---|---:|---:|---:|
+| PPO baseline | 0 / 24 | 2 / 22 | 2 / 22 |
+| PPO high penalty | 0 / 24 | 2 / 22 | 2 / 22 |
+| PPO trained with projection | 6 / 18 | 20 / 4 | 15 / 9 |
+
+No layout had a negative mean success effect or a positive mean collision
+effect for any method. These counts describe breadth over fixed, potentially
+related task conditions and are not a 24-replicate inferential sample.
+
+Under enabled projection-trained execution, 12 layouts had zero success across
+all five checkpoints and four layouts had success across all five. The four
+all-success layouts were `control_symmetric_clearance`,
+`control_upper_clearance`, `double_near_staggered_upper_first`, and
+`single_near_late_upper`. All six triple-obstacle layouts had zero success.
+
+Two observations remain exploratory and are not final claims. On obstacle-free
+`control_open_route`, two projection-trained checkpoints succeeded and three
+timed out in both modes, with projection inactive. Across 11 name-matched
+upper/lower layout pairs, enabled projection-trained success averaged 45.45%
+for upper variants and 14.55% for lower variants, a descriptive difference of
+30.91 pp. These observations do not identify policy specialization,
+directional bias, or their mechanism.
+
+#### Separate-suite interpretation
+
+For projection-trained PPO, the fixed-suite paired changes were
++76.2/-80.4/+4.2 pp for success/collision/timeout. The corresponding transfer
+changes were +5.83/-50.83/+45.00 pp. Collision reduction persisted under both
+protocols, but its net accounting differed: fixed-geometry reduction was
+balanced mainly by success, while transfer reduction was balanced mainly by
+timeout.
+
+This does not establish that geometry alone caused the difference. The fixed
+suite used stochastic action sampling and 100 repeats in one geometry. The
+transfer suite used the deterministic actor mean once in each of 24 layouts.
+They remain separate estimands.
+
+The transfer result supports broad empirical collision reduction and continued
+filter dependence for projection-trained PPO. It also shows that collision
+avoidance did not become comparably strong task completion across the tested
+transfer suite. It does not establish formal safety, arbitrary geometric
+generalization, or a causal policy-projector learning mechanism. Marginal
+outcome effects also do not identify paired terminal transitions.
+
+#### Step gate
+
+Phase II, Step 8 passes. Absolute and paired transfer outcomes, all five
+checkpoint effects, sample SD, sign consistency, leave-one-checkpoint-out
+stability, and layout breadth are verified without modifying frozen evidence.
+The next analytical action is Phase II, Step 9: terminal-outcome transition
+analysis within each matched checkpoint and evaluation key.
+
+### Phase II, Step 9: paired terminal-outcome correspondences
+
+Step 9 reconstructed which terminal outcome occurred under projection-enabled
+execution for every matching projection-disabled evaluation key. Pairing used
+method, training seed, checkpoint SHA-256, layout ID, layout repeat, and
+evaluation seed. Projection mode was the only excluded key field. The frozen
+episode rows were read without rerunning a policy or changing a result table.
+
+For disabled outcome (i), enabled outcome (j), method (m), and checkpoint
+(s), the count was
+
+\[
+N_{ij}^{(m,s)}=\sum_k
+\mathbf{1}\{Y_{m,s,k,\mathrm{off}}=i,
+Y_{m,s,k,\mathrm{on}}=j\},
+\qquad i,j\in\{S,C,T\}.
+\]
+
+Every checkpoint matrix retains all nine cells. Rows are disabled outcomes,
+columns are enabled outcomes, and both use the order success, collision,
+timeout. Row margins reproduce disabled terminal counts, column margins
+reproduce enabled terminal counts, and their differences reproduce the
+enabled-minus-disabled paired outcome changes. Method summaries use the five
+trained checkpoints as independent units. Pooled counts describe matched
+evaluation coverage only.
+
+#### Fixed-geometry checkpoint profiles
+
+Each compact matrix is written as
+`[SS, SC, ST; CS, CC, CT; TS, TC, TT]`. Each checkpoint contains 100 matched
+episode pairs.
+
+| Training condition | Seed | Complete transition-count profile |
+|---|---:|---|
+| PPO baseline | 1 | `[8, 0, 0; 1, 1, 8; 0, 0, 82]` |
+| PPO baseline | 2 | `[0, 0, 0; 0, 0, 5; 0, 0, 95]` |
+| PPO baseline | 3 | `[49, 0, 2; 8, 0, 9; 3, 0, 29]` |
+| PPO baseline | 4 | `[16, 0, 1; 3, 0, 11; 1, 0, 68]` |
+| PPO baseline | 5 | `[0, 0, 0; 0, 0, 24; 0, 0, 76]` |
+| PPO high penalty | 1 | `[0, 0, 0; 0, 0, 7; 1, 0, 92]` |
+| PPO high penalty | 2 | `[0, 0, 0; 0, 0, 12; 0, 0, 88]` |
+| PPO high penalty | 3 | `[0, 0, 0; 0, 2, 14; 0, 0, 84]` |
+| PPO high penalty | 4 | `[0, 0, 0; 0, 1, 22; 0, 0, 77]` |
+| PPO high penalty | 5 | `[0, 0, 0; 0, 0, 9; 0, 0, 91]` |
+| PPO trained with projection | 1 | `[5, 0, 1; 73, 5, 14; 0, 0, 2]` |
+| PPO trained with projection | 2 | `[12, 0, 0; 84, 1, 3; 0, 0, 0]` |
+| PPO trained with projection | 3 | `[21, 0, 1; 75, 0, 2; 1, 0, 0]` |
+| PPO trained with projection | 4 | `[24, 0, 0; 75, 0, 1; 0, 0, 0]` |
+| PPO trained with projection | 5 | `[22, 1, 0; 75, 0, 1; 1, 0, 0]` |
+
+The pooled fixed-geometry matrices, each over 500 matched pairs, were:
+
+| Training condition | Pooled 3 by 3 matrix |
+|---|---|
+| PPO baseline | `[[73, 0, 3], [12, 1, 57], [4, 0, 350]]` |
+| PPO high penalty | `[[0, 0, 0], [0, 3, 64], [1, 0, 432]]` |
+| PPO trained with projection | `[[84, 1, 2], [382, 6, 21], [2, 0, 2]]` |
+
+The projection-trained result resolves the Step 7 marginal accounting. Of 409
+disabled collisions, 382 corresponded to enabled success, 21 to enabled
+timeout, and six to enabled collision. The collision-to-success proportion was
+therefore 382/409, or 93.4%. Its count was large in every checkpoint: 73, 84,
+75, 75, and 75. Most of the fixed-geometry collision reduction was thus paired
+with successful completion under the composite controller.
+
+The matrix also prevents an absolute preservation claim. Among 87 disabled
+successes for projection-trained PPO, 84 remained successes, one corresponded
+to enabled collision, and two corresponded to enabled timeout. Two of four
+disabled timeouts corresponded to enabled success and two remained timeouts.
+
+The nominally trained methods showed a different correspondence. Baseline
+disabled collisions mapped to success in 12 of 70 cases, timeout in 57, and
+collision in one. High-penalty disabled collisions mapped to success in zero
+of 67 cases, timeout in 64, and collision in three. Their fixed-suite collision
+reductions were therefore associated mainly with noncompletion rather than
+success.
+
+#### Transfer checkpoint profiles
+
+Each transfer checkpoint contains 24 matched layout pairs.
+
+| Training condition | Seed | Complete transition-count profile |
+|---|---:|---|
+| PPO baseline | 1 | `[0, 0, 0; 0, 0, 1; 0, 0, 23]` |
+| PPO baseline | 2 | `[0, 0, 0; 0, 0, 0; 0, 0, 24]` |
+| PPO baseline | 3 | `[9, 0, 0; 0, 4, 1; 0, 0, 10]` |
+| PPO baseline | 4 | `[0, 0, 0; 0, 0, 0; 0, 0, 24]` |
+| PPO baseline | 5 | `[0, 0, 0; 0, 0, 0; 0, 0, 24]` |
+| PPO high penalty | 1 | `[0, 0, 0; 0, 0, 2; 0, 0, 22]` |
+| PPO high penalty | 2 | `[0, 0, 0; 0, 0, 0; 0, 0, 24]` |
+| PPO high penalty | 3 | `[0, 0, 0; 0, 0, 0; 0, 0, 24]` |
+| PPO high penalty | 4 | `[0, 0, 0; 0, 0, 0; 0, 0, 24]` |
+| PPO high penalty | 5 | `[0, 0, 0; 0, 0, 0; 0, 0, 24]` |
+| PPO trained with projection | 1 | `[6, 0, 0; 1, 4, 9; 0, 0, 4]` |
+| PPO trained with projection | 2 | `[6, 0, 0; 2, 5, 8; 0, 0, 3]` |
+| PPO trained with projection | 3 | `[8, 0, 0; 1, 3, 11; 0, 0, 1]` |
+| PPO trained with projection | 4 | `[6, 0, 0; 1, 1, 14; 0, 0, 2]` |
+| PPO trained with projection | 5 | `[7, 0, 0; 2, 2, 12; 0, 0, 1]` |
+
+The pooled transfer matrices, each over 120 matched pairs, were:
+
+| Training condition | Pooled 3 by 3 matrix |
+|---|---|
+| PPO baseline | `[[9, 0, 0], [0, 4, 2], [0, 0, 105]]` |
+| PPO high penalty | `[[0, 0, 0], [0, 0, 2], [0, 0, 118]]` |
+| PPO trained with projection | `[[33, 0, 0], [7, 15, 54], [0, 0, 11]]` |
+
+All transfer off-diagonal correspondences originated from disabled collisions.
+Every disabled success remained a success, and every disabled timeout remained
+a timeout. For projection-trained PPO, 7 of 76 disabled collisions corresponded
+to enabled success, 54 corresponded to enabled timeout, and 15 remained
+collisions. These conditional proportions were 9.2%, 71.1%, and 19.7%,
+respectively. Collision-to-success occurred in only one or two layouts per
+checkpoint, whereas collision-to-timeout occurred in 8 to 14.
+
+Baseline disabled collisions produced zero successes: four of six remained
+collisions and two corresponded to timeout. Both high-penalty disabled
+collisions corresponded to timeout. The transition analysis therefore
+strengthens the Step 8 statement that collision reduction transferred more
+broadly than successful task completion under the tested protocol.
+
+#### Reconciliation and interpretation boundary
+
+The fixed output contains 1,500 matched pairs and the transfer output contains
+360. In both suites, all integer row and column margins were exact, all outcome
+count deltas summed to zero, and 270 comparisons against the checkpoint,
+method, paired-delta, and paired-summary hierarchy passed. The largest
+floating-point discrepancy was (1.11\times10^{-16}), below the declared
+(10^{-12}) tolerance. All 21 focused interpretation tests passed.
+
+The row-to-column arrow is a descriptive correspondence between matched
+disabled and enabled controller executions. It is not a temporal transition
+within one trajectory because the executions may diverge after their actions
+differ. The matrices do not establish deliberate actor reliance, a causal
+policy-projector co-adaptation mechanism, formal safety, performance under a
+different projector, or arbitrary geometric generalization. Cross-suite
+differences also cannot be assigned to geometry alone because action-selection
+mode and repetition structure differ.
+
+#### Step gate
+
+Phase II, Step 9 passes. Every checkpoint profile and every matrix cell was
+retained, reconciled, and interpreted with the trained checkpoint as the
+independent unit. The next scientific step is Phase II, Step 10: attribute the
+verified evidence carefully to nominal-policy behavior and policy-plus-
+projector composite-controller behavior. Step 10 requires a separate purpose,
+source, procedure, assumptions, and authorization before execution.
+
 ## Analysis still to add
 
+- Nominal-policy versus composite-controller attribution in Phase II, Step 10.
 - Final separation of supported conclusions, limitations, and follow-up hypotheses.
-- Documentation-only release commit, pull-request merge, visibility verification, and paper-results drafting.
+- Scientific interpretation, empirical technical-report drafting, and final
+  report traceability audit.
+
+
+## Completed-repository handoff, 7 September 2026
+
+The final source, evidence-inclusion, documentation, and verification decisions
+are recorded in [repository release audit](repository_release_audit.md). The
+completed empirical findings and inferential boundaries are consolidated in the
+[final study record](final_study_record.md). Read-only interpretation outputs and
+the exact reconstruction argument arrays are retained under
+`results/interpretation/`. These reconstructions use the same frozen input data;
+no final training, policy evaluation, calibration, or benchmark was repeated.
+
+For the completed release, run the full tests and
+`python -m evaluation.verify_repository_release --base-ref main`. After staging,
+add `--require-tracked` to verify the exact file inventory and staged content.
+The historical pre-experiment runner remains available for future development
+and is not the merge gate for this completed study.

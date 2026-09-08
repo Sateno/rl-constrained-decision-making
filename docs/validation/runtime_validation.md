@@ -1,4 +1,9 @@
-# Runtime Validation
+# Development and Historical Runtime Validation
+
+For the completed release, use [release verification](release_verification.md).
+The workflows below create development training, evaluation, or benchmark data.
+They document retained development entry points and historical PASS records;
+they are not commands to rerun for the final merge.
 
 ## Principle
 
