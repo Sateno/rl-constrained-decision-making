@@ -2,18 +2,13 @@
 
 An offline, browser-based viewer for matched Projection OFF / ON recordings. The interface uses dark navy panels, coral and teal trajectories, and synchronized playback. It reads saved arrays; it never trains a policy, runs an environment, or solves a QP.
 
-## Install this overlay
+## Setup
 
-Copy the ZIP's `visualization/` folder into your repository root and allow the included files to replace their counterparts. Keep the other files already in `visualization/trajectory_viewer/`, including `data.py`, `render.py`, and `requirements.txt`. No files need to be deleted.
+The explorer is included in this repository under `visualization/trajectory_viewer/`. It requires Python, NumPy, and Matplotlib, plus a browser. FFmpeg is needed only for MP4 export.
 
-This overlay contains four files:
+Playback also requires the preserved final-evaluation trajectory archives and their matching episode-result tables. A fresh Git checkout contains the tables but does not include the archives under `runs/`; restore those archives using the paths in [Data and display contract](#data-and-display-contract).
 
-- `visualization/trajectory_viewer/viewer.py` — local launcher and recording access.
-- `visualization/trajectory_viewer/viewer.html` — the new browser interface.
-- `visualization/trajectory_viewer/README.md` — these instructions.
-- `visualization/trajectory_viewer/tests/test_viewer.py` — local-server checks using synthetic data.
-
-No new Python dependency is required. From your repository root, with your project environment active:
+From your repository root, with your Python environment active, install the viewer dependencies and launch it:
 
 ```powershell
 python -m pip install -r visualization/trajectory_viewer/requirements.txt

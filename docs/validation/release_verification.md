@@ -13,6 +13,10 @@ These commands work with `runs/` entirely absent. They do not launch final
 training, policy evaluation, calibration, or device benchmarking. Tests use
 small temporary fixtures to check software behavior.
 
+The root pytest command includes the trajectory explorer's archive-loader and
+local-server tests. These use synthetic recordings and mocked video rendering;
+they require neither the preserved run archives nor FFmpeg.
+
 All `runs/` files remain excluded from Git and preserved in local archives.
 If the previous package caused them to be staged, unstage `runs/` in your editor.
 Changing ignore rules alone does not remove an already staged file. Preserve
@@ -20,7 +24,7 @@ all local files; `runs/` is not part of the filesystem deletion list.
 
 The normal verifier checks:
 
-- the 182-file repository inventory and audited content, including source,
+- the 191-file repository inventory and audited content, including source,
   protocols, environment specification, curated results, and documentation;
 - the three externally compiled manual PDFs and exact staged/working bytes;
 - absence of tracked `runs/` files and retired source/production trees;

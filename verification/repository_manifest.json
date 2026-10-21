@@ -85,7 +85,8 @@
     "results/interpretation/README.md",
     "verification/README.md",
     "docs/records/final_study_record.md",
-    "docs/records/repository_release_audit.md"
+    "docs/records/repository_release_audit.md",
+    "visualization/trajectory_viewer/README.md"
   ],
   "files": {
     ".gitattributes": {
@@ -101,7 +102,7 @@
       "text": true
     },
     "README.md": {
-      "sha256": "cef00eb4448e1ba57c56cd507e5f8d1762f46c0552e52a0f0024493b7e7eccd5",
+      "sha256": "ff8e6eb9c137f05648c287e5f72821dca05372fe2994313ed88c0cb2065e134c",
       "text": true
     },
     "THIRD_PARTY_NOTICES.md": {
@@ -257,7 +258,7 @@
       "text": true
     },
     "docs/validation/release_verification.md": {
-      "sha256": "a3e68a570d8687821272c8d58165a1c2aedb01b60fe711326c62920cf32dbae6",
+      "sha256": "dfb8baae5167537054adea2da373e08beda27abbc0f41dc9a72dad3f97e82d37",
       "text": true
     },
     "docs/validation/runtime_validation.md": {
@@ -385,7 +386,7 @@
       "text": true
     },
     "pytest.ini": {
-      "sha256": "93dac66233bc9d8aa6991af78d5c2051885dce0dc20a895a5597fc59a7b0ba80",
+      "sha256": "66028f67e8c104b5721fc2d69abf3758d573d76cef9e5e2dcad04fe83e2d562d",
       "text": true
     },
     "results/calibration/core_navigation_layouts_v1/README.md": {
@@ -793,11 +794,47 @@
       "text": true
     },
     "verification/README.md": {
-      "sha256": "493656680493fd906978d456e6aacd4ba6705c0053d7c29671c400b84adbdd0d",
+      "sha256": "caca50a4895eb6ac12430f2d923adc55e605daed8567f7752cfad7ab216b0dea",
       "text": true
     },
     "verification/audit_environment.json": {
       "sha256": "68eebd21c9dba96c1cf9a1b44af9c482fd11dbae008bfab0b3e1f26538dae529",
+      "text": true
+    },
+    "visualization/trajectory_viewer/README.md": {
+      "sha256": "5c5bd30ff5f22dd25eeccdc2f3a0fb99e13b85c7d1ee8e6c6fb6365c3e24660d",
+      "text": true
+    },
+    "visualization/trajectory_viewer/data.py": {
+      "sha256": "52939bee337b883a3102b4bd983e78770dfa7f63afee407fa9c00c5612986c8e",
+      "text": true
+    },
+    "visualization/trajectory_viewer/launch_viewer.bat": {
+      "sha256": "0d39f5c6e6d510e10e915e8458a92cf31ec52a55cd3131390da0d3d6de148f68",
+      "text": true
+    },
+    "visualization/trajectory_viewer/render.py": {
+      "sha256": "8b0cd75c38519791b01d2264421a72c6e3bb6ddb2a05bbf4557f1fa4c7f872f9",
+      "text": true
+    },
+    "visualization/trajectory_viewer/requirements.txt": {
+      "sha256": "a5b743f043931b9c946aa9a447166b78b228430d9d9a1fb1c91758b2755cfda3",
+      "text": true
+    },
+    "visualization/trajectory_viewer/tests/test_data.py": {
+      "sha256": "47bf5d28136a0e16d41b0f00050d54735e1b4e16602152861b526f380c90ed8e",
+      "text": true
+    },
+    "visualization/trajectory_viewer/tests/test_viewer.py": {
+      "sha256": "1e57874a6a34b8ee1592da55060e50a679e494e668586c976e142c7e290c4e3e",
+      "text": true
+    },
+    "visualization/trajectory_viewer/viewer.html": {
+      "sha256": "4dfadb802e05a65136eb69f11c4a15ddc246e9bcecc255aefb90397c81662e5a",
+      "text": true
+    },
+    "visualization/trajectory_viewer/viewer.py": {
+      "sha256": "07056e14e8831c22598a00cf34223921dd99fa88cadaf276fb57d61aed07de51",
       "text": true
     }
   },

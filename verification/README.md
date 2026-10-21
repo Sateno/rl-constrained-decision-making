@@ -5,7 +5,7 @@
 - `files` contains the source, tests, environment specification, frozen
   protocols, curated tables/exports, analysis outputs, and documentation that
   belong in Git. Together with the manifest and three manual PDFs, the release
-  contains 182 repository files.
+  contains 191 repository files, including the optional trajectory explorer.
 - `local_archive_files` records checksums for 181 preserved files under `runs/`.
   These are metadata references only. The files themselves are excluded from
   Git and are not required by the normal repository checks.
