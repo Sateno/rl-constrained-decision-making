@@ -1,0 +1,1381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>PAP trajectory explorer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23192330'/%3E%3Cpath d='M8 28Q12 10 20 20T32 10' fill='none' stroke='%235bcec3' stroke-width='4'/%3E%3C/svg%3E">
+<style>
+:root {
+  --page:#131d28;
+  --panel:#1d2a38;
+  --field:#202e3d;
+  --line:#3a4b5e;
+  --line-soft:#2b3b4c;
+  --ink:#edf3fb;
+  --muted:#a9bbce;
+  --dim:#8498ae;
+  --teal:#63d4c7;
+  --coral:#f58c91;
+  --amber:#f3c56b;
+  --radius:14px;
+  font-family:Inter,"Segoe UI",-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+  font-synthesis:none;
+  color:var(--ink);
+  background:var(--page);
+}
+* {
+  box-sizing:border-box;
+}
+body {
+  margin:0;
+  min-width:360px;
+  background:radial-gradient(ellipse at 60% -280px,#25364b 0,transparent 740px),var(--page);
+  font-size:14px;
+  line-height:1.45;
+}
+button,select,input {
+  font:inherit;
+}
+button,select {
+  min-height:40px;
+}
+button,a,select,input {
+  -webkit-tap-highlight-color:transparent;
+}
+button,select {
+  border-radius:8px;
+  border:1px solid var(--line);
+  color:var(--ink);
+  background:var(--field);
+}
+button {
+  padding:9px 15px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-weight:550;
+  white-space:nowrap;
+  transition:background .15s,border-color .15s,transform .15s;
+}
+button:hover:not(:disabled) {
+  background:#2b3b4e;
+  border-color:#627991;
+}
+button:active:not(:disabled) {
+  transform:translateY(1px);
+}
+button:disabled,select:disabled,input:disabled {
+  opacity:.42;
+  cursor:default;
+}
+button.primary {
+  background:#e5edf7;
+  color:#182536;
+  border-color:#e5edf7;
+  min-width:96px;
+}
+button.primary:hover:not(:disabled) {
+  background:#fff;
+  border-color:#fff;
+}
+button svg {
+  width:15px;
+  height:15px;
+  flex:none;
+}
+button:focus-visible,select:focus-visible,a:focus-visible,input:focus-visible {
+  outline:2px solid var(--teal);
+  outline-offset:4px;
+}
+select {
+  width:100%;
+  padding:9px 36px 9px 12px;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23b9c9da' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  text-overflow:ellipsis;
+  cursor:pointer;
+}
+select:hover:not(:disabled) {
+  border-color:#627991;
+}
+option {
+  background:var(--field);
+  color:var(--ink);
+}
+a {
+  color:var(--teal);
+  text-underline-offset:3px;
+}
+svg {
+  display:block;
+}
+.app {
+  max-width:1240px;
+  margin:auto;
+  padding:28px 30px 22px;
+}
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  margin-bottom:25px;
+}
+.title {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.brand-icon {
+  height:36px;
+  width:36px;
+  border:1px solid #385264;
+  background:#203746;
+  border-radius:11px;
+  padding:8px;
+  flex:none;
+}
+.brand-icon path {
+  stroke:var(--teal);
+}
+h1 {
+  margin:0;
+  font-size:25px;
+  line-height:1.2;
+  font-weight:650;
+  letter-spacing:-.7px;
+}
+.subtitle {
+  color:var(--muted);
+  font-size:13px;
+  margin:7px 0 0;
+}
+.local-badge {
+  display:flex;
+  gap:7px;
+  align-items:center;
+  font-size:11px;
+  color:var(--muted);
+  padding:6px 10px;
+  border:1px solid var(--line-soft);
+  border-radius:20px;
+  white-space:nowrap;
+}
+.local-badge span {
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--teal);
+}
+.filters {
+  display:grid;
+  grid-template-columns:1.2fr 1.25fr .72fr 1.15fr;
+  gap:14px;
+  margin-bottom:15px;
+}
+.field label {
+  display:block;
+  font-size:12px;
+  font-weight:550;
+  color:#c6d4e4;
+  margin-bottom:7px;
+  letter-spacing:.05px;
+}
+.pair-field {
+  margin-bottom:13px;
+}
+.pair-label {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.pair-label label {
+  margin-bottom:7px;
+}
+.count {
+  font-size:11px;
+  color:var(--dim);
+  font-variant-numeric:tabular-nums;
+}
+.metadata {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  color:var(--muted);
+  font-size:12px;
+  min-height:19px;
+  margin:0 0 18px;
+}
+.metadata .dot {
+  color:#53677d;
+}
+.metadata .mode {
+  color:#d7e5f4;
+}
+.scenes {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+.scene {
+  position:relative;
+  min-width:0;
+  background:linear-gradient(145deg,#20303f,#1c2937 75%);
+  border:1px solid #3b4e62;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:0 7px 22px #08111b18;
+}
+.scene-head {
+  padding:17px 19px 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.scene-title {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:-.05px;
+}
+.scene-title .swatch {
+  height:8px;
+  width:8px;
+  border-radius:50%;
+  background:var(--coral);
+  box-shadow:0 0 12px #f58c9120;
+}
+.scene.on .swatch {
+  background:var(--teal);
+  box-shadow:0 0 12px #63d4c720;
+}
+.mode-tag {
+  font-size:10px;
+  color:var(--dim);
+  border:1px solid #3c4e60;
+  border-radius:5px;
+  padding:3px 6px;
+  letter-spacing:.25px;
+}
+.canvas-wrap {
+  height:350px;
+  position:relative;
+  width:100%;
+  overflow:hidden;
+}
+.canvas-wrap canvas {
+  display:block;
+  width:100%;
+  height:100%;
+}
+.scene-foot {
+  border-top:1px solid #33455580;
+  margin:0 19px;
+  padding:14px 0 16px;
+  min-height:80px;
+}
+.scene-status {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:7px;
+}
+.status {
+  font-size:11px;
+  font-weight:650;
+  letter-spacing:.8px;
+  color:#d7e6f7;
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.status:before {
+  content:"";
+  height:5px;
+  width:5px;
+  border-radius:50%;
+  background:#8fa5bc;
+}
+.status[data-state="SUCCESS"] {
+  color:var(--teal);
+}
+.status[data-state="SUCCESS"]:before {
+  background:var(--teal);
+}
+.status[data-state="COLLISION"] {
+  color:var(--coral);
+}
+.status[data-state="COLLISION"]:before {
+  background:var(--coral);
+}
+.status[data-state="TIMEOUT"] {
+  color:var(--amber);
+}
+.status[data-state="TIMEOUT"]:before {
+  background:var(--amber);
+}
+.status[data-state="PLAYING"]:before {
+  background:var(--teal);
+  box-shadow:0 0 7px #63d4c775;
+}
+.scene-time {
+  font-size:12px;
+  color:#cddbeb;
+  font-variant-numeric:tabular-nums;
+}
+.diagnostics {
+  font-size:11px;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  column-gap:7px;
+  row-gap:4px;
+}
+.diagnostics .intervened {
+  color:var(--amber);
+}
+.controls {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:18px;
+  flex-wrap:wrap;
+}
+.compact-select {
+  width:auto;
+  min-width:98px;
+  padding-left:12px;
+  padding-right:33px;
+}
+.controls .spacer {
+  flex:1;
+}
+.angle-control {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  white-space:nowrap;
+  margin-left:3px;
+}
+.angle-control label {
+  font-size:12px;
+  color:var(--muted);
+}
+.angle-control input {
+  width:94px;
+  max-width:100%;
+}
+.clock {
+  font-size:12px;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+  color:#dae7f5;
+  margin-left:6px;
+}
+.clock .duration {
+  color:var(--dim);
+}
+.export-button {
+  font-size:12px;
+  min-height:38px;
+}
+.timeline {
+  margin-top:18px;
+  height:20px;
+  display:flex;
+  align-items:center;
+}
+.timeline input {
+  width:100%;
+  margin:0;
+}
+.range {
+  --progress:0%;
+  appearance:none;
+  height:5px;
+  border-radius:8px;
+  background:linear-gradient(to right,#bdcfe0 var(--progress),#324253 var(--progress));
+  cursor:pointer;
+  display:block;
+  accent-color:#e7f1fb;
+}
+.range::-webkit-slider-thumb {
+  appearance:none;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:#f4f8ff;
+  border:0;
+  box-shadow:0 1px 5px #0005;
+}
+.range::-moz-range-thumb {
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:#f4f8ff;
+  border:0;
+  box-shadow:0 1px 5px #0005;
+}
+.range:hover::-webkit-slider-thumb {
+  box-shadow:0 0 0 5px #bcd6f01a;
+}
+.range:disabled {
+  opacity:.35;
+}
+.notes {
+  color:var(--dim);
+  font-size:11px;
+  line-height:1.7;
+  margin:14px 0 0;
+  max-width:980px;
+}
+.notes strong {
+  color:#b9cadb;
+  font-weight:500;
+}
+.notes .amber {
+  color:var(--amber);
+}
+.error {
+  display:none;
+  border:1px solid #815258;
+  background:#432c35;
+  border-radius:9px;
+  color:#ffced1;
+  padding:12px 15px;
+  margin:0 0 16px;
+  font-size:13px;
+  white-space:pre-wrap;
+}
+.error.visible {
+  display:block;
+}
+.export-status {
+  font-size:12px;
+  color:var(--muted);
+  margin-top:10px;
+  display:none;
+}
+.export-status.visible {
+  display:block;
+}
+.empty-label {
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#a8bacb;
+  font-size:13px;
+  pointer-events:none;
+}
+.empty-label[hidden] {
+  display:none;
+}
+.loading-dot {
+  height:5px;
+  width:5px;
+  border-radius:50%;
+  background:var(--teal);
+  margin-right:8px;
+  animation:pulse 1.1s infinite;
+}
+@keyframes pulse {
+  50% {
+    opacity:.25;
+  }
+}
+.divider {
+  color:#53677c;
+}
+.export-status a {
+  margin-left:9px;
+}
+@media(min-width:1450px) {
+  .app {
+    padding-top:40px;
+  }
+  .canvas-wrap {
+    height:390px;
+  }
+}
+@media(max-width:900px) {
+  .app {
+    padding:24px 22px 20px;
+  }
+  .canvas-wrap {
+    height:310px;
+  }
+  .mode-tag {
+    display:none;
+  }
+  .controls {
+    gap:9px;
+  }
+  .angle-control {
+    margin-left:0;
+  }
+  .controls .spacer {
+    display:none;
+  }
+  .clock {
+    margin-left:auto;
+  }
+  .export-button {
+    margin-left:0;
+  }
+  .filters {
+    gap:12px;
+  }
+  .scene-head {
+    padding:16px 15px 0;
+  }
+  .scene-foot {
+    margin:0 15px;
+  }
+  .diagnostics {
+    font-size:10px;
+    column-gap:5px;
+  }
+}
+@media(max-width:700px) {
+  .app {
+    padding:21px 16px 18px;
+  }
+  .header {
+    margin-bottom:23px;
+  }
+  .local-badge {
+    display:none;
+  }
+  h1 {
+    font-size:23px;
+  }
+  .brand-icon {
+    display:none;
+  }
+  .filters {
+    grid-template-columns:1fr 1fr;
+    gap:13px;
+  }
+  .scenes {
+    gap:12px;
+  }
+  .canvas-wrap {
+    height:280px;
+  }
+  .scene-title {
+    font-size:13px;
+  }
+  .scene-head {
+    padding:15px 13px 0;
+  }
+  .scene-foot {
+    margin:0 13px;
+    padding-top:12px;
+  }
+  .scene-status {
+    align-items:flex-start;
+    gap:4px;
+  }
+  .scene-time {
+    font-size:11px;
+  }
+  .status {
+    font-size:10px;
+    letter-spacing:.6px;
+  }
+  .diagnostics {
+    font-size:10px;
+    line-height:1.5;
+  }
+  .angle-control input {
+    width:75px;
+  }
+  .export-button {
+    order:9;
+    margin-left:auto;
+    min-height:34px;
+    padding:7px 11px;
+  }
+  .controls {
+    gap:9px;
+    row-gap:12px;
+  }
+  .clock {
+    margin-left:0;
+  }
+  .timeline {
+    margin-top:13px;
+  }
+  .metadata {
+    font-size:11px;
+    gap:6px;
+  }
+  .notes {
+    font-size:10px;
+  }
+}
+@media(max-width:480px) {
+  .app {
+    padding:17px 12px;
+  }
+  .canvas-wrap {
+    height:235px;
+  }
+  .scene-head {
+    padding:13px 10px 0;
+  }
+  .scene-foot {
+    margin:0 10px;
+  }
+  .scene-title {
+    font-size:12px;
+    gap:6px;
+  }
+  .scene-time {
+    font-size:10px;
+  }
+  .controls button {
+    padding:8px 10px;
+    min-width:auto;
+  }
+  .controls .compact-select {
+    min-width:90px;
+    font-size:12px;
+  }
+  .clock {
+    order:8;
+  }
+  .angle-control {
+    order:7;
+  }
+  .scene-status {
+    flex-wrap:wrap;
+  }
+  .diagnostics {
+    column-gap:4px;
+  }
+  .brand-icon {
+    display:none;
+  }
+  h1 {
+    font-size:22px;
+  }
+  .subtitle {
+    font-size:12px;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  * {
+    transition:none!important;
+  }
+  .loading-dot {
+    animation:none;
+  }
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="header">
+    <div><div class="title"><svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19C6 19 6 6 11 6s3 12 7 12c2 0 3-7 3-13" fill="none" stroke-width="2" stroke-linecap="round"/></svg><h1>PAP trajectory explorer</h1></div><p class="subtitle" id="subtitle">Loading recorded trajectory pairs…</p></div>
+    <div class="local-badge"><span></span> Local replay</div>
+  </header>
+  <div class="error" id="error" role="alert"></div>
+  <section aria-label="Choose a recorded trajectory pair">
+    <div class="filters">
+      <div class="field"><label for="suite">Evaluation suite</label><select id="suite" disabled></select></div>
+      <div class="field"><label for="method">Training method</label><select id="method" disabled></select></div>
+      <div class="field"><label for="seed">Training seed</label><select id="seed" disabled></select></div>
+      <div class="field"><label for="outcome">OFF → ON outcome</label><select id="outcome" disabled></select></div>
+    </div>
+    <div class="field pair-field"><div class="pair-label"><label for="pair">Trajectory pair</label><span class="count" id="pair-count"></span></div><select id="pair" disabled><option>Loading recordings…</option></select></div>
+    <div class="metadata" id="metadata" aria-live="polite">Saved trajectories · Same checkpoint and initial conditions within each pair</div>
+  </section>
+  <section class="scenes" aria-label="Synchronized trajectory replay">
+    <article class="scene off"><div class="scene-head"><div class="scene-title"><span class="swatch"></span>Projection OFF</div><span class="mode-tag">Nominal policy</span></div><div class="canvas-wrap"><canvas id="canvas-off" aria-label="Recorded trajectory with projection disabled"></canvas><div class="empty-label" id="empty-off"><span class="loading-dot"></span>Loading recording…</div></div><div class="scene-foot"><div class="scene-status"><span class="status" id="status-off" data-state="READY">READY</span><span class="scene-time" id="time-off">0.00 s</span></div><div class="diagnostics" id="detail-off">Step 0 · Grid: 0.5 m</div></div></article>
+    <article class="scene on"><div class="scene-head"><div class="scene-title"><span class="swatch"></span>Projection ON</div><span class="mode-tag">Policy + projector</span></div><div class="canvas-wrap"><canvas id="canvas-on" aria-label="Recorded trajectory with projection enabled"></canvas><div class="empty-label" id="empty-on"><span class="loading-dot"></span>Loading recording…</div></div><div class="scene-foot"><div class="scene-status"><span class="status" id="status-on" data-state="READY">READY</span><span class="scene-time" id="time-on">0.00 s</span></div><div class="diagnostics" id="detail-on">Step 0 · Intervention: — · Max slack: —</div></div></article>
+  </section>
+  <section aria-label="Playback controls">
+    <div class="controls">
+      <button class="primary" id="play" disabled aria-label="Play recorded trajectories"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.8a.6.6 0 0 1 .9-.52l8 4.7a.6.6 0 0 1 0 1.04l-8 4.7a.6.6 0 0 1-.9-.52z"/></svg><span>Play</span></button>
+      <button id="restart" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.1 5.7A5 5 0 1 1 3 10M3 2v4h4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Restart</button>
+      <select id="speed" class="compact-select" aria-label="Playback speed"><option value="0.25">0.25× speed</option><option value="0.5">0.5× speed</option><option value="1" selected>1× speed</option><option value="2">2× speed</option><option value="4">4× speed</option><option value="8">8× speed</option></select>
+      <select id="view" class="compact-select" aria-label="Camera view"><option value="3d">3D view</option><option value="2d">Top view</option></select>
+      <div class="angle-control"><label for="angle">Angle</label><input class="range" id="angle" type="range" min="-55" max="55" value="-12" step="1" aria-label="Camera angle in degrees"></div>
+      <span class="spacer"></span><div class="clock" id="clock">0.00 <span class="duration">/ 0.00 s</span></div>
+      <button id="export" class="export-button" disabled title="Download MP4 + provenance as ZIP"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8m-3-3 3 3 3-3M3 10v3h10v-3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Export MP4</button>
+    </div>
+    <div class="timeline"><input class="range" id="timeline" type="range" min="0" max="1" value="0" step="0.001" disabled aria-label="Replay time in seconds" aria-valuetext="0.00 seconds"></div>
+    <div class="export-status" id="export-status" role="status"></div>
+  </section>
+  <p class="notes"><strong class="amber">Amber ring:</strong> intervention on the latest completed transition. Recorded motion is interpolated for display; 3D heights are illustrative. Each episode holds its final pose after termination. <strong>Replay only:</strong> no policy inference or new evaluation. MP4 export uses the standard camera at 1× speed and downloads as a ZIP.</p>
+</main>
+<script>
+'use strict';
+
+const $ = id => document.getElementById(id);
+const elements = {
+  suite: $('suite'),
+  method: $('method'),
+  seed: $('seed'),
+  outcome: $('outcome'),
+  pair: $('pair'),
+  play: $('play'),
+  restart: $('restart'),
+  speed: $('speed'),
+  view: $('view'),
+  angle: $('angle'),
+  timeline: $('timeline'),
+  export: $('export')
+};
+const state = {
+  records: [],
+  filtered: [],
+  token: '',
+  selected: null,
+  pair: null,
+  time: 0,
+  duration: 0,
+  playing: false,
+  lastFrame: null,
+  loadSequence: 0,
+  abort: null,
+  bounds: null,
+  exportJob: null,
+  videoExportAvailable: true
+};
+const methodNames = {
+  ppo_baseline: 'Baseline PPO',
+  ppo_high_penalty: 'High-penalty PPO',
+  ppo_train_projection: 'Projection-trained PPO'
+};
+const suiteNames = {
+  fixed_training_geometry: 'Fixed geometry',
+  core_layout_transfer: 'Transfer geometry'
+};
+const canvases = [$('canvas-off'), $('canvas-on')];
+const number = new Intl.NumberFormat();
+function methodName(value) {
+  return methodNames[value] || value.replaceAll('_', ' ');
+}
+function suiteName(value) {
+  return suiteNames[value] || value.replaceAll('_', ' ');
+}
+function setError(message) {
+  $('error').textContent = message || '';
+  $('error').classList.toggle('visible', Boolean(message));
+}
+function option(value, label) {
+  const el = document.createElement('option');
+  el.value = value;
+  el.textContent = label;
+  return el;
+}
+function populate(select, entries, selected) {
+  select.replaceChildren(...entries.map(([value, label]) => option(value, label)));
+  if (selected !== undefined) select.value = String(selected);
+  select.disabled = false;
+}
+function addMeta(parts) {
+  $('metadata').replaceChildren();
+  parts.forEach((value, i) => {
+    if (i) {
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      dot.textContent = '·';
+      $('metadata').append(dot);
+    }
+    const span = document.createElement('span');
+    span.textContent = value;
+    if (i === 0) span.className = 'mode';
+    $('metadata').append(span);
+  });
+}
+function updateRange(el) {
+  const min = Number(el.min),
+    max = Number(el.max),
+    fraction = max > min ? (Number(el.value) - min) / (max - min) : 0;
+  el.style.setProperty('--progress', `${Math.max(0, Math.min(100, fraction * 100))}%`);
+}
+function setEmpty(message, loading = false) {
+  for (const mode of ['off', 'on']) {
+    const el = $(`empty-${mode}`);
+    el.hidden = !message;
+    el.replaceChildren();
+    if (loading) {
+      const dot = document.createElement('span');
+      dot.className = 'loading-dot';
+      el.append(dot);
+    }
+    if (message) el.append(document.createTextNode(message));
+  }
+}
+function setPlaying(value) {
+  state.playing = Boolean(value && state.pair);
+  state.lastFrame = null;
+  const label = elements.play.querySelector('span');
+  label.textContent = state.playing ? 'Pause' : 'Play';
+  elements.play.setAttribute('aria-label', state.playing ? 'Pause recorded trajectories' : 'Play recorded trajectories');
+  elements.play.querySelector('svg').innerHTML = state.playing ? '<path d="M4 3h3v10H4zm5 0h3v10H9z"/>' : '<path d="M4 2.8a.6.6 0 0 1 .9-.52l8 4.7a.6.6 0 0 1 0 1.04l-8 4.7a.6.6 0 0 1-.9-.52z"/>';
+  render();
+}
+function updateControls() {
+  const missing = !state.pair;
+  elements.play.disabled = missing;
+  elements.restart.disabled = missing;
+  elements.timeline.disabled = missing;
+  elements.export.disabled = missing || Boolean(state.exportJob) || !state.videoExportAvailable;
+  elements.export.title = state.videoExportAvailable
+    ? 'Download MP4 + provenance as ZIP'
+    : 'MP4 export requires FFmpeg. Install it and restart the viewer; replay remains available.';
+}
+function clearPair(message, loading = false) {
+  setPlaying(false);
+  state.pair = null;
+  state.bounds = null;
+  state.time = 0;
+  state.duration = 0;
+  elements.timeline.max = '1';
+  elements.timeline.value = '0';
+  setEmpty(message, loading);
+  updateControls();
+  render();
+}
+async function request(url, options) {
+  const response = await fetch(url, {
+    cache: 'no-store',
+    ...options
+  });
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error(`The local viewer returned an unreadable response (${response.status}).`);
+  }
+  if (!response.ok) throw new Error(data.error || data.message || `Request failed (${response.status}).`);
+  return data;
+}
+function matching() {
+  return state.records.filter(r => (!elements.suite.value || r.suite === elements.suite.value) && (!elements.method.value || r.method === elements.method.value) && (!elements.seed.value || String(r.train_seed) === elements.seed.value) && (!elements.outcome.value || `${r.off}|${r.on}` === elements.outcome.value));
+}
+function pairLabel(r) {
+  const layout = r.layout_id || suiteName(r.suite);
+  return `${layout} · ep ${r.episode} · ${r.off} → ${r.on}${elements.suite.value ? '' : ` · ${suiteName(r.suite)}`}${elements.method.value ? '' : ` · ${methodName(r.method)}`}${elements.seed.value ? '' : ` · seed ${r.train_seed}`}`;
+}
+function refreshPairs(preferredId) {
+  state.filtered = matching();
+  $('pair-count').textContent = `${number.format(state.filtered.length)} matching ${state.filtered.length === 1 ? 'pair' : 'pairs'}`;
+  const selection = state.filtered.find(r => r.id === (preferredId ?? state.selected)) || state.filtered[0];
+  elements.pair.replaceChildren(...state.filtered.map(r => option(r.id, pairLabel(r))));
+  if (!selection) {
+    state.loadSequence++;
+    state.abort?.abort();
+    state.selected = null;
+    elements.pair.append(option('', 'No pairs match these filters'));
+    elements.pair.disabled = true;
+    clearPair('No matching trajectories');
+    addMeta(['Try another outcome, method, or seed']);
+    return;
+  }
+  elements.pair.disabled = false;
+  elements.pair.value = String(selection.id);
+  if (state.selected !== selection.id || !state.pair) loadPair(selection.id);
+}
+async function loadPair(id) {
+  const sequence = ++state.loadSequence;
+  state.abort?.abort();
+  state.abort = new AbortController();
+  state.selected = id;
+  setError('');
+  clearPair('Loading recording…', true);
+  const record = state.records.find(r => r.id === id);
+  if (record) addMeta([record.execution === 'stochastic' ? 'Stochastic policy' : 'Actor mean', `Evaluation seed ${record.evaluation_seed}`, `Episode ${record.episode}`]);
+  try {
+    const result = await request(`/api/pair?id=${encodeURIComponent(id)}`, {
+      signal: state.abort.signal
+    });
+    if (sequence !== state.loadSequence) return;
+    state.pair = result.pair;
+    state.duration = Number(result.duration);
+    state.bounds = calculateBounds(result.pair);
+    state.time = 0;
+    elements.timeline.max = String(state.duration);
+    elements.timeline.value = '0';
+    setEmpty('');
+    const r = result.record;
+    addMeta([result.pair[0].stochastic ? 'Stochastic policy' : 'Actor mean', `Evaluation seed ${r.evaluation_seed}`, `Episode ${r.episode}`, `Δt ${Number(result.pair[0].dt).toLocaleString()} s`]);
+    updateControls();
+    render();
+  } catch (error) {
+    if (sequence !== state.loadSequence || error.name === 'AbortError') return;
+    clearPair('Recording could not be loaded');
+    setError(error.message);
+  }
+}
+function calculateBounds(pair) {
+  let xmin = Infinity,
+    xmax = -Infinity,
+    ymin = Infinity,
+    ymax = -Infinity;
+  const include = (x, y, r = 0) => {
+    xmin = Math.min(xmin, x - r);
+    xmax = Math.max(xmax, x + r);
+    ymin = Math.min(ymin, y - r);
+    ymax = Math.max(ymax, y + r);
+  };
+  pair.forEach(d => {
+    d.positions.forEach(p => include(p[0], p[1], d.agent_radius));
+    include(d.goal[0], d.goal[1], d.goal_radius);
+    d.obstacle_centers.forEach((p, i) => {
+      if (d.obstacle_mask[i]) include(p[0], p[1], d.obstacle_radii[i]);
+    });
+  });
+  const cx = (xmin + xmax) / 2,
+    cy = (ymin + ymax) / 2;
+  let width = Math.max(4, xmax - xmin + .9),
+    height = Math.max(2.7, ymax - ymin + .9);
+  return {
+    xmin: cx - width / 2,
+    xmax: cx + width / 2,
+    ymin: cy - height / 2,
+    ymax: cy + height / 2,
+    cx,
+    cy
+  };
+}
+function stateAt(d, time) {
+  const t = Math.min(Math.max(time, 0), d.duration);
+  const raw = t / d.dt;
+  const k = Math.min(Math.floor(raw + 1e-8), d.steps);
+  const next = Math.min(k + 1, d.steps);
+  const alpha = next === k ? 0 : Math.max(0, Math.min(1, raw - k));
+  const a = d.positions[k],
+    b = d.positions[next];
+  const delta = Math.atan2(Math.sin(d.headings[next] - d.headings[k]), Math.cos(d.headings[next] - d.headings[k]));
+  const transition = Math.min(d.steps - 1, k - 1);
+  return {
+    t,
+    k,
+    x: a[0] + (b[0] - a[0]) * alpha,
+    y: a[1] + (b[1] - a[1]) * alpha,
+    heading: d.headings[k] + alpha * delta,
+    transition,
+    intervened: transition >= 0 && Boolean(d.projection_intervened[transition]),
+    slack: transition >= 0 ? Number(d.projection_slack_max[transition]) : 0,
+    ended: time >= d.duration - 1e-8
+  };
+}
+function pointPath(ctx, points, close = true) {
+  ctx.beginPath();
+  points.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+  if (close) ctx.closePath();
+}
+function circlePoints(project, x, y, r, z = 0) {
+  const points = [];
+  for (let i = 0; i < 48; i++) {
+    const a = i * Math.PI / 24;
+    points.push(project(x + Math.cos(a) * r, y + Math.sin(a) * r, z));
+  }
+  return points;
+}
+function drawScene(canvas, d, index) {
+  const ctx = canvas.getContext('2d'),
+    width = canvas.clientWidth,
+    height = canvas.clientHeight,
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const targetWidth = Math.round(width * dpr),
+    targetHeight = Math.round(height * dpr);
+  if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+  if (!d || !state.bounds) return;
+  const bound = state.bounds,
+    topView = elements.view.value === '2d',
+    yaw = Number(elements.angle.value) * Math.PI / 180,
+    sin = Math.sin(yaw),
+    cos = Math.cos(yaw),
+    elevation = topView ? 1 : .79,
+    zScale = topView ? 0 : .67;
+  const rotate = (x, y) => ({
+    x: cos * (x - bound.cx) - sin * (y - bound.cy),
+    y: sin * (x - bound.cx) + cos * (y - bound.cy)
+  });
+  const raw = (x, y, z = 0) => {
+    const p = rotate(x, y);
+    return {
+      x: p.x,
+      y: -elevation * p.y - zScale * z
+    };
+  };
+  const corners = [[bound.xmin, bound.ymin], [bound.xmax, bound.ymin], [bound.xmax, bound.ymax], [bound.xmin, bound.ymax]];
+  const cornerRaw = corners.map(p => raw(p[0], p[1]));
+  const rx = cornerRaw.map(p => p.x),
+    ry = cornerRaw.map(p => p.y);
+  const minX = Math.min(...rx),
+    maxX = Math.max(...rx),
+    minY = Math.min(...ry) - .42 * zScale,
+    maxY = Math.max(...ry);
+  const margin = width < 330 ? 20 : 31;
+  const scale = Math.min((width - margin * 2) / (maxX - minX), (height - 48) / (maxY - minY));
+  const offsetX = width / 2 - (minX + maxX) * scale / 2,
+    offsetY = height / 2 + 5 - (minY + maxY) * scale / 2;
+  const project = (x, y, z = 0) => {
+    const p = raw(x, y, z);
+    return {
+      x: offsetX + p.x * scale,
+      y: offsetY + p.y * scale
+    };
+  };
+  const ground = corners.map(p => project(p[0], p[1]));
+  pointPath(ctx, ground);
+  ctx.fillStyle = '#263747';
+  ctx.fill();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#526579';
+  ctx.stroke();
+  ctx.save();
+  pointPath(ctx, ground);
+  ctx.clip();
+  ctx.lineWidth = .65;
+  ctx.strokeStyle = '#52677c52';
+  for (let x = Math.ceil(bound.xmin * 2) / 2; x <= bound.xmax; x += .5) {
+    pointPath(ctx, [project(x, bound.ymin), project(x, bound.ymax)], false);
+    ctx.stroke();
+  }
+  for (let y = Math.ceil(bound.ymin * 2) / 2; y <= bound.ymax; y += .5) {
+    pointPath(ctx, [project(bound.xmin, y), project(bound.xmax, y)], false);
+    ctx.stroke();
+  }
+  ctx.restore();
+  const sample = stateAt(d, state.time),
+    color = index === 0 ? '#f58c91' : '#63d4c7';
+  // Goal and start markings lie on the ground; displayed geometry uses recorded radii.
+  const goal = circlePoints(project, d.goal[0], d.goal[1], d.goal_radius);
+  pointPath(ctx, goal);
+  ctx.fillStyle = '#63d4c722';
+  ctx.fill();
+  ctx.lineWidth = 1.35;
+  ctx.strokeStyle = '#80d6cb';
+  ctx.stroke();
+  const goalCenter = project(d.goal[0], d.goal[1]);
+  ctx.beginPath();
+  ctx.arc(goalCenter.x, goalCenter.y, 2, 0, Math.PI * 2);
+  ctx.fillStyle = '#91e3d5';
+  ctx.fill();
+  const goalLabel = project(d.goal[0], d.goal[1] + d.goal_radius, .12);
+  ctx.font = `${width < 330 ? 10 : 11}px "Segoe UI",Arial,sans-serif`;
+  ctx.fillStyle = '#e1edf7';
+  ctx.textAlign = 'center';
+  ctx.fillText('Goal', goalLabel.x, goalLabel.y - 7);
+  const start = project(...d.positions[0]);
+  ctx.beginPath();
+  ctx.arc(start.x, start.y, 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = color + '77';
+  ctx.fill();
+  // Paint traces, obstacle bodies and agent from the far side toward the camera.
+  const shapes = [];
+  for (let k = 1; k <= sample.k; k++) {
+    const a = d.positions[k - 1],
+      b = d.positions[k];
+    shapes.push({
+      depth: rotate((a[0] + b[0]) / 2, (a[1] + b[1]) / 2).y,
+      draw: () => {
+        pointPath(ctx, [project(a[0], a[1], .022), project(b[0], b[1], .022)], false);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+    });
+  }
+  if (sample.k < d.steps) {
+    const a = d.positions[sample.k];
+    shapes.push({
+      depth: rotate((a[0] + sample.x) / 2, (a[1] + sample.y) / 2).y,
+      draw: () => {
+        pointPath(ctx, [project(a[0], a[1], .022), project(sample.x, sample.y, .022)], false);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+    });
+  }
+  function cylinder(x, y, r, h, body, top, outline, agent = false) {
+    const base = circlePoints(project, x, y, r, .018),
+      cap = circlePoints(project, x, y, r, h);
+    if (!topView) {
+      const order = Array.from({
+        length: 48
+      }, (_, i) => i).filter(i => sin * Math.cos(i * Math.PI / 24) + cos * Math.sin(i * Math.PI / 24) < 0);
+      order.forEach(i => {
+        const j = (i + 1) % 48;
+        pointPath(ctx, [base[i], base[j], cap[j], cap[i]]);
+        ctx.fillStyle = body;
+        ctx.fill();
+      });
+      ctx.strokeStyle = outline;
+      ctx.lineWidth = .7;
+      ctx.beginPath();
+      let first = true;
+      for (let i = 0; i < 49; i++) {
+        const k = i % 48;
+        if (sin * Math.cos(k * Math.PI / 24) + cos * Math.sin(k * Math.PI / 24) < 0) {
+          if (first) {
+            ctx.moveTo(base[k].x, base[k].y);
+            first = false;
+          } else ctx.lineTo(base[k].x, base[k].y);
+        } else first = true;
+      }
+      ctx.stroke();
+    }
+    pointPath(ctx, cap);
+    ctx.fillStyle = top;
+    ctx.fill();
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = agent ? 1.15 : .8;
+    ctx.stroke();
+  }
+  d.obstacle_centers.forEach((p, i) => {
+    if (!d.obstacle_mask[i]) return;
+    shapes.push({
+      depth: rotate(p[0], p[1]).y,
+      draw: () => {
+        pointPath(ctx, circlePoints(project, p[0] + .045, p[1] - .05, d.obstacle_radii[i] * 1.05));
+        ctx.fillStyle = '#0a15252a';
+        ctx.fill();
+        cylinder(p[0], p[1], d.obstacle_radii[i], .38, '#63758d', '#8295ad', '#a5b2c144');
+      }
+    });
+  });
+  shapes.push({
+    depth: rotate(sample.x, sample.y).y - .001,
+    draw: () => {
+      if (sample.intervened && index === 1) {
+        pointPath(ctx, circlePoints(project, sample.x, sample.y, d.agent_radius * 1.65, .026));
+        ctx.strokeStyle = '#f3c56b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+      cylinder(sample.x, sample.y, d.agent_radius, .16, index === 0 ? '#bd626b' : '#339f99', color, index === 0 ? '#ffd4d7' : '#b8fff3', true);
+      const c = project(sample.x, sample.y, .17),
+        front = project(sample.x + Math.cos(sample.heading) * d.agent_radius * 1.45, sample.y + Math.sin(sample.heading) * d.agent_radius * 1.45, .17),
+        left = project(sample.x + Math.cos(sample.heading + 2.25) * d.agent_radius * .56, sample.y + Math.sin(sample.heading + 2.25) * d.agent_radius * .56, .17),
+        right = project(sample.x + Math.cos(sample.heading - 2.25) * d.agent_radius * .56, sample.y + Math.sin(sample.heading - 2.25) * d.agent_radius * .56, .17);
+      pointPath(ctx, [front, left, c, right]);
+      ctx.fillStyle = index === 0 ? '#713c46' : '#1d6868';
+      ctx.fill();
+    }
+  });
+  shapes.sort((a, b) => b.depth - a.depth).forEach(s => s.draw());
+}
+function render() {
+  for (let index = 0; index < 2; index++) {
+    const mode = index === 0 ? 'off' : 'on',
+      d = state.pair?.[index];
+    drawScene(canvases[index], d, index);
+    if (!d) {
+      $(`status-${mode}`).textContent = 'READY';
+      $(`status-${mode}`).dataset.state = 'READY';
+      $(`time-${mode}`).textContent = '0.00 s';
+      $(`detail-${mode}`).textContent = index === 0 ? 'Step 0 · Grid: 0.5 m' : 'Step 0 · Intervention: — · Max slack: —';
+      continue;
+    }
+    const sample = stateAt(d, state.time),
+      status = sample.ended ? d.outcome : state.time === 0 ? 'READY' : state.playing ? 'PLAYING' : 'PAUSED';
+    $(`status-${mode}`).textContent = status;
+    $(`status-${mode}`).dataset.state = status;
+    $(`time-${mode}`).textContent = `${sample.t.toFixed(2)} s`;
+    $(`detail-${mode}`).replaceChildren();
+    const step = document.createElement('span');
+    step.textContent = `Step ${sample.k} / ${d.steps}`;
+    $(`detail-${mode}`).append(step);
+    const detail = document.createElement('span');
+    if (index === 0) detail.textContent = '· Grid: 0.5 m';else {
+      detail.textContent = `· Intervention: ${sample.intervened ? 'YES' : 'NO'}`;
+      if (sample.intervened) detail.className = 'intervened';
+    }
+    $(`detail-${mode}`).append(detail);
+    if (index === 1) {
+      const slack = document.createElement('span');
+      slack.textContent = `· Max slack: ${sample.slack.toExponential(1)}`;
+      $(`detail-${mode}`).append(slack);
+    }
+  }
+  elements.timeline.value = String(state.time);
+  elements.timeline.setAttribute('aria-valuetext', `${state.time.toFixed(2)} of ${state.duration.toFixed(2)} seconds`);
+  updateRange(elements.timeline);
+  $('clock').replaceChildren(document.createTextNode(`${state.time.toFixed(2)} `));
+  const duration = document.createElement('span');
+  duration.className = 'duration';
+  duration.textContent = `/ ${state.duration.toFixed(2)} s`;
+  $('clock').append(duration);
+}
+function tick(now) {
+  if (state.playing && state.pair) {
+    if (state.lastFrame !== null) {
+      state.time = Math.min(state.duration, state.time + (now - state.lastFrame) / 1000 * Number(elements.speed.value));
+      if (state.time >= state.duration) {
+        setPlaying(false);
+        state.time = state.duration;
+      }
+    }
+    state.lastFrame = now;
+    render();
+  } else state.lastFrame = null;
+  requestAnimationFrame(tick);
+}
+function togglePlayback() {
+  if (!state.pair) return;
+  if (!state.playing && state.time >= state.duration) state.time = 0;
+  setPlaying(!state.playing);
+}
+async function exportPair() {
+  if (!state.pair || state.exportJob || !state.videoExportAvailable) return;
+  const record = state.records.find(r => r.id === state.selected),
+    id = state.selected;
+  state.exportJob = 'starting';
+  updateControls();
+  const panel = $('export-status');
+  panel.classList.add('visible');
+  panel.replaceChildren(document.createTextNode(`Preparing MP4 · ${suiteName(record.suite)} · ${methodName(record.method)} · seed ${record.train_seed} · episode ${record.episode}`));
+  try {
+    const result = await request('/api/export', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id,
+        token: state.token
+      })
+    });
+    state.exportJob = result.id;
+    panel.append(document.createTextNode(' · Rendering at 1× speed…'));
+    const poll = async () => {
+      try {
+        const job = await request(`/api/export?id=${encodeURIComponent(result.id)}`);
+        if (job.status === 'running') {
+          setTimeout(poll, 1200);
+          return;
+        }
+        state.exportJob = null;
+        updateControls();
+        if (job.status === 'error') {
+          panel.textContent = `MP4 export failed: ${job.message || 'Unknown export error.'}`;
+          if (job.log_download) {
+            const logLink = document.createElement('a');
+            logLink.href = job.log_download;
+            logLink.textContent = 'Download export log';
+            logLink.setAttribute('download', 'export.log');
+            panel.append(logLink);
+          }
+          return;
+        }
+        panel.replaceChildren(document.createTextNode(`ZIP ready · seed ${record.train_seed} · episode ${record.episode}. `));
+        if (job.download) {
+          const link = document.createElement('a');
+          link.href = job.download;
+          link.textContent = 'Download ZIP';
+          link.setAttribute('download', job.filename || 'PAP_Trajectory_Export.zip');
+          link.title = job.filename || 'MP4 + provenance ZIP';
+          panel.append(document.createTextNode('Download requested; use Download ZIP if needed.'));
+          panel.append(link);
+          link.click();
+        } else {
+          panel.append(document.createTextNode('The download link is unavailable; please try exporting again.'));
+        }
+      } catch (error) {
+        state.exportJob = null;
+        updateControls();
+        panel.textContent = `Could not check the export: ${error.message}`;
+      }
+    };
+    setTimeout(poll, 700);
+  } catch (error) {
+    state.exportJob = null;
+    updateControls();
+    panel.textContent = `MP4 export failed: ${error.message}`;
+  }
+}
+for (const name of ['suite', 'method', 'seed', 'outcome']) elements[name].addEventListener('change', () => refreshPairs());
+elements.pair.addEventListener('change', () => loadPair(Number(elements.pair.value)));
+elements.play.addEventListener('click', togglePlayback);
+elements.restart.addEventListener('click', () => {
+  setPlaying(false);
+  state.time = 0;
+  render();
+});
+elements.timeline.addEventListener('input', () => {
+  state.time = Number(elements.timeline.value);
+  state.lastFrame = null;
+  render();
+});
+elements.view.addEventListener('change', render);
+elements.angle.addEventListener('input', () => {
+  updateRange(elements.angle);
+  render();
+});
+elements.speed.addEventListener('change', () => {
+  state.lastFrame = null;
+});
+elements.export.addEventListener('click', exportPair);
+document.addEventListener('keydown', event => {
+  if (event.code !== 'Space' || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.target.closest('input,select,textarea,button,a,[contenteditable="true"]')) return;
+  event.preventDefault();
+  togglePlayback();
+});
+document.addEventListener('visibilitychange', () => {
+  state.lastFrame = null;
+});
+new ResizeObserver(render).observe($('canvas-off').parentElement);
+new ResizeObserver(render).observe($('canvas-on').parentElement);
+updateRange(elements.angle);
+requestAnimationFrame(tick);
+async function initialize() {
+  try {
+    const result = await request('/api/catalog');
+    state.records = result.records.filter(r => r.available !== false);
+    state.token = result.token;
+    state.videoExportAvailable = result.video_export_available !== false;
+    const suites = [...new Set(state.records.map(r => r.suite))];
+    const methods = [...new Set(state.records.map(r => r.method))];
+    const seeds = [...new Set(state.records.map(r => r.train_seed))].sort((a, b) => a - b);
+    const outcomes = [...new Set(state.records.map(r => `${r.off}|${r.on}`))].sort();
+    populate(elements.suite, [['', 'Both suites'], ...suites.map(s => [s, suiteName(s)])], suites.includes('core_layout_transfer') ? 'core_layout_transfer' : '');
+    populate(elements.method, [['', 'All methods'], ...methods.map(m => [m, methodName(m)])], methods.includes('ppo_train_projection') ? 'ppo_train_projection' : '');
+    populate(elements.seed, [['', 'All seeds'], ...seeds.map(s => [s, `Seed ${s}`])], seeds.includes(1) ? 1 : '');
+    populate(elements.outcome, [['', 'All outcomes'], ...outcomes.map(o => [o, o.replace('|', ' → ')])], '');
+    $('subtitle').textContent = `${number.format(state.records.length)} recorded pairs · ${methods.length} training methods · ${seeds.length} training seeds`;
+    const preferred = state.records.find(r => r.suite === 'core_layout_transfer' && r.method === 'ppo_train_projection' && r.train_seed === 1 && r.episode === 6);
+    refreshPairs(preferred?.id);
+  } catch (error) {
+    $('subtitle').textContent = 'Recorded trajectory viewer';
+    clearPair('No recordings available');
+    setError(error.message);
+    elements.pair.replaceChildren(option('', 'Recordings unavailable'));
+  }
+}
+initialize();
+</script>
+</body>
+</html>

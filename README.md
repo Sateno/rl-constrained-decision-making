@@ -9,6 +9,9 @@ Projection: An Independent-Run Fixed-to-Transfer Audit**. The experiment and
 interpretation are complete. The manuscript, its bibliography, and its four
 figure-production sources are maintained in a separate Overleaf/GitHub project.
 
+For visual inspection of recorded OFF/ON pairs, open the
+[trajectory explorer](#trajectory-explorer).
+
 ## Study design
 
 The completed experiment contains:
@@ -70,6 +73,58 @@ describe the completed study. The manuals are compiled in separate Overleaf
 projects and copied into `docs/guides/` and `docs/design/`. Their LaTeX sources
 and build tools are maintained outside this code repository.
 
+## Trajectory explorer
+
+The [PAP trajectory explorer](visualization/trajectory_viewer/README.md) replays
+recorded projector-OFF and projector-ON trajectories side by side in a local
+browser. Use it to inspect individual fixed-geometry and transfer episodes from
+the completed evaluation.
+
+- Filter by evaluation suite, training method, training seed, and OFF-to-ON
+  outcome. Selecting a pair loads it automatically.
+- Play synchronized trajectories, seek through time, change playback speed, and
+  switch between 3D and top-down views.
+- Inspect terminal outcomes, intervention indicators, and recorded maximum
+  slack. Each episode holds its final pose while its paired episode continues.
+
+From the repository root, with `RL_PROJECTS` active:
+
+```sh
+python -m pip install -r visualization/trajectory_viewer/requirements.txt
+python visualization/trajectory_viewer/viewer.py
+```
+
+The browser opens automatically. Keep the terminal running while using the
+explorer or downloading an export; press Ctrl+C in that terminal to stop it.
+Playback is local and requires no internet connection.
+
+**Recorded archives are required.** The explorer reads the committed
+`results/tables/<suite>/evaluation_episode_results.csv` tables together with:
+
+```text
+runs/evaluation/final/<suite>/<method>/seed<N>/projection_disabled_trajectories.npz
+runs/evaluation/final/<suite>/<method>/seed<N>/projection_enabled_trajectories.npz
+```
+
+Restore the corresponding preserved archives at these paths. Only pairs with
+both trajectory archives present can be selected. A fresh Git checkout does not
+include `runs/`, so the result tables alone cannot provide trajectory playback.
+The explorer reads saved arrays. It requires no checkpoint weights and performs
+no training, policy evaluation, or QP solve. The 3D view illustrates recorded
+planar motion; cylinder heights and interpolated frames are display features.
+
+**Export MP4** renders the complete selected OFF/ON pair, regardless of the
+current preview position. It downloads a ZIP containing the MP4,
+`selected_episodes.json` provenance, and `export.log` through the browser's
+Downloads or Save As behavior. Browser exports use temporary storage outside
+the repository. Export is one pair at a time and uses the standard video
+camera at 1× simulation speed, rather than the current preview settings.
+FFmpeg is required for video export but not for playback.
+
+See the [explorer guide](visualization/trajectory_viewer/README.md) for FFmpeg
+setup, controls, data-validation details, command-line rendering, and viewer
+checks.
+
 ## Repository map
 
 ```text
@@ -85,6 +140,7 @@ results/figures/           curated generated result figures
 scripts/                  Windows convenience launchers
 tests/                    regression and scientific-integrity tests
 verification/             audited file inventory and evidence provenance
+visualization/            local trajectory explorer and recorded-motion video export
 runs/                     local generated evidence and archives; excluded from Git
 ```
 
@@ -175,6 +231,8 @@ Binary hashes cover exact bytes; text hashes normalize only CRLF to LF.
   per-execution CSV summaries and optional trajectory archives.
 - Result tools validate saved evidence and export training diagnostics,
   evaluation summaries and vector diagnostic plots.
+- The trajectory explorer replays saved OFF/ON pairs and exports individual
+  comparisons without generating new experimental observations.
 
 ## Artifact policy
 
