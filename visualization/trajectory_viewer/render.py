@@ -10,7 +10,7 @@ import json
 import subprocess
 import shutil
 
-from data import load_pair as read_pair, outcome
+from data import load_pair as read_pair, outcome, catalog, SOURCES
 
 import numpy as np
 import matplotlib
@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'trajectory_exports'
 METHOD = 'ppo_train_projection'
 TRAIN_SEED = 1
+DATA_SOURCE = 'auto'
 BG = '#f5f7fa'
 INK = '#182b42'
 MUTED = '#54677c'
@@ -41,7 +42,7 @@ CASES = [
 
 
 def load_pair(suite, episode):
-    return read_pair(ROOT, suite, METHOD, TRAIN_SEED, episode)
+    return read_pair(ROOT, suite, METHOD, TRAIN_SEED, episode, source=DATA_SOURCE)
 
 
 def cylinder_faces(xy, radius, height, z0=0.0, segments=32):
@@ -171,10 +172,12 @@ def prepare_scene(index, pair, case=None):
 
 
 def main():
-    global ROOT, OUT, METHOD, TRAIN_SEED, CASES
+    global ROOT, OUT, METHOD, TRAIN_SEED, CASES, DATA_SOURCE
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo-root',type=Path,default=ROOT)
     parser.add_argument('--output-dir',type=Path)
+    parser.add_argument('--data-source',choices=SOURCES,default='auto',
+                        help='Prefer published evaluation arrays; use local to select preserved runs explicitly.')
     parser.add_argument('--method',default=METHOD)
     parser.add_argument('--train-seed',type=int,default=1)
     parser.add_argument('--suite',choices=['fixed_training_geometry','core_layout_transfer'])
@@ -185,6 +188,7 @@ def main():
         parser.error('--suite and --episode must be supplied together')
     ROOT=args.repo_root.resolve();OUT=(args.output_dir or ROOT/'trajectory_exports').resolve()
     METHOD=args.method;TRAIN_SEED=args.train_seed
+    DATA_SOURCE=catalog(ROOT,source=args.data_source)[0]['data_source']
     if args.suite:
         p=load_pair(args.suite,args.episode)
         CASES=[(args.suite,args.episode,args.suite.replace('_',' ').title(),
@@ -201,7 +205,8 @@ def main():
     manifest=[]
     for i,pair in enumerate(pairs):
         for d in pair:
-            manifest.append({k:d[k] for k in ('mode','checkpoint_sha256','source_sha256','source_archive')} |
+            manifest.append({k:d[k] for k in ('mode','checkpoint_sha256','source_sha256','source_archive',
+                                                              'data_source','dataset_id','source_table','source_table_sha256')} |
                             {'suite':CASES[i][0],'episode':CASES[i][1],'layout_id':d['row']['layout_id'],
                              'evaluation_seed':int(d['seed']),'outcome':outcome(d),'transitions':len(d['positions'])-1})
     (OUT/'selected_episodes.json').write_text(json.dumps(manifest,indent=2)+'\n')

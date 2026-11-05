@@ -72,4 +72,119 @@ class PairValidationTests(unittest.TestCase):
         self.assertFalse(catalog(self.root)[0]['available'])
 
 
+def publish_fixture(fixture):
+    """Package a tiny fixture without touching the scientific dataset."""
+    import hashlib
+    import json
+    import shutil
+    from data import BUNDLE
+    destination = fixture.root / BUNDLE
+    destination.mkdir(parents=True, exist_ok=True)
+    manifest = {'schema_version': 'pap_trajectory_bundle_v1',
+                'dataset_id': 'pap_evaluation_v1',
+                'trajectory_archive_version': 'evaluation_trajectory_v1',
+                'tables': {}, 'archives': {}}
+    relative_table = f'results/tables/{fixture.suite}/evaluation_episode_results.csv'
+    table = fixture.root / relative_table
+    manifest['tables'][fixture.suite] = {'path': relative_table,
+        'sha256': hashlib.sha256(table.read_bytes().replace(b'\r\n', b'\n')).hexdigest()}
+    for path in fixture.folder.glob('*.npz'):
+        relative = f'{fixture.suite}/{fixture.method}/seed1/{path.name}'
+        output = destination / relative
+        output.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, output)
+        manifest['archives'][relative] = {
+            'sha256': hashlib.sha256(output.read_bytes()).hexdigest(),
+            'size_bytes': output.stat().st_size, 'episodes': 1,
+            'source_archive': 'runs/evaluation/final/' + relative}
+    (destination / 'manifest.json').write_text(json.dumps(manifest), encoding='utf-8')
+    return destination
+
+
+class PublishedBundleTests(unittest.TestCase):
+    def setUp(self):
+        self.fixture = PairValidationTests(methodName='runTest')
+        self.fixture.setUp()
+        self.addCleanup(self.fixture.doCleanups)
+        self.root = self.fixture.root
+        self.bundle = publish_fixture(self.fixture)
+
+    def load(self, source='auto'):
+        return load_pair(self.root, self.fixture.suite, self.fixture.method, 1, 0, source=source)
+
+    def test_fresh_checkout_replays_without_runs(self):
+        import shutil
+        shutil.rmtree(self.root / 'runs')
+        records = catalog(self.root)
+        self.assertTrue(records[0]['available'])
+        self.assertEqual(records[0]['data_source'], 'published')
+        pair = self.load()
+        self.assertEqual(pair[0]['dataset_id'], 'pap_evaluation_v1')
+        self.assertTrue(pair[0]['source_archive'].startswith('results/trajectories/'))
+        self.assertEqual(pair[0]['source_table_sha256'], records[0]['source_table_sha256'])
+
+    def test_published_precedence_and_explicit_local_selection(self):
+        self.fixture.change('run_checkpoint_sha256', np.asarray('changed-local-file'))
+        self.assertEqual(self.load()[1]['checkpoint_sha256'], 'checkpoint_hash')
+        with self.assertRaisesRegex(ValueError, 'Checkpoint hash'):
+            self.load(source='local')
+
+    def test_missing_published_mode_never_uses_local_copy(self):
+        next(self.bundle.rglob('projection_enabled_trajectories.npz')).unlink()
+        self.assertFalse(catalog(self.root)[0]['available'])
+        self.assertTrue(catalog(self.root, source='local')[0]['available'])
+        with self.assertRaisesRegex(ValueError, 'archive is missing'):
+            self.load()
+
+    def test_corrupt_published_bytes_never_fall_back(self):
+        path = next(self.bundle.rglob('projection_enabled_trajectories.npz'))
+        path.write_bytes(path.read_bytes() + b'changed')
+        with self.assertRaisesRegex(ValueError, 'hash/size mismatch'):
+            self.load()
+        self.assertEqual(self.load(source='local')[1]['data_source'], 'local')
+
+    def test_changed_table_rejected(self):
+        path = self.root / 'results/tables' / self.fixture.suite / 'evaluation_episode_results.csv'
+        path.write_bytes(path.read_bytes().replace(b'example', b'changed'))
+        with self.assertRaisesRegex(ValueError, 'table hash mismatch'):
+            catalog(self.root)
+
+    def test_windows_table_newlines_are_accepted(self):
+        path = self.root / 'results/tables' / self.fixture.suite / 'evaluation_episode_results.csv'
+        path.write_bytes(path.read_bytes().replace(b'\r\n', b'\n').replace(b'\n', b'\r\n'))
+        self.assertEqual(len(self.load()), 2)
+
+    def test_bad_manifest_path_and_episode_count_are_rejected(self):
+        import json
+        path = self.bundle / 'manifest.json'
+        original = json.loads(path.read_text())
+        for corruption in ('path', 'count'):
+            with self.subTest(corruption=corruption):
+                manifest = json.loads(json.dumps(original))
+                key = next(iter(manifest['archives']))
+                if corruption == 'path':
+                    manifest['archives']['../outside.npz'] = manifest['archives'].pop(key)
+                else:
+                    manifest['archives'][key]['episodes'] = 2
+                path.write_text(json.dumps(manifest))
+                with self.assertRaises(ValueError):
+                    catalog(self.root)
+
+    def test_extra_manifest_path_cannot_override_bundle_path(self):
+        import json
+        path = self.bundle / 'manifest.json'
+        manifest = json.loads(path.read_text())
+        for item in manifest['archives'].values():
+            item['path'] = 'outside/redirected.npz'
+        path.write_text(json.dumps(manifest))
+        pair = self.load()
+        self.assertTrue(pair[0]['source_archive'].startswith('results/trajectories/'))
+
+    def test_explicit_published_requires_manifest(self):
+        (self.bundle / 'manifest.json').unlink()
+        with self.assertRaisesRegex(ValueError, 'manifest is missing'):
+            catalog(self.root, source='published')
+        self.assertEqual(catalog(self.root)[0]['data_source'], 'local')
+
+
 if __name__=='__main__':unittest.main()

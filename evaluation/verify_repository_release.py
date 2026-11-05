@@ -277,6 +277,10 @@ def main() -> int:
         print(f"PASS documentation links: {verify_links(ROOT, manifest)}", flush=True)
         if args.paper_project:
             print(f"PASS separate paper evidence: {verify_paper(ROOT, manifest, args.paper_project)} matching inputs", flush=True)
+        if manifest.get("trajectory_bundle"):
+            from evaluation.verify_trajectory_bundle import verify_trajectory_bundle
+            bundle = verify_trajectory_bundle(ROOT, manifest["trajectory_bundle"])
+            print(f"PASS published trajectory bundle: {bundle}", flush=True)
         verify_saved_evidence(ROOT, archive_root=args.archive_root,
                               archive_files=manifest.get("local_archive_files"))
         if args.archive_root is not None:

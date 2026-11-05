@@ -1,6 +1,6 @@
 # Constrained Policy Learning with Predictive Action Projection
 
-Research code, curated result tables, and reproducible analysis tools for
+Research code, recorded evaluation trajectories, curated result tables, and reproducible analysis tools for
 a compact continuous-control benchmark using PPO and an optional predictive
 action-projection controller.
 
@@ -78,7 +78,9 @@ and build tools are maintained outside this code repository.
 The [PAP trajectory explorer](visualization/trajectory_viewer/README.md) replays
 recorded projector-OFF and projector-ON trajectories side by side in a local
 browser. Use it to inspect individual fixed-geometry and transfer episodes from
-the completed evaluation.
+the completed evaluation. A fresh clone includes all 3,720 recorded episodes,
+organized into 1,860 OFF/ON pairs; no local training runs or model checkpoints
+are needed for playback.
 
 - Filter by evaluation suite, training method, training seed, and OFF-to-ON
   outcome. Selecting a pair loads it automatically.
@@ -98,20 +100,29 @@ The browser opens automatically. Keep the terminal running while using the
 explorer or downloading an export; press Ctrl+C in that terminal to stop it.
 Playback is local and requires no internet connection.
 
-**Recorded archives are required.** The explorer reads the committed
-`results/tables/<suite>/evaluation_episode_results.csv` tables together with:
+The explorer reads the committed episode tables together with the versioned
+[evaluation trajectory bundle](results/trajectories/pap_evaluation_v1/README.md):
 
 ```text
-runs/evaluation/final/<suite>/<method>/seed<N>/projection_disabled_trajectories.npz
-runs/evaluation/final/<suite>/<method>/seed<N>/projection_enabled_trajectories.npz
+results/trajectories/pap_evaluation_v1/<suite>/<method>/seed<N>/projection_disabled_trajectories.npz
+results/trajectories/pap_evaluation_v1/<suite>/<method>/seed<N>/projection_enabled_trajectories.npz
 ```
 
-Restore the corresponding preserved archives at these paths. Only pairs with
-both trajectory archives present can be selected. A fresh Git checkout does not
-include `runs/`, so the result tables alone cannot provide trajectory playback.
-The explorer reads saved arrays. It requires no checkpoint weights and performs
-no training, policy evaluation, or QP solve. The 3D view illustrates recorded
-planar motion; cylinder heights and interpolated frames are display features.
+These are unchanged copies of the original final-evaluation arrays, with a
+manifest recording their hashes and provenance. They preserve the historical
+endpoint-collision outcomes used in the published tables. Playback is not a
+new evaluation or a swept-collision correction.
+
+The default `--data-source auto` uses this bundle when its manifest is present.
+For a preserved local archive, use `--data-source local` to read the matching
+files under `runs/evaluation/final/`; `--data-source published` explicitly
+requires the bundled dataset. Sources are selected as a whole and never mixed
+within a session. Missing or altered published files are not silently replaced
+with local files.
+
+The explorer reads saved arrays and performs no training, policy evaluation,
+or QP solve. The 3D view illustrates recorded planar motion; cylinder heights
+and interpolated frames are display features.
 
 **Export MP4** renders the complete selected OFF/ON pair, regardless of the
 current preview position. It downloads a ZIP containing the MP4,
@@ -137,6 +148,7 @@ experiments/              training, calibration, and frozen protocols
 projection/               predictive CBF-QP projector and wrapper
 results/tables/            frozen episode, run-level, and method summaries
 results/figures/           curated generated result figures
+results/trajectories/      versioned final-evaluation arrays and provenance
 scripts/                  Windows convenience launchers
 tests/                    regression and scientific-integrity tests
 verification/             audited file inventory and evidence provenance
@@ -161,16 +173,21 @@ python -m evaluation.verify_repository_release --base-ref main
 ```
 
 The second command verifies the repository inventory, protected source against
-the local `main` reference, published-table hashes, complete evaluation coverage,
-recorded checkpoint identities, summary reconstruction, and active documentation
-links. It works with `runs/` entirely absent and performs no training, policy
+the local `main` reference, published-table and trajectory hashes, complete
+evaluation coverage, trajectory/table agreement, recorded checkpoint identities,
+summary reconstruction, and active documentation links. It works with `runs/`
+entirely absent and performs no training, policy
 evaluation, calibration, or benchmark. After staging, add `--require-tracked`
 to verify the exact intended Git files and content. Tracked files under `runs/`
 are rejected; local archives are preserved.
 
 The [verification guide](docs/validation/release_verification.md) describes the
 optional `--archive-root` check for a separately preserved run archive and the
-comparison with the separate Overleaf ZIP.
+comparison with the separate Overleaf ZIP. To check only the bundled recordings:
+
+```sh
+python -m evaluation.verify_trajectory_bundle
+```
 
 ## Reproduce the reported analysis
 
@@ -192,18 +209,22 @@ or non-inferiority test.
 
 The repository contains the implementation, environment specification, frozen
 training/evaluation protocols, layouts, curated endpoint and summary tables,
-training diagnostic exports, and analysis tools. These support executing the
-study and reconstructing the reported numerical analysis from the supplied
-tables. The paper and its production assets are maintained separately.
+training diagnostic exports, all final-evaluation trajectory arrays, and analysis
+tools. These support inspecting the recorded evaluations, executing the study,
+and reconstructing the reported numerical analysis from the supplied tables.
+The paper and its production assets are maintained separately.
 
 All raw files under `runs/`, including final checkpoints, TensorBoard events,
 evaluation CSVs, trajectories, and validation/calibration logs, remain in the
 author's local archives and are excluded from Git. Preserving those archives
-supports inspection of the exact historical executions; a fresh checkout does
-not contain them. Analyses needing raw trajectories or model parameters require
-the corresponding archive or newly generated outputs. Re-training from the
-recorded seeds is a new execution and is not guaranteed to reproduce historical
-checkpoint bytes. See the [evidence inventory](verification/README.md).
+preserves the complete original evidence. The 60 final-evaluation trajectory
+NPZ files are also committed as byte-identical, read-only copies under
+`results/trajectories/pap_evaluation_v1/`, so inspecting those recorded trajectories
+does not require restoring `runs/`. Checkpoints, raw evaluation CSVs, TensorBoard
+events, and other run artifacts still require the corresponding local archive.
+Re-training from the recorded seeds is a new execution and is not guaranteed
+to reproduce historical checkpoint bytes. See the
+[evidence inventory](verification/README.md).
 
 Historical Windows paths are retained as provenance. Optional archive
 verification resolves their `runs/` suffix below the supplied archive root.
@@ -215,6 +236,7 @@ Binary hashes cover exact bytes; text hashes normalize only CRLF to LF.
 - [Fixed-geometry diagnostic figures](results/figures/fixed_training_geometry/)
 - [Transfer tables](results/tables/core_layout_transfer/)
 - [Transfer diagnostic figures](results/figures/core_layout_transfer/)
+- [Recorded evaluation trajectories](results/trajectories/pap_evaluation_v1/README.md)
 - [Final study record](docs/records/final_study_record.md)
 - [Historical analysis record](docs/records/Predictive_Action_Projection_Analysis_Record.md)
 - [Historical analysis command record](docs/records/Predictive_Action_Projection_Analysis_Command_Record.md)
@@ -241,6 +263,11 @@ The manifest's `files` mapping defines the Git inventory. Its separate
 and never requires those files in Git. All `runs/` contents, local environments,
 caches, and temporary outputs remain ignored. Keep the raw archives intact;
 restoring the ignore rule does not delete them.
+
+The versioned copies in `results/trajectories/` are an explicit curated-data
+addition to `files`. Their own manifest links each copy to its original archive
+path and SHA-256 hash. New evaluations continue writing to `runs/`; do not
+overwrite the published trajectory bundle with newly generated data.
 
 Keep the paper project, paper-production assets, private working notes, and
 handoff ZIP files outside this repository.

@@ -692,7 +692,7 @@ h1 {
 <body>
 <main class="app">
   <header class="header">
-    <div><div class="title"><svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19C6 19 6 6 11 6s3 12 7 12c2 0 3-7 3-13" fill="none" stroke-width="2" stroke-linecap="round"/></svg><h1>PAP trajectory explorer</h1></div><p class="subtitle" id="subtitle">Loading recorded trajectory pairs…</p></div>
+    <div><div class="title"><svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19C6 19 6 6 11 6s3 12 7 12c2 0 3-7 3-13" fill="none" stroke-width="2" stroke-linecap="round"/></svg><h1>PAP trajectory explorer</h1></div><p class="subtitle" id="subtitle">Loading recorded trajectory pairs…</p><p class="subtitle" id="data-source" style="font-size:11px;margin-top:3px">Recorded evaluation</p></div>
     <div class="local-badge"><span></span> Local replay</div>
   </header>
   <div class="error" id="error" role="alert"></div>
@@ -1366,6 +1366,8 @@ async function initialize() {
     populate(elements.seed, [['', 'All seeds'], ...seeds.map(s => [s, `Seed ${s}`])], seeds.includes(1) ? 1 : '');
     populate(elements.outcome, [['', 'All outcomes'], ...outcomes.map(o => [o, o.replace('|', ' → ')])], '');
     $('subtitle').textContent = `${number.format(state.records.length)} recorded pairs · ${methods.length} training methods · ${seeds.length} training seeds`;
+    $('data-source').textContent = (result.source_label || 'Recorded evaluation') +
+      (result.unavailable ? ` · ${number.format(result.unavailable)} pairs missing archives` : '');
     const preferred = state.records.find(r => r.suite === 'core_layout_transfer' && r.method === 'ppo_train_projection' && r.train_seed === 1 && r.episode === 6);
     refreshPairs(preferred?.id);
   } catch (error) {

@@ -1,0 +1,393 @@
+{
+  "schema_version": "pap_trajectory_bundle_v1",
+  "dataset_id": "pap_evaluation_v1",
+  "trajectory_archive_version": "evaluation_trajectory_v1",
+  "description": "Original completed-study evaluation trajectories, copied byte-for-byte from the preserved run archive.",
+  "evaluation_contract": "Historical endpoint collision detection and recorded terminal outcomes; no swept-path reclassification or new execution.",
+  "created_date": "2026-10-30",
+  "source_repository": "https://github.com/Sateno/rl-constrained-decision-making",
+  "source_repository_commit": "65a312db670e82d2a186bb1f7afb83d64c2484c3",
+  "source_zip": {
+    "filename": "rl-constrained-decision-making(20260907-183013).zip",
+    "sha256": "a43e3279eae66e174a10ed5dc263d092234362f71764d9442baf790f0afde619"
+  },
+  "source_hash_register": "verification/repository_manifest.json#local_archive_files",
+  "tables": {
+    "core_layout_transfer": {
+      "path": "results/tables/core_layout_transfer/evaluation_episode_results.csv",
+      "sha256": "8091681f988009657e2951089fcc520e3960143f48ef8dbda5c2fcfce6e7f4ae"
+    },
+    "fixed_training_geometry": {
+      "path": "results/tables/fixed_training_geometry/evaluation_episode_results.csv",
+      "sha256": "4eafae0edfc0ff75e78a884cec2dbcd5cbec4408c772bb4c9f305d183645d750"
+    }
+  },
+  "archives": {
+    "core_layout_transfer/ppo_baseline/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "06ebdd75d3a785d4a9b2f273a23e624ec57945fd50ed76445824b012d0a62c9b",
+      "size_bytes": 528090,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed1/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_baseline/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "6af8e513977840fc9ca53a81142bb45416fe4bfcafdcb55e45a19bd78b253917",
+      "size_bytes": 545676,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed1/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_baseline/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "eb346df0bb972bb178065f1c7d459a2779fbddfe5a951a7425afd488f5beb5a2",
+      "size_bytes": 345720,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed2/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_baseline/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "bbb9b3c45c6c6497240a0657e8420d47b082d379a42410db0744656cc9c85a77",
+      "size_bytes": 346833,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed2/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_baseline/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "1f6a642ac78079b6deab3737ac0edb40e33376914ff4ab93f267d610adde96d3",
+      "size_bytes": 427420,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed3/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_baseline/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "5c840402ab90521e68c203de8ab8814e3d84939de88c7dd7dc21b3018a4fe8d5",
+      "size_bytes": 470112,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed3/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_baseline/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "a5e71f029bd4e34f59add16031791f5ff3d56bfd53b9684f61a30754eef9b3eb",
+      "size_bytes": 543193,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed4/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_baseline/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "f62d7ea8f3b282ddb2a5f9aa2bfb647f31b6f350b1c3c7069694f376f1b26f4f",
+      "size_bytes": 547975,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed4/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_baseline/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "e68b60c17b0b5e280520b1346b5eb8eb5694e6f8c4271c8bf6ed60bf95b5d0ef",
+      "size_bytes": 501532,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed5/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_baseline/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "1298bdd4782fd5e25d23f176c3ee0b3fc583aaa5d6b7806de385039f897cedaa",
+      "size_bytes": 504592,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_baseline/seed5/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_high_penalty/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "59f6a6a4b24532750fe4d4e42319779533220e811d8449db54830234fe16a713",
+      "size_bytes": 524589,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed1/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_high_penalty/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "bbe9bbe2fbf97ea1f1f64ee53636d2861ee62c5b8c08e4671f3305d622273dd4",
+      "size_bytes": 548634,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed1/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_high_penalty/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "6041966413e75397f1008554beac353ba5207d993e5f041d0bb4c8eb830184f2",
+      "size_bytes": 395517,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed2/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_high_penalty/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "04f82b39737cb7c18e7c8fb31cb36744d910ff9dc0a909fa3b39335e9ae30013",
+      "size_bytes": 397349,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed2/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_high_penalty/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "350a30755f79e80e9a9404b37e44f46c3937977cb37134c5f17a1fea91718b99",
+      "size_bytes": 544504,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed3/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_high_penalty/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "f369c1ed5193a9d669beeb37bda849cea7e57ac2089a21bfc1be1a1fb0fe2904",
+      "size_bytes": 549263,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed3/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_high_penalty/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "08770fc56964c3ac5e93e30b2ef8802a96a31cb692d3e6424f27617eaef339a7",
+      "size_bytes": 425665,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed4/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_high_penalty/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "b78c119787d8017d40676443b7e7ea77b48b6365eb37847c2ae7b74aa0c5ed76",
+      "size_bytes": 427366,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed4/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_high_penalty/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "ce2bbae821a17c56820e7a683f57082428013fe8a0e875c3528d2d2459158d95",
+      "size_bytes": 495144,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed5/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_high_penalty/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "c82a7d3562220f91ebd43938872dd9221c2243beae5f0edb68ee79fa6391391f",
+      "size_bytes": 498202,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_high_penalty/seed5/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_train_projection/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "5ca745e900636550087d648cc65a25bf28570e43ff6440e1d881275c91d4985c",
+      "size_bytes": 299973,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed1/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_train_projection/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "e21adcf80e2670ec15a1db5ae8b6bab63a3d458754e612abdefff726f50cf44e",
+      "size_bytes": 501320,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed1/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_train_projection/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "b594c06b11cc0f43cf8d8b88c0737b16f3aa5bd06201a51eaabe36b4351c6a3c",
+      "size_bytes": 295640,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed2/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_train_projection/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "251488bcbbdb3cc6394792ff2fb3ae4ee355aa4efee97a8d7e77e76bf8125116",
+      "size_bytes": 465608,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed2/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_train_projection/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "3bce93167f807f9d6d05e4f59aaa51e45698a87168243d58ea2abfc0bd657fbd",
+      "size_bytes": 271817,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed3/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_train_projection/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "8bf48749242270c7bc636e4bdc579a0c24139ee77eb5823d10b1635460ea26e7",
+      "size_bytes": 476535,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed3/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_train_projection/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "87d06f2b07fe6f73bc0d6006e603257a4d83254d34d14f399d53bedf561fdf71",
+      "size_bytes": 287261,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed4/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_train_projection/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "ae1c85f3345c9b95493e70bbaedb979ad5e5dcdb0b3d0ae8380b6a15082d6b0d",
+      "size_bytes": 498073,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed4/projection_enabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_train_projection/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "088bffd0448333c70c2295f3714bf8c06723ad24927623741a3f1fda9fa88b6c",
+      "size_bytes": 278061,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed5/projection_disabled_trajectories.npz"
+    },
+    "core_layout_transfer/ppo_train_projection/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "e84bd76602eeddd4c77296401f6a1bcd4a2c22644b84ca2c4d44bea27bcc0e0b",
+      "size_bytes": 470676,
+      "episodes": 24,
+      "source_archive": "runs/evaluation/final/core_layout_transfer/ppo_train_projection/seed5/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_baseline/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "8d2a1a3144cbf98e6a7db193710c714545f1c13fc79ff98cd196fdfc84b77566",
+      "size_bytes": 2010543,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed1/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_baseline/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "3f618c87b5cfea8536d9741f1597e30091bbf27edc7c5fa0c703fa73f9e987b6",
+      "size_bytes": 2097596,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed1/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_baseline/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "48f60ed04e9a837b4729cb78f437d28f0488c5106676caf1aa6bc0a14fefd558",
+      "size_bytes": 1649122,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed2/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_baseline/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "9ea517ba5ddaded12dfb97acff383a73df31cfa46bdb704cc9c2e11abcc62b65",
+      "size_bytes": 1691990,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed2/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_baseline/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "f0f3dfcbdf214b8076fca2edfc3ce560d5b701387e5ac353bef740e0062af908",
+      "size_bytes": 1708478,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed3/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_baseline/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "d8d267680b21af3ea03fd37edad1313d87c8b27d5e607a8bc2b227f56fd674f2",
+      "size_bytes": 1877566,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed3/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_baseline/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "871dd52345f769682b7934e2bffc748ce9d9624d2cb1d37aa20d7940133a4acf",
+      "size_bytes": 1924767,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed4/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_baseline/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "666b2c4028c6619a97505670c69581591c4396b0af3a92af441e6cfa10970edf",
+      "size_bytes": 2073051,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed4/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_baseline/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "02e29ebaf82d7bf62c0d51db9a2393960b35053160e07c5af8f3319eb867d7f0",
+      "size_bytes": 1707005,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed5/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_baseline/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "e7a4ea12eaa76952446d71d55021247cd3bcf4aa015637f8dd5c5eb3bbdc3e4c",
+      "size_bytes": 1878007,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_baseline/seed5/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_high_penalty/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "37dc62e2bc68bc4472d19100c88d0e7ce05897e98f680c2cd6731a30c590430b",
+      "size_bytes": 1892238,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed1/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_high_penalty/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "47e53932277dc856b31e3ca31ea0498fe678ed5af68dcbf3c1444997fe8cf7b5",
+      "size_bytes": 1952332,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed1/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_high_penalty/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "5a15a4865b649bcdfe0c2e76fcdd7fb1e21fbd832d02fa69ef6deaa5b5c04eb9",
+      "size_bytes": 1693025,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed2/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_high_penalty/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "4f9ecf279755edf1b0b479e1e9f6fcc7cafe597324eb442d839b1418a2ef0838",
+      "size_bytes": 1782330,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed2/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_high_penalty/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "652ff2f6c3747f0c380461ef8321384caebd7492c72f6b13c8418bebe066bbd1",
+      "size_bytes": 1878841,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed3/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_high_penalty/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "b715ecc237fa8b9b4d6b84929cc659a412777d0180145d79da26e7d19929552a",
+      "size_bytes": 2001845,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed3/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_high_penalty/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "c0765cfc31da416cd77e7b3b2881fd56910ba35eb96fcce74ae25f646240c8c0",
+      "size_bytes": 1672763,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed4/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_high_penalty/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "205b9ba00dc57ca44dd2cbfb9427072600fca9904164c80516758be8681b76b4",
+      "size_bytes": 1839727,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed4/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_high_penalty/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "3ac4c0e8f127b77fc480c9fccd1b9995c63eacff424299332bc1e9dee20db70a",
+      "size_bytes": 1816061,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed5/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_high_penalty/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "a1d727ee518e55e2852caadd991d9f158ac0fb469b1cd11cb68dc7f2b53ffc55",
+      "size_bytes": 1882122,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_high_penalty/seed5/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_train_projection/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "94eb03b7c3e7363c0c8bcd6e6e97bcf3742f67047184542e95eb5009f0ec6ff7",
+      "size_bytes": 1084613,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed1/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_train_projection/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "e7a0591fd1978ee91be4bfe36f98c350e16a82e1978b80cbe6728eff2630d9a4",
+      "size_bytes": 1749950,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed1/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_train_projection/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "3293fa2f0bae8c0bb7749598c64a2a65758058dd48ac2b5eb79db319d98c460f",
+      "size_bytes": 1101207,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed2/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_train_projection/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "da159d061ec1c6d6cfceda70a19d17872bfaafa3010a8690e501d2eae7c46888",
+      "size_bytes": 1639742,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed2/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_train_projection/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "f01563ce862809c065d6e9cd39093378bf160e220d4b87ff9e2fd8385adfddd3",
+      "size_bytes": 1152363,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed3/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_train_projection/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "4788979b6615df129b60e9544b0ca680e3c5c65b854aa10cee26f7b93eeb7009",
+      "size_bytes": 1589548,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed3/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_train_projection/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "7506b70ddaed5e4dfd6904799e586d1d77fab1df4728fe6473665c208d006189",
+      "size_bytes": 1175521,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed4/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_train_projection/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "b03e9ea66d3797890f4e8430c01540aed3f2bcf678ebd91fc46dff572b2c3f3e",
+      "size_bytes": 1615629,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed4/projection_enabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_train_projection/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "5d528978ae161d23bfc143a34f25afcae426297ce6d266796490f8c5056779e2",
+      "size_bytes": 1190303,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed5/projection_disabled_trajectories.npz"
+    },
+    "fixed_training_geometry/ppo_train_projection/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "38bcf0231e45e808329bfacc0f8edcce417e6498786f3c34e7dd9791428b625a",
+      "size_bytes": 1594660,
+      "episodes": 100,
+      "source_archive": "runs/evaluation/final/fixed_training_geometry/ppo_train_projection/seed5/projection_enabled_trajectories.npz"
+    }
+  },
+  "counts": {
+    "archives": 60,
+    "episodes": 3720,
+    "pairs": 1860
+  },
+  "total_archive_bytes": 64335285
+}

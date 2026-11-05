@@ -22,7 +22,7 @@ from urllib.parse import parse_qs, urlsplit
 import webbrowser
 import zipfile
 
-from data import catalog, load_pair, outcome
+from data import catalog, load_pair, outcome, SOURCES, SOURCE_LABELS
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -41,9 +41,10 @@ def json_bytes(value):
 class ViewerState:
     """Read-only recording access and separately managed video exports."""
 
-    def __init__(self, root):
+    def __init__(self, root, source="auto"):
         self.root = Path(root).resolve()
-        records = catalog(self.root)
+        records = catalog(self.root, source=source)
+        self.data_source = records[0]["data_source"]
         self.records = [r for r in records if r["available"]]
         self.missing = len(records) - len(self.records)
         self.token = secrets.token_urlsafe(32)
@@ -67,6 +68,7 @@ class ViewerState:
     def catalog_payload(self):
         return {"records": [self.public_record(i) for i in range(len(self.records))],
                 "total": len(self.records), "unavailable": self.missing,
+                "data_source": self.data_source, "source_label": SOURCE_LABELS[self.data_source],
                 "token": self.token, "video_export_available": bool(shutil.which("ffmpeg"))}
 
     def pair_bytes(self, index):
@@ -76,7 +78,7 @@ class ViewerState:
                 self.cache.move_to_end(index)
                 return self.cache[index]
         pair = load_pair(self.root, record["suite"], record["method"],
-                         record["train_seed"], record["episode"], record=record)
+                         record["train_seed"], record["episode"], record=record, source=self.data_source)
         payload = []
         for data in pair:
             steps = len(data["positions"]) - 1
@@ -132,7 +134,7 @@ class ViewerState:
         command = [sys.executable, str(HERE / "render.py"), "--repo-root", str(self.root),
                    "--suite", record["suite"], "--method", record["method"],
                    "--train-seed", str(record["train_seed"]), "--episode", str(record["episode"]),
-                   "--output-dir", str(folder)]
+                   "--data-source", self.data_source, "--output-dir", str(folder)]
         try:
             environment = dict(os.environ, PYTHONDONTWRITEBYTECODE="1",
                                MPLCONFIGDIR=str(folder / "matplotlib_cache"))
@@ -299,6 +301,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=ROOT,
                         help="Defaults to the repository containing visualization/trajectory_viewer.")
+    parser.add_argument("--data-source", choices=SOURCES, default="auto",
+                        help="auto uses the published bundle when present, otherwise local runs; never mixes sources.")
     parser.add_argument("--port", type=int, default=0, help="Local port; 0 chooses an available port.")
     parser.add_argument("--no-browser", action="store_true", help="Print the URL without opening a browser.")
     args = parser.parse_args()
@@ -307,11 +311,12 @@ def main():
     if not (HERE / "viewer.html").is_file():
         parser.error("viewer.html is missing. Copy all files from the viewer overlay.")
     try:
-        state = ViewerState(args.repo_root)
+        state = ViewerState(args.repo_root, source=args.data_source)
         server = ViewerServer(state, args.port)
     except (OSError, ValueError) as error:
         parser.exit(1, f"Cannot open the trajectory viewer: {error}\n")
     print(f"PAP trajectory explorer: {server.origin}", flush=True)
+    print(SOURCE_LABELS[state.data_source], flush=True)
     print(f"{len(state.records):,} recorded pairs. Keep this terminal open; press Ctrl+C to stop.", flush=True)
     if state.missing:
         print(f"{state.missing:,} pairs are unavailable because trajectory archives are missing.", flush=True)
