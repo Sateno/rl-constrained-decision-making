@@ -18,24 +18,47 @@ local-server tests. These use synthetic recordings and mocked video rendering;
 they require neither the preserved run archives nor FFmpeg.
 
 All `runs/` files remain excluded from Git and preserved in local archives.
+The 60 final-evaluation trajectory archives also have byte-identical published
+copies under `results/trajectories/pap_evaluation_v1/`. Those versioned copies
+are required repository files, so playback and trajectory verification work
+without restoring `runs/`.
 If the previous package caused them to be staged, unstage `runs/` in your editor.
 Changing ignore rules alone does not remove an already staged file. Preserve
 all local files; `runs/` is not part of the filesystem deletion list.
 
 The normal verifier checks:
 
-- the 191-file repository inventory and audited content, including source,
+- the manifest-defined repository inventory and audited content, including source,
   protocols, environment specification, curated results, and documentation;
 - the three externally compiled manual PDFs and exact staged/working bytes;
 - absence of tracked `runs/` files and retired source/production trees;
 - protected runtime and protocols against the local `main` reference;
 - all 3,000 fixed and 720 transfer rows, design coverage, recorded model
   identities, OFF/ON pairing, and reconstruction of the suite summary tables;
+- the published trajectory bundle's exact hashes, provenance, complete episode
+  coverage, and agreement between recorded arrays and the endpoint tables;
 - active Markdown links and the exact staged file inventory/content.
 
 Before staging, omit `--require-tracked` to inspect the working files. Tracked
 run files are rejected in either mode. The base comparison uses the local Git
 reference and does not query the live remote.
+
+## Published trajectory bundle only
+
+```sh
+python -m evaluation.verify_trajectory_bundle
+```
+
+This reads the manifest and all 60 NPZ files under
+`results/trajectories/pap_evaluation_v1/`, checks their hashes and correspondence
+with the 3,720 published episode rows, and verifies the saved trajectory data.
+It performs no training, policy evaluation, or QP solve. The default repository
+verifier also runs this check when the release manifest declares the bundle.
+
+The bundle preserves the original endpoint-collision contract and labels. Its
+verification establishes consistency with those recorded results, not physical
+safety or a later swept-collision reanalysis. Do not regenerate data or hashes
+to make a failed check pass; locate the changed or missing artifact first.
 
 ## Optional local archive verification
 
@@ -56,8 +79,9 @@ This additionally verifies all archive checksums, the 60 final raw CSVs and
 hashes/configurations/finite parameters, the TensorBoard scalar/episode/rollout
 exports, and recorded solver exposure. It prints `LOCAL_ARCHIVE PASS` followed
 by the repository result. It never stages, deletes, or changes the archive.
-Omitting this option verifies the repository only; it makes no claim to have
-checked raw files absent from a public checkout.
+Omitting this option still verifies the committed trajectory bundle, but makes
+no claim to have checked checkpoint files, raw CSVs, TensorBoard events or other
+raw artifacts absent from a public checkout.
 
 ## Optional separate paper comparison
 
@@ -81,7 +105,8 @@ CPU validation environment. No CUDA hardware or TeX installation is needed for
 the repository checks. The historical pre-experiment runner remains a
 development tool and is not an additional merge gate.
 
-The repository supports rerunning the specified study and reproducing its
-numerical analysis from curated tables. Exact historical trajectories, trained
-parameters, and raw-log reconstructions require the separately preserved
-archive. A new training run is not guaranteed to reproduce historical bytes.
+The repository supports replaying the exact recorded final-evaluation
+trajectories and reproducing numerical analysis from curated tables. Trained
+parameters, raw CSV comparisons and raw-log reconstructions require the
+separately preserved archive. A new training run is not guaranteed to reproduce
+historical bytes.

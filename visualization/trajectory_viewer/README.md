@@ -6,7 +6,7 @@ An offline, browser-based viewer for matched Projection OFF / ON recordings. The
 
 The explorer is included in this repository under `visualization/trajectory_viewer/`. It requires Python, NumPy, and Matplotlib, plus a browser. FFmpeg is needed only for MP4 export.
 
-Playback also requires the preserved final-evaluation trajectory archives and their matching episode-result tables. A fresh Git checkout contains the tables but does not include the archives under `runs/`; restore those archives using the paths in [Data and display contract](#data-and-display-contract).
+A fresh Git checkout includes the matching episode tables and all 60 final-evaluation trajectory archives under `results/trajectories/pap_evaluation_v1/`. These contain 3,720 recorded episodes, or 1,860 OFF/ON pairs. No checkpoint weights or local `runs/` directory are needed for playback.
 
 From your repository root, with your Python environment active, install the viewer dependencies and launch it:
 
@@ -28,6 +28,19 @@ python visualization/trajectory_viewer/viewer.py --repo-root PATH --no-browser
 ```
 
 `--port 8765` optionally chooses a fixed local port. By default an available port is selected automatically.
+
+## Recorded data source
+
+The default `--data-source auto` uses the published bundle when its manifest exists. If there is no bundle manifest, it supports the legacy local archive under `runs/evaluation/final/`. Select a source explicitly when needed:
+
+```powershell
+python visualization/trajectory_viewer/viewer.py --data-source published
+python visualization/trajectory_viewer/viewer.py --data-source local
+```
+
+`published` requires the versioned bundle. `local` requires the preserved final-evaluation archives matching the committed episode tables. It does not index arbitrary new training runs or unrelated evaluations. The viewer selects one source for the entire session, with no mixing or silent fallback when published files are missing or altered. The interface identifies the selected source.
+
+The [bundle guide](../../results/trajectories/pap_evaluation_v1/README.md) describes provenance and the historical evaluation contract. These are unchanged original recordings, including their historical endpoint-collision labels. Replaying them does not rerun a policy or apply later swept-collision corrections. Keep the original archives and published bundle intact; newly generated evaluations belong in separate local outputs.
 
 ## Browse and play
 
@@ -59,7 +72,7 @@ conda install -c conda-forge ffmpeg
 The downloaded ZIP contains:
 
 - `PAP_Recorded_Trajectories_3D.mp4`
-- `selected_episodes.json`, recording archive paths and SHA-256 hashes, checkpoint hash, suite, episode, evaluation seed, layout and outcomes.
+- `selected_episodes.json`, recording the selected data source, archive paths and SHA-256 hashes, checkpoint hash, suite, episode, evaluation seed, layout and outcomes.
 - `export.log`, containing the renderer's diagnostics.
 
 When the ZIP is ready, the interface requests its download automatically and leaves a **Download ZIP** link available if the browser blocks or postpones the automatic download. “Download requested” does not confirm that the browser has saved the file; check the browser's downloads list. If rendering fails, **Download export log** provides the available diagnostic log.
@@ -74,11 +87,12 @@ python visualization/trajectory_viewer/render.py --output-dir "$HOME/Downloads/P
 python visualization/trajectory_viewer/render.py --suite core_layout_transfer --method ppo_baseline --train-seed 2 --episode 8 --output-dir "$HOME/Downloads/PAP_baseline_seed2_episode8"
 ```
 
-Its default episode selection reproduces the three original examples: projection-trained PPO, seed 1; fixed episode 2 and transfer episodes 6 and 8. Episode numbers are zero-based. This standalone script is unchanged: it writes directly to `--output-dir`, does not create a download ZIP, and overwrites existing output files in that directory. If `--output-dir` is omitted, it still defaults to the repository's `trajectory_exports/` folder. Always supply an external output directory to keep command-line renders outside the repository; browser exports already do this automatically.
+Its default episode selection reproduces the three original examples: projection-trained PPO, seed 1; fixed episode 2 and transfer episodes 6 and 8. Episode numbers are zero-based. The renderer accepts the same `--data-source auto|published|local` option, and browser exports use the source selected for that viewer session. The standalone script writes directly to `--output-dir`, does not create a download ZIP, and overwrites existing output files in that directory. If `--output-dir` is omitted, it still defaults to the repository's `trajectory_exports/` folder. Always supply an external output directory to keep command-line renders outside the repository; browser exports already do this automatically.
 
 ## Data and display contract
 
-- Reads `results/tables/<suite>/evaluation_episode_results.csv` and `runs/evaluation/final/<suite>/<method>/seed<N>/projection_{disabled,enabled}_trajectories.npz`.
+- Reads `results/tables/<suite>/evaluation_episode_results.csv` and `<archive-root>/<suite>/<method>/seed<N>/projection_{disabled,enabled}_trajectories.npz`. The published archive root is `results/trajectories/pap_evaluation_v1/`; the local root is `runs/evaluation/final/`.
+- For the published source, verifies the bundle manifest and episode-table hashes before cataloguing, and checks the selected archives' exact bytes against their manifest hashes and sizes before loading. Text hashes normalize CRLF to LF; archive hashes do not normalize any bytes.
 - Validates archive schema, checkpoint identity, evaluation seed, initial pose, geometry, state/transition alignment, policy mode, projection mode and terminal outcomes against the CSV.
 - Each controller follows its own recorded observations and actions. Pairing does not imply that the raw action sequences remain identical after the paths diverge.
 - Positions are linearly interpolated for display; headings follow the shortest angular arc. Interpolated frames are not newly simulated states.
@@ -87,7 +101,7 @@ Its default episode selection reproduces the three original examples: projection
 - Intervention and maximum slack refer to the latest completed transition, not the next transition being interpolated. Slack has barrier-residual units, not metres or collision probability.
 - Recording files are read-only. Restart the viewer after changing source evaluation files, since the catalog and up to four loaded pairs are cached for the session.
 
-This add-on contains no paper sources, evaluation data copies, checkpoints, or generated videos.
+The viewer code contains no paper sources, checkpoints, or generated videos. Published evaluation arrays are stored separately under `results/trajectories/`, not inside the viewer implementation.
 
 ## Code checks
 
@@ -96,6 +110,7 @@ Run from the repository root:
 ```powershell
 python -m unittest discover -s visualization/trajectory_viewer/tests -v
 python -m compileall -q visualization/trajectory_viewer
+python -m evaluation.verify_trajectory_bundle
 ```
 
-The tests use small synthetic archives and do not rerun evaluation. Browser checks for this release used the supplied recordings, including both evaluation suites and the collision → success and collision → timeout examples. The interface was checked in headless Chromium at desktop and narrow widths; native Windows browser appearance was not directly tested here.
+The unit tests use small synthetic archives and do not rerun evaluation. The bundle verifier checks all published archive hashes and trajectory/table agreement using saved arrays only. Neither requires a policy rollout or QP solve. The earlier interface checks used the supplied recordings in headless Chromium at desktop and narrow widths; native Windows browser appearance was not directly tested in those checks.

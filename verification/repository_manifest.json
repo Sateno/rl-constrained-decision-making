@@ -86,7 +86,8 @@
     "verification/README.md",
     "docs/records/final_study_record.md",
     "docs/records/repository_release_audit.md",
-    "visualization/trajectory_viewer/README.md"
+    "visualization/trajectory_viewer/README.md",
+    "results/trajectories/pap_evaluation_v1/README.md"
   ],
   "files": {
     ".gitattributes": {
@@ -102,7 +103,7 @@
       "text": true
     },
     "README.md": {
-      "sha256": "ff8e6eb9c137f05648c287e5f72821dca05372fe2994313ed88c0cb2065e134c",
+      "sha256": "9b7c247f2e9baeaeb6997f19d000e9688578230d32265ae3a15a32a54f2a4847",
       "text": true
     },
     "THIRD_PARTY_NOTICES.md": {
@@ -258,7 +259,7 @@
       "text": true
     },
     "docs/validation/release_verification.md": {
-      "sha256": "dfb8baae5167537054adea2da373e08beda27abbc0f41dc9a72dad3f97e82d37",
+      "sha256": "47bac8ed53e420e0d5ca7401b7b35139917f12d087a6248c0786c11d6e91c4b1",
       "text": true
     },
     "docs/validation/runtime_validation.md": {
@@ -338,7 +339,11 @@
       "text": true
     },
     "evaluation/verify_repository_release.py": {
-      "sha256": "4d61455d41ac40bfd22c2f738888bdfb8669d6a402cbeb2182c982ef44a3591d",
+      "sha256": "950ce69e400781c4ecc94ca1b382592a722742127b33eb7d8810fb362c24ce4e",
+      "text": true
+    },
+    "evaluation/verify_trajectory_bundle.py": {
+      "sha256": "90f85cae5b2d21daa081a8d6cb106766dc2fb795fbac26ef662c1ff6f358579a",
       "text": true
     },
     "experiments/__init__.py": {
@@ -689,6 +694,254 @@
       "sha256": "17cba92be1e501afb28ee838515569b7afcadd7d295dd0280a6f2d11fdedac1f",
       "text": true
     },
+    "results/trajectories/pap_evaluation_v1/README.md": {
+      "sha256": "b729a31eb067131dcd2a6718ababb088aa1ca56cd23f3fb2204b964259fc68df",
+      "text": true
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_baseline/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "06ebdd75d3a785d4a9b2f273a23e624ec57945fd50ed76445824b012d0a62c9b",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_baseline/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "6af8e513977840fc9ca53a81142bb45416fe4bfcafdcb55e45a19bd78b253917",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_baseline/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "eb346df0bb972bb178065f1c7d459a2779fbddfe5a951a7425afd488f5beb5a2",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_baseline/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "bbb9b3c45c6c6497240a0657e8420d47b082d379a42410db0744656cc9c85a77",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_baseline/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "1f6a642ac78079b6deab3737ac0edb40e33376914ff4ab93f267d610adde96d3",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_baseline/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "5c840402ab90521e68c203de8ab8814e3d84939de88c7dd7dc21b3018a4fe8d5",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_baseline/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "a5e71f029bd4e34f59add16031791f5ff3d56bfd53b9684f61a30754eef9b3eb",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_baseline/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "f62d7ea8f3b282ddb2a5f9aa2bfb647f31b6f350b1c3c7069694f376f1b26f4f",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_baseline/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "e68b60c17b0b5e280520b1346b5eb8eb5694e6f8c4271c8bf6ed60bf95b5d0ef",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_baseline/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "1298bdd4782fd5e25d23f176c3ee0b3fc583aaa5d6b7806de385039f897cedaa",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_high_penalty/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "59f6a6a4b24532750fe4d4e42319779533220e811d8449db54830234fe16a713",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_high_penalty/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "bbe9bbe2fbf97ea1f1f64ee53636d2861ee62c5b8c08e4671f3305d622273dd4",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_high_penalty/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "6041966413e75397f1008554beac353ba5207d993e5f041d0bb4c8eb830184f2",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_high_penalty/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "04f82b39737cb7c18e7c8fb31cb36744d910ff9dc0a909fa3b39335e9ae30013",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_high_penalty/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "350a30755f79e80e9a9404b37e44f46c3937977cb37134c5f17a1fea91718b99",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_high_penalty/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "f369c1ed5193a9d669beeb37bda849cea7e57ac2089a21bfc1be1a1fb0fe2904",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_high_penalty/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "08770fc56964c3ac5e93e30b2ef8802a96a31cb692d3e6424f27617eaef339a7",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_high_penalty/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "b78c119787d8017d40676443b7e7ea77b48b6365eb37847c2ae7b74aa0c5ed76",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_high_penalty/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "ce2bbae821a17c56820e7a683f57082428013fe8a0e875c3528d2d2459158d95",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_high_penalty/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "c82a7d3562220f91ebd43938872dd9221c2243beae5f0edb68ee79fa6391391f",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_train_projection/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "5ca745e900636550087d648cc65a25bf28570e43ff6440e1d881275c91d4985c",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_train_projection/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "e21adcf80e2670ec15a1db5ae8b6bab63a3d458754e612abdefff726f50cf44e",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_train_projection/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "b594c06b11cc0f43cf8d8b88c0737b16f3aa5bd06201a51eaabe36b4351c6a3c",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_train_projection/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "251488bcbbdb3cc6394792ff2fb3ae4ee355aa4efee97a8d7e77e76bf8125116",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_train_projection/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "3bce93167f807f9d6d05e4f59aaa51e45698a87168243d58ea2abfc0bd657fbd",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_train_projection/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "8bf48749242270c7bc636e4bdc579a0c24139ee77eb5823d10b1635460ea26e7",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_train_projection/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "87d06f2b07fe6f73bc0d6006e603257a4d83254d34d14f399d53bedf561fdf71",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_train_projection/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "ae1c85f3345c9b95493e70bbaedb979ad5e5dcdb0b3d0ae8380b6a15082d6b0d",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_train_projection/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "088bffd0448333c70c2295f3714bf8c06723ad24927623741a3f1fda9fa88b6c",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/core_layout_transfer/ppo_train_projection/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "e84bd76602eeddd4c77296401f6a1bcd4a2c22644b84ca2c4d44bea27bcc0e0b",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_baseline/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "8d2a1a3144cbf98e6a7db193710c714545f1c13fc79ff98cd196fdfc84b77566",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_baseline/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "3f618c87b5cfea8536d9741f1597e30091bbf27edc7c5fa0c703fa73f9e987b6",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_baseline/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "48f60ed04e9a837b4729cb78f437d28f0488c5106676caf1aa6bc0a14fefd558",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_baseline/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "9ea517ba5ddaded12dfb97acff383a73df31cfa46bdb704cc9c2e11abcc62b65",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_baseline/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "f0f3dfcbdf214b8076fca2edfc3ce560d5b701387e5ac353bef740e0062af908",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_baseline/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "d8d267680b21af3ea03fd37edad1313d87c8b27d5e607a8bc2b227f56fd674f2",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_baseline/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "871dd52345f769682b7934e2bffc748ce9d9624d2cb1d37aa20d7940133a4acf",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_baseline/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "666b2c4028c6619a97505670c69581591c4396b0af3a92af441e6cfa10970edf",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_baseline/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "02e29ebaf82d7bf62c0d51db9a2393960b35053160e07c5af8f3319eb867d7f0",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_baseline/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "e7a4ea12eaa76952446d71d55021247cd3bcf4aa015637f8dd5c5eb3bbdc3e4c",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_high_penalty/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "37dc62e2bc68bc4472d19100c88d0e7ce05897e98f680c2cd6731a30c590430b",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_high_penalty/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "47e53932277dc856b31e3ca31ea0498fe678ed5af68dcbf3c1444997fe8cf7b5",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_high_penalty/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "5a15a4865b649bcdfe0c2e76fcdd7fb1e21fbd832d02fa69ef6deaa5b5c04eb9",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_high_penalty/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "4f9ecf279755edf1b0b479e1e9f6fcc7cafe597324eb442d839b1418a2ef0838",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_high_penalty/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "652ff2f6c3747f0c380461ef8321384caebd7492c72f6b13c8418bebe066bbd1",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_high_penalty/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "b715ecc237fa8b9b4d6b84929cc659a412777d0180145d79da26e7d19929552a",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_high_penalty/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "c0765cfc31da416cd77e7b3b2881fd56910ba35eb96fcce74ae25f646240c8c0",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_high_penalty/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "205b9ba00dc57ca44dd2cbfb9427072600fca9904164c80516758be8681b76b4",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_high_penalty/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "3ac4c0e8f127b77fc480c9fccd1b9995c63eacff424299332bc1e9dee20db70a",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_high_penalty/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "a1d727ee518e55e2852caadd991d9f158ac0fb469b1cd11cb68dc7f2b53ffc55",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_train_projection/seed1/projection_disabled_trajectories.npz": {
+      "sha256": "94eb03b7c3e7363c0c8bcd6e6e97bcf3742f67047184542e95eb5009f0ec6ff7",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_train_projection/seed1/projection_enabled_trajectories.npz": {
+      "sha256": "e7a0591fd1978ee91be4bfe36f98c350e16a82e1978b80cbe6728eff2630d9a4",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_train_projection/seed2/projection_disabled_trajectories.npz": {
+      "sha256": "3293fa2f0bae8c0bb7749598c64a2a65758058dd48ac2b5eb79db319d98c460f",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_train_projection/seed2/projection_enabled_trajectories.npz": {
+      "sha256": "da159d061ec1c6d6cfceda70a19d17872bfaafa3010a8690e501d2eae7c46888",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_train_projection/seed3/projection_disabled_trajectories.npz": {
+      "sha256": "f01563ce862809c065d6e9cd39093378bf160e220d4b87ff9e2fd8385adfddd3",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_train_projection/seed3/projection_enabled_trajectories.npz": {
+      "sha256": "4788979b6615df129b60e9544b0ca680e3c5c65b854aa10cee26f7b93eeb7009",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_train_projection/seed4/projection_disabled_trajectories.npz": {
+      "sha256": "7506b70ddaed5e4dfd6904799e586d1d77fab1df4728fe6473665c208d006189",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_train_projection/seed4/projection_enabled_trajectories.npz": {
+      "sha256": "b03e9ea66d3797890f4e8430c01540aed3f2bcf678ebd91fc46dff572b2c3f3e",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_train_projection/seed5/projection_disabled_trajectories.npz": {
+      "sha256": "5d528978ae161d23bfc143a34f25afcae426297ce6d266796490f8c5056779e2",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/fixed_training_geometry/ppo_train_projection/seed5/projection_enabled_trajectories.npz": {
+      "sha256": "38bcf0231e45e808329bfacc0f8edcce417e6498786f3c34e7dd9791428b625a",
+      "text": false
+    },
+    "results/trajectories/pap_evaluation_v1/manifest.json": {
+      "sha256": "4f8e114d052f643c96f08a0d5ddceef0f4e6f529be3d36f3f5c3d9dc28e5743c",
+      "text": true
+    },
     "scripts/benchmark_training_devices.bat": {
       "sha256": "0a2390fc58898b1ca6eaf5e6638937997d7484599940c50ef4569622559ddda4",
       "text": true
@@ -793,8 +1046,12 @@
       "sha256": "f83086bb1ac7e1e6acc05a737f02bd3350779f51f4cefe5abb8d06e8f4be6749",
       "text": true
     },
+    "tests/test_trajectory_bundle.py": {
+      "sha256": "4f5f8b64a2f459ac9b9a414429c2e997d0eca43c74a3531b7fb27b817f84d7f3",
+      "text": true
+    },
     "verification/README.md": {
-      "sha256": "caca50a4895eb6ac12430f2d923adc55e605daed8567f7752cfad7ab216b0dea",
+      "sha256": "9f60c62aaa62d893c7a35b710494119e186e6c95548a663282a9d54b5f72f77d",
       "text": true
     },
     "verification/audit_environment.json": {
@@ -802,11 +1059,11 @@
       "text": true
     },
     "visualization/trajectory_viewer/README.md": {
-      "sha256": "5c5bd30ff5f22dd25eeccdc2f3a0fb99e13b85c7d1ee8e6c6fb6365c3e24660d",
+      "sha256": "9bf019607cc053dab6769f0cddde203d00f9d4863d6c990974367b55f37466d0",
       "text": true
     },
     "visualization/trajectory_viewer/data.py": {
-      "sha256": "52939bee337b883a3102b4bd983e78770dfa7f63afee407fa9c00c5612986c8e",
+      "sha256": "b28308099a32fdfac8e3c6ffb323c5c5f3c265f4eaa62aa6770f980dabd774ff",
       "text": true
     },
     "visualization/trajectory_viewer/launch_viewer.bat": {
@@ -814,7 +1071,7 @@
       "text": true
     },
     "visualization/trajectory_viewer/render.py": {
-      "sha256": "8b0cd75c38519791b01d2264421a72c6e3bb6ddb2a05bbf4557f1fa4c7f872f9",
+      "sha256": "a67b35cebdf8beca7f5c14706ab9ed51a758b8df0f92422d04d972b58acd1e7d",
       "text": true
     },
     "visualization/trajectory_viewer/requirements.txt": {
@@ -822,19 +1079,19 @@
       "text": true
     },
     "visualization/trajectory_viewer/tests/test_data.py": {
-      "sha256": "47bf5d28136a0e16d41b0f00050d54735e1b4e16602152861b526f380c90ed8e",
+      "sha256": "f88d90235647be46b46a7d9531ca05916bf76743da1f1af372ab1bb4adc302f1",
       "text": true
     },
     "visualization/trajectory_viewer/tests/test_viewer.py": {
-      "sha256": "1e57874a6a34b8ee1592da55060e50a679e494e668586c976e142c7e290c4e3e",
+      "sha256": "e5aaaedff45258ae0fb8d36f1e939e36b401859241ec8c742a747bebdc372e2f",
       "text": true
     },
     "visualization/trajectory_viewer/viewer.html": {
-      "sha256": "4dfadb802e05a65136eb69f11c4a15ddc246e9bcecc255aefb90397c81662e5a",
+      "sha256": "d4a8e545f92f20f5bb09d0460d6a071e0d0b64f982d6c43cdd24db4dd2689026",
       "text": true
     },
     "visualization/trajectory_viewer/viewer.py": {
-      "sha256": "07056e14e8831c22598a00cf34223921dd99fa88cadaf276fb57d61aed07de51",
+      "sha256": "1fbec50709981fc90feef2aa4fd226b776b393179ba07c17c0e83167f2c29bd8",
       "text": true
     }
   },
@@ -1577,5 +1834,11 @@
       "sha256": "c6f2d3086498152e9441873f1eed746d7fb3ad0244db7db878b7e52994350a67",
       "text": true
     }
+  },
+  "trajectory_bundle": "results/trajectories/pap_evaluation_v1",
+  "trajectory_bundle_packaging": {
+    "date": "2026-10-30",
+    "base_commit": "65a312db670e82d2a186bb1f7afb83d64c2484c3",
+    "note": "Byte-identical copies of the original 60 final-evaluation NPZ archives are included as a versioned replay dataset. Original archive provenance and scientific tables remain unchanged."
   }
 }

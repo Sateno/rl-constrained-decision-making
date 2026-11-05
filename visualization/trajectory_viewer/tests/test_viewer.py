@@ -86,6 +86,26 @@ class ViewerTests(unittest.TestCase):
         self.assertEqual(missing["total"], 0)
         self.assertEqual(missing["unavailable"], 1)
 
+    def test_published_source_is_displayed_and_passed_to_export(self):
+        fixtures.publish_fixture(self.fixture)
+        state = viewer.ViewerState(self.fixture.root)
+        self.addCleanup(state.close)
+        self.assertEqual(state.catalog_payload()["data_source"], "published")
+        self.assertIn("original recorded outcomes", state.catalog_payload()["source_label"])
+        self.assertEqual(json.loads(state.pair_bytes(0))["pair"][0]["outcome"], "SUCCESS")
+        state.records[0]["suite"] = "core_layout_transfer"
+        commands = []
+        def fake_renderer(command, **kwargs):
+            commands.append(command)
+            return self.write_fake_export(command, **kwargs)
+        with mock.patch.object(viewer.shutil, "which", return_value="ffmpeg"), \
+             mock.patch.object(viewer.subprocess, "run", side_effect=fake_renderer):
+            job = state.start_export(0)
+            for worker in state._workers:
+                worker.join(timeout=5)
+            self.assertEqual(state.job(job["id"])["status"], "done")
+        self.assertEqual(commands[0][commands[0].index("--data-source") + 1], "published")
+
     def test_rejects_invalid_pair_ids(self):
         for value in (-1, 1, "0", 0.0, True, None):
             with self.subTest(value=value), self.assertRaises(ValueError):
@@ -146,6 +166,7 @@ class ViewerTests(unittest.TestCase):
             "method": command[command.index("--method") + 1],
             "train_seed": int(command[command.index("--train-seed") + 1]),
             "episode": int(command[command.index("--episode") + 1]),
+            "data_source": command[command.index("--data-source") + 1],
         }))
         kwargs["stdout"].write("Fixture renderer completed.\n")
         return mock.Mock(returncode=0)
@@ -198,7 +219,7 @@ class ViewerTests(unittest.TestCase):
         command, kwargs = called[0]
         for option, value in (("--suite", "core_layout_transfer"),
                               ("--method", "ppo_train_projection"),
-                              ("--train-seed", "4"), ("--episode", "8")):
+                              ("--train-seed", "4"), ("--episode", "8"), ("--data-source", "local")):
             self.assertEqual(command[command.index(option) + 1], value)
         self.assertEqual(done["pair_id"], 1)
         folder = Path(command[command.index("--output-dir") + 1])
@@ -219,7 +240,8 @@ class ViewerTests(unittest.TestCase):
             self.assertIn(b"Fixture renderer completed.", archive.read("export.log"))
             manifest = json.loads(archive.read("selected_episodes.json"))
             self.assertEqual(manifest, {"suite": "core_layout_transfer",
-                "method": "ppo_train_projection", "train_seed": 4, "episode": 8})
+                "method": "ppo_train_projection", "train_seed": 4, "episode": 8,
+                "data_source": "local"})
         self.assertEqual(self.repository_snapshot(), snapshot)
         self.state.close()
         self.assertFalse(folder.exists())
